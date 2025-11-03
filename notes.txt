@@ -1,0 +1,27 @@
+TODO
+
+    almost certainly won't work in 24 bit mode
+        fpsp/isp are after the 1MB ROM mapping boundary (80000 - 8FFFFF)
+
+    Need to correctly handled the new exception stack frame in slot manager 
+        PATCH_SLOTMGR_BERR_HACK
+
+    Need to replace ptestr in FLUSHCRANGE
+        right now we just blow away the entire cache
+
+    finder crashes with cache enabled at boot but can enable after boot (?)
+
+#########################################################################
+Code snips
+
+
+InitIopMgrPatch:
+    
+   /* movem.l  %a0-%a1, -(%sp)| preserve registers. don't care about a0 
+	movec.l %VBR, %a0
+    lea _060_isp_unimp, %a1
+    move.l %a1, vectUnimpInteger(%a0)
+    movem.l  (%sp)+,%a0-%a1*/
+
+   |MOVEQ	#true32b,%D0					| set 32-bit addressing mode	
+	|_SwapMMUMode	

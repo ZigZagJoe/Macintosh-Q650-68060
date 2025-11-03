@@ -1,0 +1,28 @@
+
+Discarded input sections
+
+ .data          0x0000000000000000        0x0 obj/src/F1ACAD13.o
+ .bss           0x0000000000000000        0x0 obj/src/F1ACAD13.o
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+ROM              0x0000000040800000 0x0000000000800000 xr
+*default*        0x0000000000000000 0xffffffffffffffff
+
+Linker script and memory map
+
+
+/DISCARD/
+ *(.comment)
+
+.text           0x0000000040800000   0x10f090
+ *F1ACAD13.o(.text)
+ .text          0x0000000040800000   0x10f090 obj/src/F1ACAD13.o
+                0x0000000040800000                BASEOFROM
+                0x0000000040900000                ROMEND
+
+/DISCARD/
+ *(*)
+LOAD obj/src/F1ACAD13.o
+OUTPUT(obj/Q650.ROM binary)
