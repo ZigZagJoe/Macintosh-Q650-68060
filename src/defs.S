@@ -7,8 +7,8 @@
 #define PATCH_NOCHECKSUM        // no ROM checksum
 #define PATCH_ROM_MAP_8MB       // map 8MB of ROM space. note 24 bit mode only has 1MB addr space
 #define PATCH_SLOTMGR_BERR_HACK // assume any bus errors are slot manager's fault (TODO)
-#define PATCH_FLUSHCRANGE       // cache flush hack (avoid ptestr) - TODO
-//#define PATCH_BADDIVIDES      // ugly hack out the early 64/32 divides
+#define PATCH_FLUSHCRANGE       // cache flush hack (avoid ptestr) (TODO)
+//#define PATCH_BADDIVIDES      // ugly hack out the early 64/32 divides in sound stuff
 
 #define INITIAL_PC 0x0000002A
 
