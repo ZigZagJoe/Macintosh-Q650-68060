@@ -1,28 +1,23 @@
 TODO
 
-    almost certainly won't work in 24 bit mode
-        fpsp/isp are after the 1MB ROM mapping boundary (80000 - 8FFFFF)
+    almost certainly won't work in 24 bit mode as fpsp/isp are after the 1MB ROM mapping boundary (80000 - 8FFFFF) probably just have to accept that
 
-    Need to replace ptestr in FLUSHCRANGE
-        right now we just blow away the entire cache
+    branch cache probably not working
+        no change in performance noted. might be cleared somewhere
+        may need to begin clearing that at similar times to ATC?
 
-    finder crashes with cache enabled at boot but can enable after boot (?)
-        enabler?
-
-    fpsp   
+    FPU   
         no FPU detected in tattletech or speedometer
-        sane trap behavior seems odd?
-        inexact handoff to system handler? what? 
-            	move.l	($00C4).W,-(sp)			; push vector to user INEX handler <1/8/91, JPO>
-	            rts					; execute user handler <1/8/91, JPO>
+            might happen at early boot while we have the FPU disabled
+        sane trap behavior wrt 040 probably needs expansion
+            hands over to system handlers for some of the traps not used for 040 but 060 fpsp would use those
 
-    superscalar?
     bus error handling (in general)
         Need to correctly handled the new exception stack frame in slot manager  PATCH_SLOTMGR_BERR_HACK
 
 #########################################################################
-Code snips
-
+# Code snip notepad
+#########################################################################
 
 InitIopMgrPatch:
     
@@ -105,3 +100,13 @@ mainloop:
     bra  mainloop
 
 */
+
+
+true32b=1
+false32b=0
+
+.macro _SwapMMUMode
+ .short 0xA05D
+.endm
+
+

@@ -1,16 +1,25 @@
-#define INIT_68060              // NOTE: this will prevent an 040 from booting at all! 
+/* Tested patches */
 #define INSTALL_ISP             // include the ISP
-#define INSTALL_FPSP            // include the FPSP 
-#define PATCH_INSTALLFPSP       // patch installFPSP to reload ISP vectors
-#define PATCH_ROMENTRY          // patch initial entry point to set up for 68060
-#define PATCH_TMVECTORS_ISP     // patch tmVectors to point to ISP
+#define PATCH_INSTALLFPSP       // patch installFPSP to install SP vectors
+#define PATCH_TMVECTORS_ISP     // patch tmVectors (test manager ROM vectors) to point to ISP
 #define PATCH_NORAMTEST         // no memory tests
 #define PATCH_NOCHECKSUM        // no ROM checksum
 #define PATCH_ROM_MAP_8MB       // map 8MB of ROM space. note 24 bit mode only has 1MB addr space still!
-#define PATCH_SLOTMGR_BERR_HACK // assume any bus errors are slot manager's fault (TODO)
-#define PATCH_FLUSHCRANGE       // cache flush hack (avoid ptestr) (TODO)
-//#define PATCH_BADDIVIDES      // ugly hack out the early 64/32 divides in sound stuff
-#define PATCH_SANE_FLUSHIT      // cache flush hack in SANE flushit  (TODO)
+#define PATCH_FLUSHCRANGE       // cache flush replace ptest correctly
+#define PATCH_SANE_FLUSHIT      // sane cache flush replace ptest correctly
+#define ENABLE_SUPERSCALAR      // pentium-like superscalar execution
+
+/* TODOs / Unproven */
+#define PATCH_ROMENTRY          // disable 68060 FPU initially. NOTE: this will prevent an 040 from booting! 
+//#define INSTALL_FPSP            // install the FPSP and vectors and enable FPU
+#define ENABLE_BRANCH_CACHE     // enable branch prediction cache  (TODO-seems to not work)
+//#define ENABLE_LOADSTORE_FIFO   // enable load store FIFO, don't use on rev5 and earlier due to errata TODO-seems to not work)
+#define PATCH_SLOTMGR_BERR_HACK // during slot manager, assume any bus errors are slot manager's fault (TODO)
+
+/* OLD hacks, no longer needed */
+//#define PATCH_SANE_FLUSHIT_HACK   // cache flush hack in SANE flushit just flush all caches
+//#define PATCH_BADDIVIDES          // ugly hack out the early 64/32 divides in sound stuff
+//#define PATCH_FLUSHCRANGE_HACK    // cache flush hack just flush all caches
 
 #define INITIAL_PC 0x0000002A
 
@@ -51,12 +60,3 @@ FPOVFL_VEC040	=	0x1FD8
 FPSNAN_VEC040	=	0x1FDC
 
 noErr = 0	
-
-true32b=1
-false32b=0
-
-.macro _SwapMMUMode
- .short 0xA05D
-.endm
-
-

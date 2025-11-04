@@ -1,8 +1,7 @@
 myRomEntry:
-#ifdef INIT_68060 /* NOTE: this will prevent an 040 from booting at all! */
+   
     moveq #2,%d0        | disable FPU (bit 1 = 1) and superscalar execution (bit 0 = 0)
-    movec %d0, %pcr
-#endif
+    movec %d0, %pcr     | NOTE: this will prevent an 040 from booting at all! 
 
     jmp INITIAL_PC      | back to original entry
 
@@ -42,12 +41,40 @@ PatchInstallSP:
     move.l %a1, VECI_LINE1111(%a0)
 
     /* BSUN vector is not used on 060 - handled in fline */
-
-    movec %pcr, %d0     
-    bclr    #1, %d0     | clear FPU disable bit
-   | bset    #0, %d0     | enable superscalar
-    movec %d0, %pcr     
 #endif
+
+
+    movec %pcr, %d0 
+
+#ifdef INSTALL_FPSP    
+    bclr #1, %d0        | clear FPU disable bit (bit=0)
+#else
+    bset #1, %d0        | set FPU disable bit (bit=1)
+#endif
+#ifdef ENABLE_SUPERSCALAR
+    bset #0, %d0        | enable superscalar (bit=1)
+#else
+    bclr #0, %d0        | disable superscalar (bit=0)
+#endif
+
+    movec %d0, %pcr     
+
+
+    movec %cacr, %d0    | set up the CACR for 060 added features
+
+#ifdef ENABLE_BRANCH_CACHE
+    or.l #0xe00000, %d2 | enable branch cache (bit 23) and clear it (22,21)
+#else
+    bclr #23, %d0
+#endif
+
+#ifdef ENABLE_LOADSTORE_FIFO
+    bset #29, %d0
+#else
+    bclr #29, %d0 
+#endif
+
+    movec %d0, %cacr
 
     movem.l  (%sp)+,%d0/%a0-%a1
     rts
