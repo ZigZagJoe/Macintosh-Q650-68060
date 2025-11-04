@@ -3,6 +3,8 @@ This project is a collection of ROM modifications to get a minimum level of func
 
 Thanks to Jockelill for a pointer on the MMU ROM mapping and Aprezbios for supplying scrap 060s to play with.
 
+PROOF: https://www.youtube.com/watch?v=KXSWiKu-ASA
+
 This is a experimental proof of concept ONLY and no warranty is expressed or implied. 
 Please don't rush out to replicate this unless you know what you're doing!
 
