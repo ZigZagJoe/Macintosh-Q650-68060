@@ -62,6 +62,13 @@
 #################################
 */
 
+.macro _fpsp_rte_noerr_todo
+    fsave	%sp@-
+	movew	#0x6000,%sp@(0x2)
+	frestore	%sp@+
+	rte
+.endm
+
 /*
 #
 # _060_fpsp_done():
@@ -89,10 +96,8 @@ _060_fpsp_done:
 #
 */
 _060_real_ovfl:
-	fsave	%sp@-
-	movew	#0x6000,%sp@(0x2)
-	frestore	%sp@+
-	jmp	fpfault
+	move.l	(FPOVFL_VEC040).W,-(%sp)	| push vector to user OVFL handler <1/8/91, JPO>
+	rts				| execute user handler <1/8/91, JPO>
 
 /*
 #
@@ -108,10 +113,8 @@ _060_real_ovfl:
 #
 */
 _060_real_unfl:
-	fsave	%sp@-
-	movew	#0x6000,%sp@(0x2)
-	frestore	%sp@+
-	jmp	fpfault
+	move.l	(FPUNFL_VEC040).W,-(%sp)	| push vector to user UNFL handler <1/9/91, JPO>
+	rts				| execute user handler <1/9/91, JPO>
 
 /*
 #
@@ -128,10 +131,8 @@ _060_real_unfl:
 #
 */
 _060_real_operr:
-	fsave	%sp@-
-	movew	#0x6000,%sp@(0x2)
-	frestore	%sp@+
-	jmp	fpfault
+	move.l	(FPOPERR_VEC040).W,-(%sp)	| push vector to user's handler <1/9/91, JPO>
+	rts					| execute user's handler <1/9/91, JPO>
 
 /*
 #
@@ -148,10 +149,8 @@ _060_real_operr:
 #
 */
 _060_real_snan:
-	fsave	%sp@-
-	movew	#0x6000,%sp@(0x2)
-	frestore	%sp@+
-	jmp	fpfault
+	move.l	(FPSNAN_VEC040).W,-(%sp)	| push vector to user handler <1/9/91, JPO>
+	rts				| execute user handler <1/9/91, JPO>
 
 /*
 #
@@ -168,10 +167,7 @@ _060_real_snan:
 #
 */
 _060_real_dz:
-	fsave	%sp@-
-	movew	#0x6000,%sp@(0x2)
-	frestore	%sp@+
-	jmp	fpfault
+	_fpsp_rte_noerr_todo
 
 /*
 #
@@ -188,10 +184,7 @@ _060_real_dz:
 #
 */
 _060_real_inex:
-	fsave	%sp@-
-	movew	#0x6000,%sp@(0x2)
-	frestore	%sp@+
-	jmp	fpfault
+	_fpsp_rte_noerr_todo
 
 /*
 #
@@ -208,14 +201,8 @@ _060_real_inex:
 #
 */
 _060_real_bsun:
-	fsave	%sp@-
-
-	fmovel	%fpsr,%sp@-
-	andib	#0xfe,%sp@
-	fmovel	%sp@+,%fpsr
-
-	addl	#0xc,%sp
-	jmp	fpfault
+    move.l	(FPBSUN_VEC040).W,-(%sp)	| push vector to user's handler <1/8/91, JPO>
+	rts				| execute user's handler <1/8/91, JPO>
 
 /*
 #
@@ -230,7 +217,8 @@ _060_real_bsun:
 # 
 */
 _060_real_fline:
-	jmp	fpfault
+	move.l	(FLINE_VEC040).W,-(%sp)	| push vector to user's handler <1/8/91, JPO>
+	rts				| execute user's handler <1/8/91, JPO>
 
 /*
 #
@@ -274,9 +262,6 @@ _060_real_fpu_disabled:
 _060_real_trap:
 	rte
 
-fpfault: | TODO
-    rte
-
 /*
 #############################################################################
 
@@ -284,32 +269,33 @@ fpfault: | TODO
 # (2) EXAMPLE PACKAGE ENTRY CODE #
 ##################################
 */
-_060_fpsp_snan:
-	bral	(FP_CALL_TOP)+0x80+0x00
+/*
+_060_fpsp_snan: 
+	bral	FP_CALL_TOP+0x80+0x00
 
-_060_fpsp_operr:
-	bral	(FP_CALL_TOP)+0x80+0x08
+_060_fpsp_operr: 
+	bral	FP_CALL_TOP+0x80+0x08
 
-_060_fpsp_ovfl:
-	bral	(FP_CALL_TOP)+0x80+0x10
+_060_fpsp_ovfl: 
+	bral	FP_CALL_TOP+0x80+0x10
 
-_060_fpsp_unfl:
-	bral	(FP_CALL_TOP)+0x80+0x18
+_060_fpsp_unfl: 
+	bral	FP_CALL_TOP+0x80+0x18
 
 _060_fpsp_dz:
-	bral	(FP_CALL_TOP)+0x80+0x20
+	bral	FP_CALL_TOP+0x80+0x20
 
 _060_fpsp_inex:
-	bral	(FP_CALL_TOP)+0x80+0x28
+	bral	FP_CALL_TOP+0x80+0x28
 
-_060_fpsp_fline:
-	bral	(FP_CALL_TOP)+0x80+0x30
+_060_fpsp_fline: 
+	bral	FP_CALL_TOP+0x80+0x30
 
-_060_fpsp_unsupp:
-	bral	(FP_CALL_TOP)+0x80+0x38
+_060_fpsp_unsupp: 
+	bral	FP_CALL_TOP+0x80+0x38
 
-_060_fpsp_effadd:
-	bral	(FP_CALL_TOP)+0x80+0x40
+_060_fpsp_effadd: 
+	bral	FP_CALL_TOP+0x80+0x40*/
 
 /*
 #############################################################################
@@ -328,26 +314,28 @@ FP_CALL_TOP:
 	.long	_060_real_unfl-FP_CALL_TOP
 	.long	_060_real_dz-FP_CALL_TOP
 	.long	_060_real_inex-FP_CALL_TOP
-	.long	_060_real_fline-FP_CALL_TOP
+	.long	_060_real_fline-FP_CALL_TOP     |
 	.long	_060_real_fpu_disabled-FP_CALL_TOP
-	.long	_060_real_trap-FP_CALL_TOP
-	.long	_060_real_trace-FP_CALL_TOP
-	.long	_060_real_access-FP_CALL_TOP
+
+	.long	_060_real_trap-FP_CALL_TOP      | unused
+
+	.long	_060_real_trace-FP_CALL_TOP     | shared with ISP
+	.long	_060_real_access-FP_CALL_TOP    | shared with ISP
 	.long	_060_fpsp_done-FP_CALL_TOP
 
 	.long	0x00000000,0x00000000,0x00000000
 
-	.long	_060_imem_read-I_CALL_TOP
-	.long	_060_dmem_read-I_CALL_TOP
-	.long	_060_dmem_write-I_CALL_TOP
-	.long	_060_imem_read_word-I_CALL_TOP
-	.long	_060_imem_read_long-I_CALL_TOP
-	.long	_060_dmem_read_byte-I_CALL_TOP
-	.long	_060_dmem_read_word-I_CALL_TOP
-	.long	_060_dmem_read_long-I_CALL_TOP
-	.long	_060_dmem_write_byte-I_CALL_TOP
-	.long	_060_dmem_write_word-I_CALL_TOP
-	.long	_060_dmem_write_long-I_CALL_TOP
+	.long	_060_imem_read-FP_CALL_TOP       | shared with ISP
+	.long	_060_dmem_read-FP_CALL_TOP       | shared with ISP
+	.long	_060_dmem_write-FP_CALL_TOP      | shared with ISP
+	.long	_060_imem_read_word-FP_CALL_TOP  | shared with ISP
+	.long	_060_imem_read_long-FP_CALL_TOP  | shared with ISP
+	.long	_060_dmem_read_byte-FP_CALL_TOP  | shared with ISP
+	.long	_060_dmem_read_word-FP_CALL_TOP  | shared with ISP
+	.long	_060_dmem_read_long-FP_CALL_TOP  | shared with ISP
+	.long	_060_dmem_write_byte-FP_CALL_TOP | shared with ISP
+	.long	_060_dmem_write_word-FP_CALL_TOP | shared with ISP
+	.long	_060_dmem_write_long-FP_CALL_TOP | shared with ISP
 
 	.long	0x00000000
 

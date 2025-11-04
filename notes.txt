@@ -3,13 +3,22 @@ TODO
     almost certainly won't work in 24 bit mode
         fpsp/isp are after the 1MB ROM mapping boundary (80000 - 8FFFFF)
 
-    Need to correctly handled the new exception stack frame in slot manager 
-        PATCH_SLOTMGR_BERR_HACK
-
     Need to replace ptestr in FLUSHCRANGE
         right now we just blow away the entire cache
 
     finder crashes with cache enabled at boot but can enable after boot (?)
+        enabler?
+
+    fpsp   
+        no FPU detected in tattletech or speedometer
+        sane trap behavior seems odd?
+        inexact handoff to system handler? what? 
+            	move.l	($00C4).W,-(sp)			; push vector to user INEX handler <1/8/91, JPO>
+	            rts					; execute user handler <1/8/91, JPO>
+
+    superscalar?
+    bus error handling (in general)
+        Need to correctly handled the new exception stack frame in slot manager  PATCH_SLOTMGR_BERR_HACK
 
 #########################################################################
 Code snips
@@ -25,3 +34,74 @@ InitIopMgrPatch:
 
    |MOVEQ	#true32b,%D0					| set 32-bit addressing mode	
 	|_SwapMMUMode	
+
+
+/*
+		vectab[VECI_BUSERR]        = buserr60;
+		vectab[VECI_ADDRERR]       = addrerr4060;
+		vectab[VECI_FP_INEX]       = FP_INEX_HANDLER60;
+		vectab[VECI_FP_DZ]         = FP_DZ_HANDLER60;
+		vectab[VECI_FP_UNFL]       = FP_UNFL_HANDLER60;
+		vectab[VECI_FP_OPERR]      = FP_OPERR_HANDLER60;
+		vectab[VECI_FP_OVFL]       = FP_OVFL_HANDLER60;
+		vectab[VECI_FP_SNAN]       = FP_SNAN_HANDLER60;
+		vectab[VECI_UNIMP_FP_DATA] = UNIMP_FP_DATA_HANDLER60;
+		vectab[VECI_UNIMP_EA]      = UNIMP_EA_HANDLER60;
+		vectab[VECI_UNIMP_II]      = UNIMP_II_HANDLER60;
+
+
+#define	FP_SNAN_HANDLER60	&FP_CALL_TOP[128 + 0x00]
+#define	FP_OPERR_HANDLER60	&FP_CALL_TOP[128 + 0x08]
+
+#define	FP_OVFL_HANDLER60	&FP_CALL_TOP[128 + 0x10]
+#define	FP_UNFL_HANDLER60	&FP_CALL_TOP[128 + 0x18]
+#define	FP_DZ_HANDLER60		&FP_CALL_TOP[128 + 0x20]
+#define	FP_INEX_HANDLER60	&FP_CALL_TOP[128 + 0x28]
+#define	LINE111_HANDLER60	&FP_CALL_TOP[128 + 0x30]
+#define	UNIMP_FP_DATA_HANDLER60	&FP_CALL_TOP[128 + 0x38]
+#define	UNIMP_EA_HANDLER60	&FP_CALL_TOP[128 + 0x40]
+#define	UNIMP_II_HANDLER60	&I_CALL_TOP[128 + 0x00] */
+
+
+
+  /*  move.l		Line1111(%a0),(FLINE_VEC040).W| save original vector for unknown F-Lines			<T2>
+    lea			_060_fpsp_fline,%a1
+    move.l		%a1,Line1111(%a0)		| vector FLINE to emulation code
+    
+    lea			bsun,%a1 | Branch or Set on Unordered Condition
+    move.l		%a1,BSUNVector(%a0)	| vector BSUN to emulation code
+
+    lea			_060_fpsp_unfl,%a1
+    move.l		%a1,UNFLVector(%a0)	| vector UNFL to emulation code
+
+    lea			_060_fpsp_operr,%a1
+    move.l		%a1,OPERRVector(%a0)	| vector OPERR to emulation code
+
+    lea			_060_fpsp_ovfl,%a1
+    move.l		%a1,OVFLVector(%a0)	| vector OVFL to emulation code
+
+    lea			_060_fpsp_snan,%a1
+    move.l		%a1,SNANVector(%a0)	| vector SNAN to emulation code
+
+    lea			_060_fpsp_unsupp,%a1 | Unimplemented Data Type
+    move.l		%a1,UNIMPDTVector(%a0)| vector UNSUPP to emulation code
+    */
+
+
+/*
+#include "serial.S"
+
+SerialTest:
+    
+	bra InitSCC
+mainloop:
+
+	put_char 'H'
+	put_char 'e'
+	put_char 'l'
+	put_char 'l'
+	put_char 'o'
+
+    bra  mainloop
+
+*/

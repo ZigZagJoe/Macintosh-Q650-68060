@@ -150,7 +150,7 @@ _060_real_divbyzero:
 #
 */
 	moveb	#0x24,%sp@(0x7)		|# set trace vecno
-	bral	(_060_real_trace)
+	bral	_060_real_trace
 
 real_divbyzero_end:
 	rte
@@ -230,29 +230,30 @@ _060_real_unlock_page:
 ##################################
 */
 
+/*
 _060_isp_unimp:
-	bral	(I_CALL_TOP)+0x80+0x00
+	bral	I_CALL_TOP+0x80+0x00
 
 _060_isp_cas:
-	bral	(I_CALL_TOP)+0x80+0x08
+	bral	I_CALL_TOP+0x80+0x08
 
 _060_isp_cas2:
-	bral	(I_CALL_TOP)+0x80+0x10
+	bral	I_CALL_TOP+0x80+0x10
 
 _060_isp_cas_finish:
-	bral	(I_CALL_TOP)+0x80+0x18
+	bral	I_CALL_TOP+0x80+0x18
 
 _060_isp_cas2_finish:
-	bral	(I_CALL_TOP)+0x80+0x20
+	bral	I_CALL_TOP+0x80+0x20
 
 _060_isp_cas_inrange:
-	bral	(I_CALL_TOP)+0x80+0x28
+	bral	I_CALL_TOP+0x80+0x28
 
 _060_isp_cas_terminate:
-	bral	(I_CALL_TOP)+0x80+0x30
+	bral	I_CALL_TOP+0x80+0x30
 
 _060_isp_cas_restart:
-	bral	(I_CALL_TOP)+0x80+0x38
+	bral	I_CALL_TOP+0x80+0x38*/
 
 |############################################################################
 
