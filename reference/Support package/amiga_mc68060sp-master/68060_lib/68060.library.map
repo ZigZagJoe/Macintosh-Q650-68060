@@ -1,0 +1,62 @@
+68060.library.ld                                22-May-97 20:08:41  Hunk Section                                        Page 1-1
+
+ num hunk                 size filename         punit            type         base  alv     size
+   0 startup              fac0 mc60_startup.o   mc60_startup     code            0    0       e0
+                               ispemu/AmigaISP. isp              code           e0    0     1260
+                               fpuemu/AmigaFPSP fpsp             code         1340    0     d800
+                               mc60_init.o      mc60_init.c      code         eb40    0      1f8
+                               mc60_patches.o   mc60_patches     code         ed38    0      388
+                               mc60_dispatcher. mc60_dispatcher  code         f0c0    0      1bc
+                               mc60_mmu.o       mc60_mmu.c       code         f27c    0      714
+                               mc60_misc.o      mc60_misc        code         f990    0      11c
+                               lib:amiga.lib    <noname>         code         faac    0       14
+                               mc60_tagstub.o   mc60_tagstub     code         fac0    0        0
+68060.library.ld                               22-May-97 20:08:41  Symbol Section                                       Page 2-1
+
+symbol             offset:hunk symbol             offset:hunk symbol             offset:hunk symbol             offset:hunk
+@BuildMMUTables      f7da:0    @CreateNestCount     f5f0:0    @SetDispatcher       ebb6:0    CASW_START            d30:0   
+FPSP060_Start        1340:0    ISP060_Start           e0:0    LibStart                0:0    RomTagEnd            fac0:0   
+_060_dmem_write      14ce:0    _calc_ea              504:0    _CheckMMU            fa72:0    _chk2_cmp2            47a:0   
+_compandset           c9c:0    _compandset2          f48:0    _div64                a80:0    _EnableCaches        f99c:0   
+_FPU_Dispatcher      f0c0:0    _FPU_LaunchPoint     f254:0    _GetVBR              f990:0    _Install_AmigaFP     13ba:0   
+_Install_AmigaIS      158:0    _isp_unimp            190:0    _LibInit             ec36:0    _LinkerDB              (0:*)  
+_MMUFrame            ee3a:0    _moveperipheral       3e6:0    _mul64                9a2:0    _NewList             faac:0   
+_PatchExec           ed38:0    _SetMMUTables        fa12:0    _SetVBR              f996:0    __BSSBAS               (0:*)  
+__BSSLEN               (0:*)   __CoverLength          (0:*)   __CoverStart           (0:*)   __LibRevision          (0:*)  
+__LibVersion           (0:*)  
+68060.library.ld                                22-May-97 20:08:41  Xref Section                                        Page 3-1
+
+symbol                   (Def) Module  Off         (Ref) Module  Off         (Ref) Module  Off         (Ref) Module  Off
+@BuildMMUTables  mc60_mmu.c            55e mc60_init.c           1b0
+RomTagEnd        mc60_tagstub            0 mc60_startup            a
+_CheckMMU        mc60_misc              e2 mc60_init.c           198
+_EnableCaches    mc60_misc               c mc60_init.c           1d4
+_FPU_Dispatcher  mc60_dispatcher         0 mc60_init.c            a8
+_FPU_LaunchPoint mc60_dispatcher       194 mc60_init.c            ba
+_GetVBR          mc60_misc               0 mc60_init.c             6
+_Install_AmigaFP fpsp                   7a mc60_init.c           174
+_Install_AmigaIS isp                    78 mc60_init.c           16e
+_LibInit         mc60_init.c            f6 mc60_startup           82
+_MMUFrame        mc60_patches          102 mc60_misc              88 mc60_init.c           156 mc60_init.c           180
+                                           mc60_init.c           1b6 mc60_init.c           1bc
+_NewList             faac:0                mc60_mmu.c            3fc mc60_mmu.c            408
+_PatchExec       mc60_patches            0 mc60_init.c           188
+_SetMMUTables    mc60_misc              82 mc60_init.c           1c4
+_SetVBR          mc60_misc               6 mc60_init.c            44
+68060.library.ld                                22-May-97 20:08:41  File Section                                        Page 4-1
+
+filename         punit            hunk             type       offset:hunk     size
+mc60_startup.o   mc60_startup     startup          code            0:0          e0
+ispemu/AmigaISP. isp              CODE             code           e0:0        1260
+fpuemu/AmigaFPSP fpsp             Init             code         1340:0        d800
+mc60_init.o      mc60_init.c      text             code         eb40:0         1f8
+mc60_patches.o   mc60_patches     patches          code         ed38:0         388
+mc60_dispatcher. mc60_dispatcher  CODE             code         f0c0:0         1bc
+mc60_mmu.o       mc60_mmu.c       text             code         f27c:0         714
+mc60_misc.o      mc60_misc        mmu_code         code         f990:0         11c
+68060.library.ld                              22-May-97 20:08:41  Library Section                                       Page 5-1
+
+filename         punit            hunk             type       offset:hunk     size
+lib:amiga.lib    <noname>         <noname>         code            -:-           0
+                                  _NewList         code         faac:0          14
+lib:debug.lib    mc60_tagstub.o   mc60_tagstub     code             code         fac0:0           0

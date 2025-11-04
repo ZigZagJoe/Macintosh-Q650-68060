@@ -1,0 +1,278 @@
+AmigaFPSP.ld                             22-Sep-97 01:57:56  Hunk Section                                  Page 1-1
+
+ num hunk             size filename     punit        type         base  alv     size
+   0 FPSP060          c734 fpsp_init.o  fpsp_init    code            0    0      1a4
+                           fpsp_temp.o  fpsp_temp    code          1a4    0       b4
+                           fpsp_excepts fpsp_excepts code          258   22     1a9c
+                           fpsp_trans.o fpsp_trans   code         1d78    2     4ce4
+                           fpsp_base.o  fpsp_base    code         6a68    0     2b30
+                           fpsp_fxcc.o  fpsp_fxcc    code         9598    0      ac4
+                           fpsp_fouts.o fpsp_fouts   code         a05c    0      da0
+                           fpsp_subs.o  fpsp_subs    code         adfc    0     1934
+                           fpsp_end.o   fpsp_end     code         c730    0        4
+AmigaFPSP.ld                            22-Sep-97 01:57:56  Symbol Section                                 Page 2-1
+
+symbol         offset:hunk symbol         offset:hunk symbol         offset:hunk symbol         offset:hunk
+addsub_scale     933e:0    bindec           c068:0    binstr           c6d2:0    decbin           bdd8:0   
+dec_areg         ae50:0    dnrm_lp          b638:0    dst_inf          6712:0    dst_qnan         6a1e:0   
+dst_snan         6a10:0    dst_zero         66e8:0    fabs             7f32:0    facos            6d28:0   
+fadd             8940:0    fasin            6b44:0    fatan            6b18:0    fatanh           6b70:0   
+fcmp             81b4:0    fcos             6d54:0    fcosh            6cfc:0    fdabs            7f2a:0   
+fdadd            8938:0    fddiv            771a:0    fdin             747c:0    fdiv             7722:0   
+fdiv_inf_dst     7ace:0    fdiv_inf_loa     7aa0:0    fdiv_zero_lo     7a78:0    fdmul            70aa:0   
+fdneg            7b04:0    fdsqrt           9080:0    fdsub            8cda:0    fetch_dreg       b336:0   
+fetox            6bf4:0    fetoxm1          6ac0:0    fgen_except      6e88:0    fgetexp          6d80:0   
+fgetman          6dac:0    fin              7484:0    fint             7e04:0    fintrz           7e9a:0   
+fix_skewed_o      738:0    flog10           6ca4:0    flog2            6cd0:0    flogn            6c78:0   
+flognp1          6a94:0    fmod             6e04:0    fmovm_calc_e     a376:0    fmovm_ctrl       a700:0   
+fmovm_dynami     a05c:0    fmul             70b2:0    fmul_inf_dst     743c:0    fmul_inf_src     7464:0   
+fmul_zero        7414:0    fneg             7b0c:0    FooBar              0:0    fout             a81a:0   
+FPSP060_End      c730:0    FPSP060_Star       12:0    frem             6e30:0    fsabs            7f20:0   
+fsadd            892e:0    fscale           6e5c:0    fsdiv            7710:0    fsgldiv          8628:0   
+fsglmul          82fe:0    fsin             7472:0    fsincos          6dd8:0    fsine            6b9c:0   
+fsinh            6a68:0    fsmul            70a0:0    fsneg            7afa:0    fsqrt            9088:0   
+fssqrt           9076:0    fssub            8cd0:0    fsub             8ce2:0    ftan             6bc8:0   
+ftanh            6aec:0    ftentox          6c4c:0    ftst             7d9e:0    ftwotox          6c20:0   
+funimp_iacc      1cae:0    funimp_skew       e3e:0    get_packed       bd7a:0    iea_dacc         13cc:0   
+iea_iacc         137e:0    inc_areg         adfc:0    ld_minf          6702:0    ld_mone          673e:0   
+ld_mpi2          6778:0    ld_mzero         66d8:0    ld_pinf          66f2:0    ld_pone          6730:0   
+ld_ppi2          676a:0    ld_pzero         66c8:0    load_fpn1        b46c:0    load_fpn2        b500:0   
+norm             b8ae:0    ovf_res          bb74:0    ovf_res2         bb82:0    res_operr        957a:0   
+res_qnan         94fc:0    res_qnan_1op     9528:0    res_snan         94fc:0    res_snan_1op     9514:0   
+sacos            2866:0    sacosd           28ea:0    sasin            27c2:0    sasind           2862:0   
+satan            3918:0    satand           3b42:0    satanh           5382:0    satanhd          53f8:0   
+scale_sqrt       9454:0    scale_to_zer     94c4:0    scale_to_zer     941c:0    scos             21d6:0   
+scosd            23a6:0    scosh            44a6:0    scoshd           453a:0    setox            3fd6:0   
+setoxd           4170:0    setoxm1          4192:0    setoxm1d         4430:0    setoxm1i         6726:0   
+set_tag_d        b9ee:0    set_tag_s        ba46:0    set_tag_x        b972:0    sgetexp          4434:0   
+sgetexpd         444e:0    sgetman          4464:0    sgetmand         4490:0    slog10           541c:0   
+slog10d          5444:0    slog2            545e:0    slog2d           54ac:0    slogn            5006:0   
+slognd           51aa:0    slognp1          5238:0    slognp1d         537e:0    smod             6060:0   
+smod_sdnrm       682a:0    smod_sinf        6880:0    smod_snorm       682a:0    smod_szero       6854:0   
+smovcr           5b68:0    sopr_inf         671e:0    sop_sqnan        69e2:0    sop_ssnan        69f4:0   
+spi_2            6766:0    src_inf          66ee:0    src_one          672c:0    src_qnan         6a44:0   
+src_snan         6a36:0    src_zero         66c4:0    srem             606c:0    srem_sdnrm       68f8:0   
+srem_sinf        694e:0    srem_snorm       68f8:0    srem_szero       6922:0    sscale           5f68:0   
+sscale_sdnrm     697a:0    sscale_sinf      69ca:0    sscale_snorm     697a:0    sscale_szero     69a2:0   
+ssin             21d0:0    ssincos          23b2:0    ssincosd         2636:0    ssincosi         67b2:0   
+ssincosqnan      67be:0    ssincossnan      67c8:0    ssincosz         6786:0    ssind            23a2:0   
+ssinh            4552:0    ssinhd           461a:0    stan             2d98:0    stand            2ef4:0   
+stanh            461e:0    stanhd           4772:0    stentox          5a24:0    stentoxd         5b4c:0   
+store_dreg_b     b42c:0    store_dreg_l     b3ac:0    store_dreg_w     b3ec:0    store_fpreg      b594:0   
+sto_cos          67d2:0    stwotox          5936:0    stwotoxd         5a08:0    szr_inf          6718:0   
+tbl_trans        1db0:0    tbl_unsupp       6ecc:0    t_catch          6466:0    t_catch2         64aa:0   
+t_dz             62de:0    t_dz2            62f4:0    t_extdnrm        6320:0    t_inx2           6472:0   
+t_minx2          6482:0    t_operr          6306:0    t_ovfl           6424:0    t_ovfl2          6446:0   
+t_ovfl_sc        63c4:0    t_pinx2          647a:0    t_resdnrm        6316:0    t_unfl           638a:0   
+t_unfl2          63a8:0    unf_res          ba92:0    unf_res4         bb0a:0    unnorm_fix       b8f6:0   
+Vector_11         17a:0    Vector_48         17e:0    Vector_49         182:0    Vector_50         186:0   
+Vector_51         18a:0    Vector_52         18e:0    Vector_53         192:0    Vector_54         196:0   
+Vector_55         19a:0    Vector_60         19e:0    _calc_ea_fou     af06:0    _denorm          b602:0   
+_fdbcc           9598:0    _fpsp_done        1c8:0    _fpsp_dz         18a8:0    _fpsp_effadd      ec8:0   
+_fpsp_fline      18fa:0    _fpsp_inex       1766:0    _fpsp_operr      1414:0    _fpsp_ovfl        258:0   
+_fpsp_snan       152c:0    _fpsp_unfl        3f0:0    _fpsp_unimp      199c:0    _fpsp_unsupp      5a0:0   
+AmigaFPSP.ld                            22-Sep-97 01:57:56  Symbol Section                                 Page 2-2
+
+symbol         offset:hunk symbol         offset:hunk symbol         offset:hunk symbol         offset:hunk
+_fscc            9c88:0    _ftrapcc         993c:0    _Install_Ami       8c:0    _LinkerDB          (0:*)  
+_load_fop        b1ec:0    _real_access      1b6:0    _real_bsun        212:0    _real_dz          1fa:0   
+_real_fline       226:0    _real_fpu_di      22c:0    _real_inex        206:0    _real_operr       1e2:0   
+_real_ovfl        1ca:0    _real_snan        1ee:0    _real_trace       1a4:0    _real_trap        244:0   
+_real_unfl        1d6:0    _round           b752:0    __BSSBAS           (0:*)   __BSSLEN           (0:*)  
+__CoverLengt       (0:*)   __CoverStart       (0:*)   __LibRevisio       (0:*)   __LibVersion       (0:*)  
+___stub          c730:0   
+AmigaFPSP.ld                             22-Sep-97 01:57:56  Xref Section                                  Page 3-1
+
+symbol           (Def) Module  Off     (Ref) Module  Off     (Ref) Module  Off     (Ref) Module  Off     (Ref) Module  Off
+bindec       fpsp_subs        126c fpsp_fouts        d08
+decbin       fpsp_subs         fdc fpsp_excepts      d14 fpsp_excepts     1d06
+dec_areg     fpsp_subs          54 fpsp_fxcc         ab6
+dnrm_lp      fpsp_subs         83c fpsp_excepts      c54 fpsp_excepts     1d66
+fetch_dreg   fpsp_subs         53a fpsp_fouts        cf4 fpsp_fouts        608 fpsp_fouts        5c6 fpsp_fouts        552
+                                   fpsp_fouts        52c fpsp_fouts          c fpsp_fxcc         37c
+fgen_except  fpsp_base         420 fpsp_trans       472a
+fmovm_calc_e fpsp_fouts        31a fpsp_excepts     10e4 fpsp_excepts     1d12
+fmovm_ctrl   fpsp_fouts        6a4 fpsp_excepts     105a fpsp_excepts     1d5a
+fmovm_dynami fpsp_fouts          0 fpsp_excepts      ed2 fpsp_excepts      eb8 fpsp_excepts     1d6c
+fout         fpsp_fouts        7be fpsp_excepts     164c fpsp_excepts      a08 fpsp_excepts      5c8 fpsp_excepts      308
+                                   fpsp_excepts      158 fpsp_excepts     1d00
+FPSP060_End  fpsp_end            0 fpsp_init          18
+get_packed   fpsp_subs         f7e fpsp_excepts      808 fpsp_excepts     1d30
+inc_areg     fpsp_subs           0 fpsp_fxcc         a9e
+ld_pinf      fpsp_trans       497a fpsp_base         2aa
+ld_pone      fpsp_trans       49b8 fpsp_base         2fa fpsp_base         2a2 fpsp_base         1f2 fpsp_base         1c6
+                                   fpsp_base         19a
+ld_ppi2      fpsp_trans       49f2 fpsp_base         2ce
+load_fpn1    fpsp_subs         670 fpsp_excepts      9e0 fpsp_excepts     1d36
+load_fpn2    fpsp_subs         704 fpsp_excepts     15be fpsp_excepts      d5a fpsp_excepts      82e fpsp_excepts      3f6
+                                   fpsp_excepts      1fa fpsp_excepts       5a fpsp_excepts     1d18
+norm         fpsp_subs         ab2 fpsp_fouts        c00 fpsp_fouts        b18 fpsp_fouts        a18 fpsp_fouts        96c
+                                   fpsp_base        2a8c fpsp_base        2a34 fpsp_base        29e4 fpsp_base        2974
+                                   fpsp_base        2922 fpsp_base        1532 fpsp_base        111e fpsp_base         a78
+                                   fpsp_trans       467c fpsp_trans       45f8 fpsp_trans       4242 fpsp_trans       271a
+                                   fpsp_trans       26d8 fpsp_excepts      55c fpsp_excepts      514 fpsp_excepts     1d60
+ovf_res      fpsp_subs         d78 fpsp_fouts        c64 fpsp_fouts        a82 fpsp_base        2806 fpsp_base        233c
+                                   fpsp_base        1f9a fpsp_base        1cda fpsp_base        1992 fpsp_base        16aa
+                                   fpsp_base        129e fpsp_base         de6 fpsp_base         bf6 fpsp_base         74a
+                                   fpsp_trans       46da fpsp_trans       46ba fpsp_trans       6a62
+sacos        fpsp_trans        aee fpsp_base         2c6
+sacosd       fpsp_trans        b72 fpsp_base         2de
+sasin        fpsp_trans        a4a fpsp_base          e2
+sasind       fpsp_trans        aea fpsp_base          fa
+satan        fpsp_trans       1ba0 fpsp_base          b6
+satand       fpsp_trans       1dca fpsp_base          ce
+satanh       fpsp_trans       360a fpsp_base         10e
+satanhd      fpsp_trans       3680 fpsp_base         126
+scos         fpsp_trans        45e fpsp_base         2f2
+scosd        fpsp_trans        62e fpsp_base         30a
+scosh        fpsp_trans       272e fpsp_base         29a
+scoshd       fpsp_trans       27c2 fpsp_base         2b2
+setox        fpsp_trans       225e fpsp_base         192
+setoxd       fpsp_trans       23f8 fpsp_base         1aa
+setoxm1      fpsp_trans       241a fpsp_base          5e
+setoxm1d     fpsp_trans       26b8 fpsp_base          76
+setoxm1i     fpsp_trans       49ae fpsp_base          6e
+set_tag_x    fpsp_subs         b76 fpsp_excepts     15c6 fpsp_excepts     15a0 fpsp_excepts      d62 fpsp_excepts      d2a
+                                   fpsp_excepts      9e8 fpsp_excepts      836 fpsp_excepts      810 fpsp_excepts      3fe
+                                   fpsp_excepts      3ce fpsp_excepts      202 fpsp_excepts      1dc fpsp_excepts       62
+                                   fpsp_excepts       44 fpsp_excepts     1cfa
+sgetexp      fpsp_trans       26bc fpsp_base         31e
+sgetexpd     fpsp_trans       26d6 fpsp_base         336
+sgetman      fpsp_trans       26ec fpsp_base         34a
+sgetmand     fpsp_trans       2718 fpsp_base         362
+slog10       fpsp_trans       36a4 fpsp_base         242
+slog10d      fpsp_trans       36cc fpsp_base         25a
+AmigaFPSP.ld                             22-Sep-97 01:57:56  Xref Section                                  Page 3-2
+
+symbol           (Def) Module  Off     (Ref) Module  Off     (Ref) Module  Off     (Ref) Module  Off     (Ref) Module  Off
+slog2        fpsp_trans       36e6 fpsp_base         26e
+slog2d       fpsp_trans       3734 fpsp_base         286
+slogn        fpsp_trans       328e fpsp_base         216
+slognd       fpsp_trans       3432 fpsp_base         22e
+slognp1      fpsp_trans       34c0 fpsp_base          32
+slognp1d     fpsp_trans       3606 fpsp_base          4a
+smod_sdnrm   fpsp_trans       4ab2 fpsp_base         3ba
+smod_sinf    fpsp_trans       4b08 fpsp_base         3b2
+smod_snorm   fpsp_trans       4ab2 fpsp_base         3a2
+smod_szero   fpsp_trans       4adc fpsp_base         3aa
+smovcr       fpsp_trans       3df0 fpsp_excepts     1884 fpsp_excepts     1630
+sopr_inf     fpsp_trans       49a6 fpsp_base         27e fpsp_base         252 fpsp_base         226 fpsp_base          42
+sop_sqnan    fpsp_trans       4c6a fpsp_base         41a fpsp_base         3ee fpsp_base         3c2
+sop_ssnan    fpsp_trans       4c7c fpsp_base         41e fpsp_base         3f2 fpsp_base         3c6
+spi_2        fpsp_trans       49ee fpsp_base          c6
+src_inf      fpsp_trans       4976 fpsp_base          16
+src_one      fpsp_trans       49b4 fpsp_base          9a
+src_qnan     fpsp_trans       4ccc fpsp_base         36a fpsp_base         33e fpsp_base         312 fpsp_base         2e6
+                                   fpsp_base         2ba fpsp_base         28e fpsp_base         262 fpsp_base         236
+                                   fpsp_base         20a fpsp_base         1de fpsp_base         1b2 fpsp_base         186
+                                   fpsp_base         15a fpsp_base         12e fpsp_base         102 fpsp_base          d6
+                                   fpsp_base          aa fpsp_base          7e fpsp_base          52 fpsp_base          26
+src_snan     fpsp_trans       4cbe fpsp_base         36e fpsp_base         342 fpsp_base         316 fpsp_base         2ea
+                                   fpsp_base         2be fpsp_base         292 fpsp_base         266 fpsp_base         23a
+                                   fpsp_base         20e fpsp_base         1e2 fpsp_base         1b6 fpsp_base         18a
+                                   fpsp_base         15e fpsp_base         132 fpsp_base         106 fpsp_base          da
+                                   fpsp_base          ae fpsp_base          82 fpsp_base          56 fpsp_base          2a
+src_zero     fpsp_trans       494c fpsp_base         352 fpsp_base         326 fpsp_base         16e fpsp_base         142
+                                   fpsp_base         116 fpsp_base          ea fpsp_base          be fpsp_base          92
+                                   fpsp_base          66 fpsp_base          3a fpsp_base           e
+srem_sdnrm   fpsp_trans       4b80 fpsp_base         3e6
+srem_sinf    fpsp_trans       4bd6 fpsp_base         3de
+srem_snorm   fpsp_trans       4b80 fpsp_base         3ce
+srem_szero   fpsp_trans       4baa fpsp_base         3d6
+sscale_sdnrm fpsp_trans       4c02 fpsp_base         412
+sscale_sinf  fpsp_trans       4c52 fpsp_base         40a
+sscale_snorm fpsp_trans       4c02 fpsp_base         3fa
+sscale_szero fpsp_trans       4c2a fpsp_base         402
+ssin         fpsp_trans        458 fpsp_base         13a
+ssincos      fpsp_trans        63a fpsp_base         376
+ssincosd     fpsp_trans        8be fpsp_base         38e
+ssincosi     fpsp_trans       4a3a fpsp_base         386
+ssincosqnan  fpsp_trans       4a46 fpsp_base         396
+ssincossnan  fpsp_trans       4a50 fpsp_base         39a
+ssincosz     fpsp_trans       4a0e fpsp_base         37e
+ssind        fpsp_trans        62a fpsp_base         152
+ssinh        fpsp_trans       27da fpsp_base           6
+ssinhd       fpsp_trans       28a2 fpsp_base          1e
+stan         fpsp_trans       1020 fpsp_base         166
+stand        fpsp_trans       117c fpsp_base         17e
+stanh        fpsp_trans       28a6 fpsp_base          8a
+stanhd       fpsp_trans       29fa fpsp_base          a2
+stentox      fpsp_trans       3cac fpsp_base         1ea
+stentoxd     fpsp_trans       3dd4 fpsp_base         202
+store_dreg_b fpsp_subs         630 fpsp_fouts        81e fpsp_fxcc         a70 fpsp_excepts     136c fpsp_excepts     128e
+                                   fpsp_excepts     1d48
+store_dreg_l fpsp_subs         5b0 fpsp_fouts        aa8 fpsp_fouts        a4a fpsp_fouts        9ec fpsp_fouts        8ca
+                                   fpsp_fxcc         382 fpsp_excepts     13fe fpsp_excepts     13ae fpsp_excepts     12ce
+AmigaFPSP.ld                             22-Sep-97 01:57:56  Xref Section                                  Page 3-3
+
+symbol           (Def) Module  Off     (Ref) Module  Off     (Ref) Module  Off     (Ref) Module  Off     (Ref) Module  Off
+                                   fpsp_excepts     1d1e
+store_dreg_w fpsp_subs         5f0 fpsp_fouts        874 fpsp_excepts     138c fpsp_excepts     12ae fpsp_excepts     1cf4
+store_fpreg  fpsp_subs         798 fpsp_excepts     17fa fpsp_excepts     1600 fpsp_excepts      dd0 fpsp_excepts      882
+                                   fpsp_excepts      44a fpsp_excepts      252 fpsp_excepts       b2 fpsp_excepts     1d3c
+stwotox      fpsp_trans       3bbe fpsp_base         1be
+stwotoxd     fpsp_trans       3c90 fpsp_base         1d6
+szr_inf      fpsp_trans       49a0 fpsp_base         1fa fpsp_base         1ce fpsp_base         1a2
+tbl_trans    fpsp_trans         38 fpsp_excepts     17e8 fpsp_excepts     17e2
+tbl_unsupp   fpsp_base         464 fpsp_excepts     15f6 fpsp_excepts     15f0 fpsp_excepts      dba fpsp_excepts      db4
+                                   fpsp_excepts      864 fpsp_excepts      85e fpsp_excepts      42c fpsp_excepts      426
+                                   fpsp_excepts      248 fpsp_excepts      242 fpsp_excepts       a8 fpsp_excepts       a2
+                                   fpsp_excepts     1d2a
+t_dz2        fpsp_trans       457c fpsp_base         276 fpsp_base         24a fpsp_base         21e
+t_operr      fpsp_trans       458e fpsp_base         35a fpsp_base         32e fpsp_base         302 fpsp_base         2d6
+                                   fpsp_base         176 fpsp_base         14a fpsp_base         11e fpsp_base          f2
+unf_res      fpsp_subs         c96 fpsp_fouts        c0c fpsp_fouts        a24 fpsp_base        277a fpsp_base        23e8
+                                   fpsp_base        2046 fpsp_base        161e fpsp_base        1212 fpsp_base         e9e
+                                   fpsp_base         b6a fpsp_base         83e
+unf_res4     fpsp_subs         d0e fpsp_base        1d66 fpsp_base        1a5a
+unnorm_fix   fpsp_subs         afa fpsp_excepts     15d0 fpsp_excepts      d70 fpsp_excepts      d38 fpsp_excepts      9f2
+                                   fpsp_excepts      840 fpsp_excepts      5aa fpsp_excepts      408 fpsp_excepts      3d8
+                                   fpsp_excepts      20c fpsp_excepts       6c fpsp_excepts     1d0c
+Vector_11    fpsp_init         17a fpsp_temp          84
+_calc_ea_fou fpsp_subs         10a fpsp_fouts        cd4 fpsp_fouts        8fc fpsp_excepts     14b4 fpsp_excepts     1486
+                                   fpsp_excepts     1d4e
+_fdbcc       fpsp_fxcc           0 fpsp_excepts     197c fpsp_excepts     1d24
+_fpsp_done   fpsp_temp          24 fpsp_excepts     1826 fpsp_excepts     1052 fpsp_excepts      336 fpsp_excepts      186
+_fpsp_dz     fpsp_excepts     1650 fpsp_init         106
+_fpsp_effadd fpsp_excepts      c70 fpsp_init         16a
+_fpsp_fline  fpsp_excepts     16a2 fpsp_init         142
+_fpsp_inex   fpsp_excepts     150e fpsp_init         11a
+_fpsp_operr  fpsp_excepts     11bc fpsp_init          ca
+_fpsp_ovfl   fpsp_excepts        0 fpsp_init          de
+_fpsp_snan   fpsp_excepts     12d4 fpsp_init          b6
+_fpsp_unfl   fpsp_excepts      198 fpsp_init          f2
+_fpsp_unsupp fpsp_excepts      348 fpsp_init         156
+_fscc        fpsp_fxcc         6f0 fpsp_excepts     198c fpsp_excepts     1d42
+_ftrapcc     fpsp_fxcc         3a4 fpsp_excepts     1934 fpsp_excepts     1d54
+_load_fop    fpsp_subs         3f0 fpsp_excepts     17c0 fpsp_excepts     1d72
+_real_access fpsp_temp          12 fpsp_excepts     1a9a fpsp_excepts     1172
+_real_bsun   fpsp_temp          6e fpsp_excepts     1a28 fpsp_init         12e
+_real_dz     fpsp_temp          56 fpsp_excepts     16a0
+_real_fline  fpsp_temp          82 fpsp_excepts     1742
+_real_fpu_di fpsp_temp          88 fpsp_excepts     1714 fpsp_excepts     16b4 fpsp_excepts     1124
+_real_inex   fpsp_temp          62 fpsp_excepts     161c fpsp_excepts      be4 fpsp_excepts      7ec fpsp_excepts      2de
+                                   fpsp_excepts      12e
+_real_operr  fpsp_temp          3e fpsp_excepts     1214 fpsp_excepts      b78 fpsp_excepts      6ec
+_real_ovfl   fpsp_temp          26 fpsp_excepts      71a fpsp_excepts      100
+_real_snan   fpsp_temp          4a fpsp_excepts     150c fpsp_excepts     132a fpsp_excepts      b0c fpsp_excepts      6c4
+_real_trace  fpsp_temp           0 fpsp_excepts     1a54 fpsp_excepts     19f2 fpsp_excepts     183a fpsp_excepts     10a0
+                                   fpsp_excepts     1056 fpsp_excepts      f58 fpsp_excepts      e9e fpsp_excepts      9be
+                                   fpsp_excepts      67a fpsp_excepts      346 fpsp_excepts      196
+_real_trap   fpsp_temp          a0 fpsp_excepts     196c
+_real_unfl   fpsp_temp          32 fpsp_excepts      7be fpsp_excepts      75a fpsp_excepts      2a8
+_round       fpsp_subs         956 fpsp_fouts        b62 fpsp_trans       3ece fpsp_trans       6a5c
+AmigaFPSP.ld                             22-Sep-97 01:57:56  File Section                                  Page 4-1
+
+filename     punit        hunk         type       offset:hunk     size
+fpsp_init.o  fpsp_init    FPSP060      code            0:0         1a4
+fpsp_temp.o  fpsp_temp    FPSP060      code          1a4:0          b4
+fpsp_excepts fpsp_excepts FPSP060      code          258:0        1a9c
+fpsp_trans.o fpsp_trans   FPSP060      code         1d78:0        4ce4
+fpsp_base.o  fpsp_base    FPSP060      code         6a68:0        2b30
+fpsp_fxcc.o  fpsp_fxcc    FPSP060      code         9598:0         ac4
+fpsp_fouts.o fpsp_fouts   FPSP060      code         a05c:0         da0
+fpsp_subs.o  fpsp_subs    FPSP060      code         adfc:0        1934
+fpsp_end.o   fpsp_end     FPSP060      code         c730:0           4
+AmigaFPSP.ld                            22-Sep-97 01:57:56  Library Section                                Page 5-1
+
+filename     punit        hunk         type       offset:hunk     size

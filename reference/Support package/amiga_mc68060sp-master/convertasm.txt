@@ -1,0 +1,74 @@
+
+Hi Rexxman, :-)
+
+Chnages:
+
+Folgende Änderungen am Convertasm werden noch benötigt, leider hast du noch kein RCS
+dann würde ich dir kurzerhand das "isp.asm,v" von RCS schieben, das sein geiler :-)
+
+1) CRLF -> CR (selbiges wie CED)
+2) MACRO SWBEG \1 ->    ILLEGAL
+                        DC.W \1
+2) TDIVU.x  %dx,%dy:%dz  -> DIVU.x dx,dy:dz         (z.2038 in .handmade)
+3) align $xx -> cnop 0,$xx
+
+4) BUG !!! SHORTS in dc.w umwandeln			// hab ich bei mir schon mal gefixt.
+
+5) BUG !!! MOV nur in MNEMONIC in MOVE wandeln, nicht in labels oder args
+
+6) (F)MOVEM Registerliste aus Binärform in ASC wandeln ( z.383 in .m68)
+        movem.l #$xxxx,<ea>		xxxx == bitmaske a7-d0  !\_ Achtung~!! Prüfs aber nochmal genauer
+        movem.l <ea>,#$yyyy             yyyy == bitmaske d0-a7  !/
+        bei FMOVEM musst du nochmal nachsehen, ist aber ähnlich... vergleich dir Sourcen
+        
+-------------- 8< ---------------------------
+swbeg	macro
+	illegal
+        dc.w	\1
+        endm
+
+align  macro
+	cnop	0,\1
+       endm
+-------------- 8< ---------------------------
+# rlog isp.asm
+RCS file: rcs/isp.asm
+Working file: isp.asm
+head: 1.0
+branch: 1.0.1
+locks: strict
+access list:
+symbolic names:
+comment leader: ";; "
+keyword substitution: kv
+total revisions: 5;     selected revisions: 5
+description:
+Integer Exeception Software Package
+Motorola Release 1.01 vom 7-Okt-1994
+----------------------------
+revision 1.0                                                             ##########  Das wars original
+date: 1996/02/19 22:45:49;  author: schlote;  state: Exp;
+branches:  1.0.1;
+Initial revision
+----------------------------
+revision 1.0.1.4								#### So das lässt sich assemblen
+date: 1996/02/19 23:02:26;  author: schlote;  state: Exp;  lines: +51 -43
+Bugfix ->  Core Emu Stack Offsets for DataRegs (were reversed)
+----------------------------
+revision 1.0.1.3
+date: 1996/02/19 23:01:38;  author: schlote;  state: Exp;  lines: +79 -210
+Added Macros for ISP Call Outs
+----------------------------
+revision 1.0.1.2
+date: 1996/02/19 22:57:33;  author: schlote;  state: Exp;  lines: +3280 -3207
+Amiga Port, PhxAss 3.x
+Optimizing switches added
+Beautified source
+----------------------------
+revision 1.0.1.1									## CR raus
+date: 1996/02/19 22:54:15;  author: schlote;  state: Exp;  lines: +4283 -4273
+Changed to ISO latin-1
+=============================================================================
+
+
+

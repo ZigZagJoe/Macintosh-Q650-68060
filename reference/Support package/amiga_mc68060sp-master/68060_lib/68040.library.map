@@ -1,0 +1,20 @@
+68040.library.ld                                22-May-97 20:08:23  Hunk Section                                        Page 1-1
+
+ num hunk                 size filename         punit            type         base  alv     size
+   0 loader                1c0 mc40_loader.o    mc40_loader      code            0    0      1c0
+68040.library.ld                               22-May-97 20:08:23  Symbol Section                                       Page 2-1
+
+symbol             offset:hunk symbol             offset:hunk symbol             offset:hunk symbol             offset:hunk
+_Check060             176:0    _LibCode              12a:0    _LinkerDB              (0:*)   __BSSBAS               (0:*)  
+__BSSLEN               (0:*)   __CoverLength          (0:*)   __CoverStart           (0:*)   __LibRevision          (0:*)  
+__LibVersion           (0:*)  
+68040.library.ld                                22-May-97 20:08:23  Xref Section                                        Page 3-1
+
+symbol                   (Def) Module  Off         (Ref) Module  Off         (Ref) Module  Off         (Ref) Module  Off
+68040.library.ld                                22-May-97 20:08:23  File Section                                        Page 4-1
+
+filename         punit            hunk             type       offset:hunk     size
+mc40_loader.o    mc40_loader      loader           code            0:0         1c0
+68040.library.ld                              22-May-97 20:08:23  Library Section                                       Page 5-1
+
+filename         punit            hunk             type       offset:hunk     size

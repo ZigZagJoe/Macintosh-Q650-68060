@@ -1,0 +1,17 @@
+/*-------------------------------------------------------------------------------
+**  /\    |\     Silicon Department     
+**  \_  o| \_ _  Software Entwicklung
+**      \||  |_)|)   Copyright by Carsten Schlote, 1990-2016
+** \__/||_/\_|     Released under CC-BY-NC-SA 4.0 license in 2016
+** See      http://creativecommons.org/licenses/by-nc-sa/4.0/legalcode
+**------------------------------------------------------------------------------
+*/
+
+
+-	Fix address decoding for ISP - untested
+
+
+68060 Software Package Errata	As of 7 October 1994
+------------------------------
+
+No known errata for this release.

@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta charset="UTF-8">
+<link rel="stylesheet" href="Nekonomicon%20-%20FS%20Apple%2068K%20LC475_060%20crazy%20maxed%20out,%20running%20gentoo_m68k_files/style.css">
+<title>Nekonomicon - FS Apple 68K LC475/060 crazy maxed out, running gentoo/m68k</title>
+</head>
+<body id="forum">
+<div id="navigation">
+<img id="wiz" src="Nekonomicon%20-%20FS%20Apple%2068K%20LC475_060%20crazy%20maxed%20out,%20running%20gentoo_m68k_files/wiz-sgi.png" alt="Wiz with SGI cube logo staff">
+<div id="navigation-title">Teleport to...</div>
+<div class="navigation-item"><a href="https://gainos.org/~elf/sgi/nekonomicon/index.html">Nekonomicon</a></div>
+<div class="navigation-item"><a href="https://gainos.org/~elf/sgi/nekonomicon/forum/index.html">Book of Notes</a></div>
+<div class="navigation-item"><a href="https://gainos.org/~elf/sgi/nekonomicon/forum/4/1.html">Hardware For Sale/Trade</a></div>
+<div class="navigation-item">FS Apple 68K LC475/06...</div>
+</div>
+<div id="content">
+<h1>Hardware For Sale/Trade</h1>
+<h2>
+FS Apple 68K LC475/060 crazy maxed out, running gentoo/m68k
+</h2>
+<div class="forum-post">
+<div class="forum-post-meta">
+<div class="forum-post-meta-text">
+<div class="forum-post-meta-author">
+<span class="forum-post-meta-author-username">
+<a href="https://gainos.org/~elf/sgi/nekonomicon/forum/users/ivelegacy/1.html">ivelegacy</a>
+</span><br>
+<span class="forum-post-meta-author-joindate">Who joined Jan. 4, 2015, 5:12 a.m.</span><br>
+</div>
+<div class="forum-post-meta-posted">
+<span class="forum-post-meta-posted">Wrote the following at March 18, 2015, 1:50 a.m...</span>
+</div>
+</div>
+</div>
+<div class="forum-post-body">
+<div class="forum-post-content">
+<div class="content">
+it's a mad hack i have done in 2009, trying to put a full gentoo/m68k on (which simply does not exist, so i had to create it)
+<br>
+<br>
+i need money to repair my Octane2, or to replace it, also i need to have
+ more free space in my small room, so here it is my crazy box for sale, 
+featured with
+<br>
+<br>
+<ul>
+<li>
+68060 FULL, it has MMU and FPU (68LC060 does not have FPU, 68EC060 does not have FPU and MMU)
+</li>
+<li>
+SmartSocket, to put a 68060 on the 68040 socket you need it, as it 
+performs 3.3V conversion for the 68060, the 68040 uses 5V, also it has a
+ PLL to provide the proper clock, while 68040 has a double frequency in 
+quadrature, which the 68060 simply doesn't have
+</li>
+<li>
+clocked @ 33Mhz (PLL hack, it was @ 25Mhz)
+</li>
+<li>
+rom hacked to put 68060SP on, as this CPU does not support all the 68040
+ ISA, you need a "support package", more specifically you need to put 
+"handlers" on "unsupported opcode exceptions", the hack is needed to 
+have the firmware able to boot the kernel, which bootstrap thinking to 
+have to deal with a 68060, so … it requires the SP already loaded by the
+ boot loader. I wanted to put everything into flash instead of dealing 
+with what is loaded from the hard drive at early boot stage because i 
+wanted to profile all my firmware to 68060 instead of having things 
+compiled for 68000 and things compiled for 68060
+</li>
+<li>
+LAN E410, it's a NuBus/E420 LC PDS, EtherNet Adapter on RJ45
+</li>
+<li>
+SCSI to pATA, it's a board i have developed by myself, it's not the 
+perfection, it's slow, but … it performs 3Mbyte/sec making you able to 
+put a micro drive on
+</li>
+<li>
+micro drive of 4Gbyte with a mon68k, a second stage boot loader, and the
+ linux kernel 2.6.27-hacked, plus a ram rootfs + a full gentoo stage4, 
+but i mean … the minimal survival apps, gcc, binutils, a bit of 
+utilities, and … nothing more, it takes to much to emerge things, but it
+ has a full portage, python and emerge … this machine takes 7 month 
+24h/24 to emerge her stage4, also … using NFS due to the limitations of 
+the installed ram (too poor for emerge, the swap file was provided by 
+NFS, 1Gbyte), CPU power (the 68060 is hardly under clocked, it can go up
+ to 66/75Mhz), etc
+</li>
+<li>
+32Mbyte installed
+</li>
+<li>
+LCD 2x16 backlighted on the front of the machine, connected to the 
+/dev/ttyS1, so it is possible to put short-texts on (load balance, 
+machine status, pretty MessageOfTheDay, whatever), i have removed the 
+floppy that is -broken- and -useless-
+</li>
+</ul>
+<br>
+<br>
+<br>
+the following screenshot show how pretty she boots from a SEAGATE 
+ST32550N hard drive, which trust me … this SCSI disc was very very 
+noisy, while the micro drive is very silent (even if … slower due to my 
+SCSI-to-pATA interface)
+<br>
+<br>
+<div class="codebox">
+<p>
+Code:
+<a href="#" onclick="selectCode(this); return false;">
+Select all
+</a>
+</p>
+<code>
+version 2.6.27-rotary-wombat-m68k-apple-lc475-68060
+<br>
+- compiled by root@queen-vittoria
+<br>
+- compiled with gcc version 3.4.5
+<br>
+- compiled on 19 Tue Jan2009
+<br>
+Detected Macintosh model: LC475
+<br>
+Bootinfo data:
+<br>
+Video: addr 0xf9001000 row 0x400 depth 8 dimensions 640 x 480
+<br>
+Videological 0xf0101000 phys. 0x51901000, SCC at 0x50f0c020
+<br>
+Boottime: 0xe71c3e2a GMTBias: 0x0
+<br>
+Machine ID: 90 CPUid: 0x2 memory size: 0x24
+<br>
+VIA1 at 50f00000 is a 6522 or clone
+<br>
+VIA2 at 50f02000 is a 6522 or clone
+<br>
+On node 0 totalpages: 9216
+<br>
+free_area_init_node: node 0, pgdat 00207b9c, node_mem_map 00257000
+<br>
+DMA zone: 9135 pages, LIFO batch:1
+<br>
+Built 1 zonelists in Zone order, mobility grouping on.&nbsp; Total pages: 9135
+<br>
+Kernel command line: root=/dev/sda7 init=/sbin/initmini
+<br>
+mac_init_IRQ(): Setting things up …
+<br>
+- Killing onboard sonic ethernet card ... &lt;6&gt;Done
+<br>
+mac_init_IRQ(): Done!
+<br>
+PID hash table entries: 256 (order: 8, 1024 bytes)
+<br>
+mac_enable_irq irq=14, irq_src=1 &lt;6&gt; via_irq_enable &lt;6&gt;
+<br>
+Console: colour dummy device 80x25
+<br>
+console [tty0] enabled
+<br>
+Dentry cache hash table entries: 8192 (order: 3, 32768 bytes)
+<br>
+Inode-cache hash table entries: 4096 (order: 2, 16384 bytes)
+<br>
+Memory: 34072k/34092k available (1544k kernel code, 1144k data, 84k init)
+<br>
+SLUB: Genslabs=12, HWalign=16, Order=0-3, MinObjects=0, CPUs=1, Nodes=8
+<br>
+Calibrating delay loop... 31.70 BogoMIPS
+<br>
+Mount-cache hash table entries: 512
+<br>
+net_namespace: 292 bytes
+<br>
+NET: Registered protocol family 16
+<br>
+NuBus: Scanning NuBus slots.
+<br>
+Now probing slot E at feffffff
+<br>
+Now probing slot E at fefffffe
+<br>
+Slot E:
+<br>
+Board resource:
+<br>
+type: [cat 0x1 type 0x0 hw 0x0 sw 0x0]
+<br>
+name: EtherNet card
+<br>
+board id: 0x8
+<br>
+vendor info:
+<br>
+ID: TFL LAN INC.
+<br>
+revision: REV 1.1
+<br>
+part: E410 NuBus/E420 LC PDS,EtherNet Adapter
+<br>
+Function 0x08:
+<br>
+type: [cat 0x4 type 0x1 hw 0x11e sw 0x100]
+<br>
+name: Network_Ethernet_Apple_TFL
+<br>
+memory offset: 0x000d0000
+<br>
+MAC address: 00:a0:4b:08:db:26
+<br>
+SCSI subsystem initialized
+<br>
+NET: Registered protocol family 2
+<br>
+IP route cache hash table entries: 1024 (order: 0, 4096 bytes)
+<br>
+TCP established hash table entries: 2048 (order: 2, 16384 bytes)
+<br>
+TCP bind hash table entries: 2048 (order: 1, 8192 bytes)
+<br>
+TCP: Hash tables configured (established 2048 bind 2048)
+<br>
+TCP reno registered
+<br>
+NET: Registered protocol family 1
+<br>
+msgmni has been set to 66
+<br>
+io scheduler noop registered
+<br>
+io scheduler anticipatory registered
+<br>
+io scheduler deadline registered
+<br>
+io scheduler cfq registered (default)
+<br>
+macfb: framebuffer at 0xf9001000, mapped to 0x02800000, size 480k
+<br>
+macfb: mode is 640x480x8, linelength=1024
+<br>
+macfb: scrolling: redraw
+<br>
+Console: switching to colour frame buffer device 80x30
+<br>
+fb0: DAFB frame buffer device
+<br>
+r3964: Philips r3964 Driver $Revision: 1.10 $
+<br>
+Ethernet Channel Bonding Driver: v3.3.0 (June 10, 2008)
+<br>
+mac8390.c: v0.4
+<br>
+eth0: Memory length resource for slot E not found, probing
+<br>
+eth0: EtherNet card in slot E (type apple)
+<br>
+MAC 00:a0:4b:08:db:26 IRQ 61, 32 KB shared memory at 0xfeed0000,&nbsp; 32-bit access.
+<br>
+tun: Universal TUN/TAP device driver, 1.6
+<br>
+tun: (C) 1999-2004 Max Krasnyansky &lt;maxk@qualcomm.com&gt;
+<br>
+input: Macintosh mouse button emulation as /class/input/input0
+<br>
+mac_enable_irq irq=10, irq_src=1 &lt;6&gt; via_irq_enable &lt;6&gt;
+<br>
+Macintosh CUDA driver v0.5 for Unified ADB.
+<br>
+adb: starting probe task …
+<br>
+mac_esp: using PDMA for controller 0
+<br>
+mac_enable_irq irq=19, irq_src=2 &lt;6&gt; (via:present) &lt;6&gt;
+<br>
+esp: esp0, regs[50f10000:0] irq[19]
+<br>
+esp: esp0 is a ESP236, 16 MHz (ccf=4), SCSI ID 7
+<br>
+adb devices: [2]: 2 8
+<br>
+ADB keyboard at 2, handler 1
+<br>
+Detected ADB keyboard, type ANSI.
+<br>
+input: ADB keyboard as /class/input/input1
+<br>
+adb: finished probe task...
+<br>
+scsi0 : esp
+<br>
+osst :I: Tape driver with OnStream support version 0.99.4
+<br>
+osst :I: $Id: osst.c,v 1.73 2005/01/01 21:13:34 wriede Exp $
+<br>
+Driver 'osst' needs updating - please use bus_type methods
+<br>
+scsi 0:0:0:0: Direct-Access&nbsp; &nbsp; &nbsp;SEAGATE&nbsp; ST32550N&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;8607 PQ: 0 ANSI: 2
+<br>
+target0:0:0: Beginning Domain Validation
+<br>
+SCSI Media Changer driver v0.25
+<br>
+target0:0:0: FAST-5 SCSI 3.3 MB/s ST (304 ns, offset 15)
+<br>
+target0:0:0: Domain Validation skipping write tests
+<br>
+target0:0:0: Ending Domain Validation
+<br>
+mice: PS/2 mouse device common for all mice
+<br>
+NET: Registered protocol family 26
+<br>
+IPv4 over IPv4 tunneling driver
+<br>
+sd 0:0:0:0: [sda] 4194995 512-byte hardware sectors (2148 MB)
+<br>
+TCP bic registered
+<br>
+TCP cubic registered
+<br>
+TCP westwood registered
+<br>
+TCP htcp registered
+<br>
+NET: Registered protocol family 17
+<br>
+NET: Registered protocol family 15
+<br>
+802.1Q VLAN Support v1.8
+<br>
+sd 0:0:0:0: [sda] Write Protect is off
+<br>
+sd 0:0:0:0: [sda] Mode Sense: ab 00 10 08
+<br>
+scsi: waiting for bus probes to complete ...
+<br>
+sd 0:0:0:0: [sda] Write cache: disabled, read cache: enabled, supports DPO and FUA
+<br>
+sd 0:0:0:0: [sda] 4194995 512-byte hardware sectors (2148 MB)
+<br>
+sd 0:0:0:0: [sda] Write Protect is off
+<br>
+sd 0:0:0:0: [sda] Mode Sense: ab 00 10 08
+<br>
+sd 0:0:0:0: [sda] Write cache: disabled, read cache: enabled, supports DPO and FUA
+<br>
+sda: [mac] sda1 sda2 sda3 sda4 sda5 sda6 sda7
+<br>
+sd 0:0:0:0: [sda] Attached SCSI disk
+<br>
+sd 0:0:0:0: Attached scsi generic sg0 type 0
+<br>
+kjournald starting.&nbsp; Commit interval 5 seconds
+<br>
+EXT3-fs: mounted filesystem with ordered data mode.
+<br>
+VFS: Mounted root (ext3 filesystem) readonly.
+<br>
+EXT3-fs warning: checktime reached, running e2fsck is recommended
+<br>
+EXT3 FS on sda7, internal journal
+<br>
+</code>
+</div>
+<br>
+<br>
+# gcc -v
+<br>
+<blockquote class="uncited">
+<div>
+Target: m68k-unknown-linux-gnu
+<br>
+Configured with: 
+/var/tmp/portage/sys-devel/gcc-4.2.3/work/gcc-4.2.3/configure 
+--prefix=/usr --bindir=/usr/m68k-unknown-linux-gnu/gcc-bin/4.2.3 
+--includedir=/usr/lib/gcc/m68k-unknown-linux-gnu/4.2.3/include 
+--datadir=/usr/share/gcc-data/m68k-unknown-linux-gnu/4.2.3 
+--mandir=/usr/share/gcc-data/m68k-unknown-linux-gnu/4.2.3/man 
+--infodir=/usr/share/gcc-data/m68k-unknown-linux-gnu/4.2.3/info 
+--with-gxx-include-dir=/usr/lib/gcc/m68k-unknown-linux-gnu/4.2.3/include/g++-v4
+ --host=m68k-unknown-linux-gnu --build=m68k-unknown-linux-gnu 
+--disable-altivec --disable-nls --with-system-zlib --disable-checking 
+--disable-werror --enable-secureplt --disable-libunwind-exceptions 
+--disable-multilib --disable-libmudflap --disable-libssp 
+--disable-libgcj --enable-languages=c,c++,objc,obj-c++,treelang,fortran 
+--enable-shared --enable-threads=posix --enable-__cxa_atexit 
+--enable-clocale=gnu
+<br>
+Thread model: posix
+<br>
+gcc version 4.2.3 (Gentoo 4.2.3 p1.0)
+<br>
+</div>
+</blockquote>
+<br>
+<br>
+# cat /proc/cpuinfo
+<br>
+<blockquote class="uncited">
+<div>
+m68k ~ # cat /proc/cpuinfo
+<br>
+CPU: 68060
+<br>
+MMU: 68060
+<br>
+FPU: 68060
+<br>
+Clocking: 33 MHz
+<br>
+</div>
+</blockquote>
+<br>
+<br>
+<br>
+just to make you understand how "pretty slow" is this machine with linux
+<br>
+<br>
+<div class="codebox">
+<p>
+Code:
+<a href="#" onclick="selectCode(this); return false;">
+Select all
+</a>
+</p>
+<code>
+#include &lt;stdio.h&gt;
+<br>
+<br>
+int main()
+<br>
+{
+<br>
+printf("hAllo world, ops i did muuuuuuuue again\n");
+<br>
+return 0;
+<br>
+}
+<br>
+</code>
+</div>
+<br>
+<br>
+# time gcc hAllo.c -o hAllo
+<br>
+<div class="codebox">
+<p>
+Code:
+<a href="#" onclick="selectCode(this); return false;">
+Select all
+</a>
+</p>
+<code>
+real&nbsp; &nbsp;0m6.890s
+<br>
+user&nbsp; &nbsp;0m5.620s
+<br>
+sys&nbsp; &nbsp;0m1.260s
+<br>
+</code>
+</div>
+<br>
+<br>
+# ./hAllo
+<br>
+<div class="codebox">
+<p>
+Code:
+<a href="#" onclick="selectCode(this); return false;">
+Select all
+</a>
+</p>
+<code>
+hAllo world, ops i did muuuuuuuue again
+<br>
+</code>
+</div>
+<br>
+<br>
+<br>
+a modern machine takes 0.062s for the real time parameter
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+btw, let me know if you want to feel the gentoo/m68k Appeal
+<img alt=":lol:" class="smilies" src="Nekonomicon%20-%20FS%20Apple%2068K%20LC475_060%20crazy%20maxed%20out,%20running%20gentoo_m68k_files/e3f252e5-1494-4194-84cb-114b675b1e4b.gif" title="Laughing">
+</div>
+</div>
+<div class="forum-post-signature">
+<div class="signature" id="sig7377673">
+IP30/Octane2,
+<span style="font-weight: bold">
+linux
+</span>
+kernel development,
+<span style="font-weight: bold">
+Irix
+</span>
+Scientific Apps (I'd like to use Ansys and Catia, I need more ram)
+</div>
+</div>
+</div>
+</div>
+<div class="forum-post">
+<div class="forum-post-meta">
+<div class="forum-post-meta-text">
+<div class="forum-post-meta-author">
+<span class="forum-post-meta-author-username">
+<a href="https://gainos.org/~elf/sgi/nekonomicon/forum/users/duewix/1.html">duewix</a>
+</span><br>
+<span class="forum-post-meta-author-joindate">Who joined April 22, 2007, 10:10 a.m.</span><br>
+</div>
+<div class="forum-post-meta-posted">
+<span class="forum-post-meta-posted">Wrote the following at March 18, 2015, 6:25 p.m...</span>
+</div>
+</div>
+</div>
+<div class="forum-post-body">
+<div class="forum-post-content">
+<div class="content">
+Amazing work! What a cool machine. I'm interested...do you have a figure in mind?
+</div>
+</div>
+</div>
+</div>
+<div class="forum-post">
+<div class="forum-post-meta">
+<div class="forum-post-meta-text">
+<div class="forum-post-meta-author">
+<span class="forum-post-meta-author-username">
+<a href="https://gainos.org/~elf/sgi/nekonomicon/forum/users/foetz/1.html">foetz</a>
+</span><br>
+<span class="forum-post-meta-author-rank">Moderator</span><br>
+<span class="forum-post-meta-author-joindate">Who joined April 14, 2003, 4:34 a.m.</span><br>
+</div>
+<div class="forum-post-meta-posted">
+<span class="forum-post-meta-posted">Wrote the following at March 18, 2015, 6:31 p.m...</span>
+</div>
+</div>
+</div>
+<div class="forum-post-body">
+<div class="forum-post-content">
+<div class="content">
+indeed impressive how you reconstructed the whole thing. i wonder what you would/could do to an 68k sgi
+<img alt=":D" class="smilies" src="Nekonomicon%20-%20FS%20Apple%2068K%20LC475_060%20crazy%20maxed%20out,%20running%20gentoo_m68k_files/ef4eb73a-2e8c-4158-a46e-4f5e33adc2b1.gif" title="Very Happy">
+</div>
+</div>
+<div class="forum-post-signature">
+<div class="signature" id="sig7377716">
+r-a-c.de
+</div>
+</div>
+</div>
+</div>
+<div class="forum-post">
+<div class="forum-post-meta">
+<div class="forum-post-meta-text">
+<div class="forum-post-meta-author">
+<span class="forum-post-meta-author-username">
+<a href="https://gainos.org/~elf/sgi/nekonomicon/forum/users/ivelegacy/1.html">ivelegacy</a>
+</span><br>
+<span class="forum-post-meta-author-joindate">Who joined Jan. 4, 2015, 5:12 a.m.</span><br>
+</div>
+<div class="forum-post-meta-posted">
+<span class="forum-post-meta-posted">Wrote the following at March 19, 2015, 4:05 a.m...</span>
+</div>
+</div>
+</div>
+<div class="forum-post-body">
+<div class="forum-post-content">
+<div class="content">
+thank you =)
+<br>
+<br>
+a guy has proposed me a very pretty exchange: his Acorn RiscPC/Arm-610 
+machine for my "strange" 68K linux pizza box, and i am really thinking 
+it would be a very nice exchange. His machine is missing the lan, but 
+it's not a problem, i can find one.
+<br>
+<br>
+No decision taken yet, but i have to confess i am really tempted to accept the exchange.
+<br>
+<br>
+<img alt="Image" class="postimage" src="Nekonomicon%20-%20FS%20Apple%2068K%20LC475_060%20crazy%20maxed%20out,%20running%20gentoo_m68k_files/Untitled.htm">
+<br>
+<img alt="Image" class="postimage" src="Nekonomicon%20-%20FS%20Apple%2068K%20LC475_060%20crazy%20maxed%20out,%20running%20gentoo_m68k_files/68010_case.jpg">
+<br>
+<img alt="Image" class="postimage" src="Nekonomicon%20-%20FS%20Apple%2068K%20LC475_060%20crazy%20maxed%20out,%20running%20gentoo_m68k_files/68010_case_inside.jpg">
+<br>
+<img alt="Image" class="postimage" src="Nekonomicon%20-%20FS%20Apple%2068K%20LC475_060%20crazy%20maxed%20out,%20running%20gentoo_m68k_files/68010_case_fornt.jpg">
+<br>
+<img alt="Image" class="postimage" src="Nekonomicon%20-%20FS%20Apple%2068K%20LC475_060%20crazy%20maxed%20out,%20running%20gentoo_m68k_files/68010_case_with_board.jpg">
+<br>
+<br>
+@foetz
+<br>
+i have never seen the earlier SGI 68k line, i have few informations 
+about them, but …. about m68k I have designed an home-made 68k-board, 
+also trying to adapt a box-case (IBM S/370 CRT-Terminal). I't not 
+completed yet, also the firmware needs more improvement, it has 2 big 
+NVram for the storage (non volatile memory, it stores things when you 
+switch the PSU off) but currently the firmware boots an
+<a class="postlink" href="https://web.archive.org/web/20181015065007/https://code.google.com/p/little-interpreter/">
+interpreter
+</a>
+(released as open sources) i have coded it in order to pass my 
+university homework, and which looks like "pascal". Well, if pascal 
+hadn't procedures
+<img alt=":lol:" class="smilies" src="Nekonomicon%20-%20FS%20Apple%2068K%20LC475_060%20crazy%20maxed%20out,%20running%20gentoo_m68k_files/e3f252e5-1494-4194-84cb-114b675b1e4b.gif" title="Laughing">
+<br>
+<br>
+Sorry about that, i am still having limited capability about designing 
+an interpreter, i am still having lessons about (computer science, 
+"compiler and interpreters" courses), it may be i will learn, actually 
+it has no procedures, just the "main", even if it's able to do this:
+<br>
+<br>
+<div class="codebox">
+<p>
+Code:
+<a href="#" onclick="selectCode(this); return false;">
+Select all
+</a>
+</p>
+<code>
+_______________________
+<br>
+&lt; Have you mooed today? &gt;
+<br>
+-----------------------
+<br>
+\&nbsp; &nbsp;^__^
+<br>
+\&nbsp; (oo)\_______
+<br>
+(__)\&nbsp; &nbsp; &nbsp; &nbsp;)\/\
+<br>
+||----w |
+<br>
+||&nbsp; &nbsp; &nbsp;||
+<br>
+<br>
+</code>
+</div>
+<br>
+<br>
+<img alt="Image" class="postimage" src="Nekonomicon%20-%20FS%20Apple%2068K%20LC475_060%20crazy%20maxed%20out,%20running%20gentoo_m68k_files/MC68060-_VME-_SMP.jpg">
+<br>
+MC68060 VME SMP
+<br>
+<br>
+my 68K-home board machine is a pretty common design in where you have 
+all devices attached to the CPU bus, no DMA, and just a few interrupt 
+driven devices (e.g. the ACIA, uart, and the PIT, which is used as timer
+ and could be used for "tick" generator in order to schedule things). 
+Nothing special in this design, everything looks very easy, while the 
+board in the picture looks much more interesting !
+<br>
+<br>
+That's MC68060 VME SMP made by "Eltec". There are other companies that 
+used the Eltec board, and they do "embroidery machines", but we are 
+talking about bit-industrial embroidery machines, something that need 
+"hard real time" processing, so the board i got from ebay dot com looks 
+more interesting.
+<br>
+<br>
+The board has two big 68060 CPUs @ 50Mhz, and a pretty amount of "shared
+ ram", something like "dual port" ram, but it also have 2 engines that 
+perform DMA and "mail boxes". Each CPU has a private space, and can 
+access the "partner" space in two way: -1- accessing the share ram 
+(which is also semaphored), and -2- trapping a mail into the partner 
+mail-box, this is the full interrupt driven way. DMA works in the 
+background, has 4 channels, and can move stream from and to the VME bus.
+<br>
+<br>
+Very amazing design, and VxWorks v5 is running, i have seen it on the 
+serial console. I had to hack it a bit, adding a VME backplane in order 
+to power to board, and reversing the console to wire out a connector in 
+order to access the console. Lately I got a pretty documentation, thanks
+ to Eltec, which has provided me 2 big pdf
+<img alt=":D" class="smilies" src="Nekonomicon%20-%20FS%20Apple%2068K%20LC475_060%20crazy%20maxed%20out,%20running%20gentoo_m68k_files/ef4eb73a-2e8c-4158-a46e-4f5e33adc2b1.gif" title="Very Happy">
+</div>
+</div>
+<div class="forum-post-signature">
+<div class="signature" id="sig7377739">
+IP30/Octane2,
+<span style="font-weight: bold">
+linux
+</span>
+kernel development,
+<span style="font-weight: bold">
+Irix
+</span>
+Scientific Apps (I'd like to use Ansys and Catia, I need more ram)
+</div>
+</div>
+</div>
+</div>
+<div class="forum-post">
+<div class="forum-post-meta">
+<div class="forum-post-meta-text">
+<div class="forum-post-meta-author">
+<span class="forum-post-meta-author-username">
+<a href="https://gainos.org/~elf/sgi/nekonomicon/forum/users/duewix/1.html">duewix</a>
+</span><br>
+<span class="forum-post-meta-author-joindate">Who joined April 22, 2007, 10:10 a.m.</span><br>
+</div>
+<div class="forum-post-meta-posted">
+<span class="forum-post-meta-posted">Wrote the following at March 19, 2015, 3:49 p.m...</span>
+</div>
+</div>
+</div>
+<div class="forum-post-body">
+<div class="forum-post-content">
+<div class="content">
+If you decide to make the trade, can you post pictures of your machine? I'd love to see your handy work.
+<br>
+<br>
+Just saying, I might have some interesting gear to trade as well...
+<br>
+<br>
+<img alt=":-)" class="smilies" src="Nekonomicon%20-%20FS%20Apple%2068K%20LC475_060%20crazy%20maxed%20out,%20running%20gentoo_m68k_files/16eb49a6-4d38-4070-ab3e-3aa4c3cc9c77.gif" title="Smile">
+</div>
+</div>
+</div>
+</div>
+<div class="forum-post">
+<div class="forum-post-meta">
+<div class="forum-post-meta-text">
+<div class="forum-post-meta-author">
+<span class="forum-post-meta-author-username">
+<a href="https://gainos.org/~elf/sgi/nekonomicon/forum/users/ivelegacy/1.html">ivelegacy</a>
+</span><br>
+<span class="forum-post-meta-author-joindate">Who joined Jan. 4, 2015, 5:12 a.m.</span><br>
+</div>
+<div class="forum-post-meta-posted">
+<span class="forum-post-meta-posted">Wrote the following at March 19, 2015, 4:18 p.m...</span>
+</div>
+</div>
+</div>
+<div class="forum-post-body">
+<div class="forum-post-content">
+<div class="content">
+sure, i have posted old photos of my home-made 68k just because i 
+already have them on my hard drive, for new photos i have to ask my 
+friend for his digital camera
+<br>
+<br>
+i hope i will be able to take a shot of the booting stage: it's very funny
+<img alt=":D" class="smilies" src="Nekonomicon%20-%20FS%20Apple%2068K%20LC475_060%20crazy%20maxed%20out,%20running%20gentoo_m68k_files/ef4eb73a-2e8c-4158-a46e-4f5e33adc2b1.gif" title="Very Happy">
+</div>
+</div>
+<div class="forum-post-signature">
+<div class="signature" id="sig7377765">
+IP30/Octane2,
+<span style="font-weight: bold">
+linux
+</span>
+kernel development,
+<span style="font-weight: bold">
+Irix
+</span>
+Scientific Apps (I'd like to use Ansys and Catia, I need more ram)
+</div>
+</div>
+</div>
+</div>
+<div class="forum-post">
+<div class="forum-post-meta">
+<div class="forum-post-meta-text">
+<div class="forum-post-meta-author">
+<span class="forum-post-meta-author-username">
+<a href="https://gainos.org/~elf/sgi/nekonomicon/forum/users/ajw99uk/1.html">ajw99uk</a>
+</span><br>
+<span class="forum-post-meta-author-location">From Yorkshire, UK</span><br>
+<span class="forum-post-meta-author-joindate">Who joined April 19, 2011, 4:59 a.m.</span><br>
+</div>
+<div class="forum-post-meta-posted">
+<span class="forum-post-meta-posted">Wrote the following at March 19, 2015, 5:07 p.m...</span>
+</div>
+</div>
+</div>
+<div class="forum-post-body">
+<div class="forum-post-content">
+<div class="content">
+<blockquote>
+<div>
+<cite>
+ivelegacy wrote:
+</cite>
+thank you =)
+<br>
+a guy has proposed me a very pretty exchange: his Acorn RiscPC/Arm-610 
+machine for my "strange" 68K linux pizza box, and i am really thinking 
+it would be a very nice exchange. His machine is missing the lan, but 
+it's not a problem, i can find one.
+<br>
+</div>
+</blockquote>
+<br>
+... on which you can then run ARM Linux! though it will cope much better with RISC OS.
+<br>
+<br>
+I've just brought mine up to Debian 4.0 after several "false starts" over the years. There is
+<a class="postlink" href="ftp://ftp.arm.linux.org.uk/pub/linux/arm/people/chocks/">
+a 2.2 install image on the net
+</a>
+that did the trick; upgrading from there via 3.0 to 3.1 ran into a 
+keymap problem, but that seems to have gone away in 4.0. But note that I
+ have a Kinetic StrongARM and plenty of RAM - with an ARM610 you might 
+want to start with
+<a class="postlink" href="ftp://ftp.arm.linux.org.uk/pub/linux/arm/arch/rpc/">
+the 2.0.36/Redhat installation
+</a>
+</div>
+</div>
+<div class="forum-post-signature">
+<div class="signature" id="sig7377773">
+<span style="font-size: 85%; line-height: 116%;">
+<a class="postlink" href="https://web.archive.org/web/20181015065008/http://forums.nekochan.net/viewtopic.php?f=14&amp;t=16725766">
+Fuel
+</a>
+;
+<a class="postlink" href="https://web.archive.org/web/20181015065008/http://forums.nekochan.net/viewtopic.php?f=14&amp;t=16726758">
+Indigo2
+</a>
+; RiscPC Kinetic-StrongARM/448MB/RISCOS4.39 or Debian-etch; EspressoPC 
+ViaC3/900MHz/256MB/Debian-testing; RPi B RISCOS5.21 or Raspbian-jessie; 
+A5000/33MHz/FPA11/8MB/RISCOS3.11; A540/25MHz/FPA10/16MB/RISCOS3.11 or 
+RISCiX1.21; R140/35MHz/4MB/RISCOS3.11 or RISCiX1.21
+</span>
+</div>
+</div>
+</div>
+</div>
+<div class="forum-post">
+<div class="forum-post-meta">
+<div class="forum-post-meta-text">
+<div class="forum-post-meta-author">
+<span class="forum-post-meta-author-username">
+<a href="https://gainos.org/~elf/sgi/nekonomicon/forum/users/ivelegacy/1.html">ivelegacy</a>
+</span><br>
+<span class="forum-post-meta-author-joindate">Who joined Jan. 4, 2015, 5:12 a.m.</span><br>
+</div>
+<div class="forum-post-meta-posted">
+<span class="forum-post-meta-posted">Wrote the following at March 19, 2015, 5:15 p.m...</span>
+</div>
+</div>
+</div>
+<div class="forum-post-body">
+<div class="forum-post-content">
+<div class="content">
+i am a gentoo guy, not a debian guy, and not a red hat guy (see my smile
+<img alt=":D" class="smilies" src="Nekonomicon%20-%20FS%20Apple%2068K%20LC475_060%20crazy%20maxed%20out,%20running%20gentoo_m68k_files/ef4eb73a-2e8c-4158-a46e-4f5e33adc2b1.gif" title="Very Happy">
+) , so, if there is a linux kernel work Acorn RiscPC, then i will put a 
+stage1-4 on catalyst/arm (under qemu/arm) in order to have the specific 
+rootfs. It will be easier than the work i did for the LC475 gentoo/m68k.
+ The real problem is … that dude has a RiscPC/700 equipped with a 
+StrongArm @ 200Mhz CPU but only 32+2Mbyte of ram, so It looks to me like
+ the profile i have with my this LC475 machine, and in this case … it's a
+ problem about natively emerging things from the gentoo's portage 
+because emerge eats a lot of ram. Acorn ram are very expensive, i was 
+asked about 30-35UKP on ebay, and 99UKP by dealers, for just one 
+128Mbyte module, plus shipping and VAT
+</div>
+</div>
+<div class="forum-post-signature">
+<div class="signature" id="sig7377774">
+IP30/Octane2,
+<span style="font-weight: bold">
+linux
+</span>
+kernel development,
+<span style="font-weight: bold">
+Irix
+</span>
+Scientific Apps (I'd like to use Ansys and Catia, I need more ram)
+</div>
+</div>
+</div>
+</div>
+<div class="forum-post">
+<div class="forum-post-meta">
+<div class="forum-post-meta-text">
+<div class="forum-post-meta-author">
+<span class="forum-post-meta-author-username">
+<a href="https://gainos.org/~elf/sgi/nekonomicon/forum/users/ajw99uk/1.html">ajw99uk</a>
+</span><br>
+<span class="forum-post-meta-author-location">From Yorkshire, UK</span><br>
+<span class="forum-post-meta-author-joindate">Who joined April 19, 2011, 4:59 a.m.</span><br>
+</div>
+<div class="forum-post-meta-posted">
+<span class="forum-post-meta-posted">Wrote the following at March 20, 2015, 6:38 a.m...</span>
+</div>
+</div>
+</div>
+<div class="forum-post-body">
+<div class="forum-post-content">
+<div class="content">
+<blockquote>
+<div>
+<cite>
+ivelegacy wrote:
+</cite>
+i am a gentoo guy, not a debian guy, and not a red hat guy (see my smile
+<img alt=":D" class="smilies" src="Nekonomicon%20-%20FS%20Apple%2068K%20LC475_060%20crazy%20maxed%20out,%20running%20gentoo_m68k_files/ef4eb73a-2e8c-4158-a46e-4f5e33adc2b1.gif" title="Very Happy">
+) , so, if there is a linux kernel work Acorn RiscPC, then i will put a 
+stage1-4 on catalyst/arm (under qemu/arm) in order to have the specific 
+rootfs. It will be easier than the work i did for the LC475 gentoo/m68k.
+</div>
+</blockquote>
+<br>
+Aside from the compiled kernels 2.6.18-4 and 2.6.18-6 in the Debian etch
+ distribution archive, you might find something useful at slackware/arm 
+or the ARMLinux site - there is more in the FTP side than appears from 
+the web pages.
+<br>
+<blockquote>
+<div>
+<cite>
+ivelegacy wrote:
+</cite>
+The real problem is … that dude has a RiscPC/700 equipped with a 
+StrongArm @ 200Mhz CPU but only 32+2Mbyte of ram, so It looks to me like
+ the profile i have with my this LC475 machine, and in this case … it's a
+ problem about natively emerging things from the gentoo's portage 
+because emerge eats a lot of ram. Acorn ram are very expensive, i was 
+asked about 30-35UKP on ebay, and 99UKP by dealers, for just one 
+128Mbyte module, plus shipping and VAT
+</div>
+</blockquote>
+<br>
+Look out for non-parity, non-ECC, 32bit, 60ns "generic" SIMMs - none 
+standing out on ebay just now but they do come up at reasonable cost 
+from time to time, from printers or Amiga boards. Check the part number 
+on the motherboard - "1280" means a later revision that could well be 
+tolerant of EDO as well as FPM SIMMs - I have an EDO SIMM on an old m/b,
+ so they are worth trying anyway. Full technical specs from Acorn at
+
+<a class="postlink" href="http://chrisacorns.computinghistory.org.uk/docs/Acorn/AN/259.pdf">
+http://chrisacorns.computinghistory.org ... AN/259.pdf
+</a>
+
+insisting on FPM will give you the key parameters.
+</div>
+</div>
+<div class="forum-post-signature">
+<div class="signature" id="sig7377814">
+<span style="font-size: 85%; line-height: 116%;">
+<a class="postlink" href="https://web.archive.org/web/20181015065008/http://forums.nekochan.net/viewtopic.php?f=14&amp;t=16725766">
+Fuel
+</a>
+;
+<a class="postlink" href="https://web.archive.org/web/20181015065008/http://forums.nekochan.net/viewtopic.php?f=14&amp;t=16726758">
+Indigo2
+</a>
+; RiscPC Kinetic-StrongARM/448MB/RISCOS4.39 or Debian-etch; EspressoPC 
+ViaC3/900MHz/256MB/Debian-testing; RPi B RISCOS5.21 or Raspbian-jessie; 
+A5000/33MHz/FPA11/8MB/RISCOS3.11; A540/25MHz/FPA10/16MB/RISCOS3.11 or 
+RISCiX1.21; R140/35MHz/4MB/RISCOS3.11 or RISCiX1.21
+</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+</body></html>

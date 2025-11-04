@@ -1,0 +1,9404 @@
+
+_LVOSetFunction:	EQU	-$000001A4
+ColdCapture:	EQU	$0000002A
+_LVOCacheControl:	EQU	-$00000288
+CACRF_WriteAllocate:	EQU	$00002000
+CACRF_IBE:	EQU	$00000010
+_LVOAllocVec:	EQU	-$000002AC
+LN_NAME:	EQU	$0000000A
+_LVORemHead:	EQU	-$00000102
+LN_TYPE:	EQU	$00000008
+MEMF_CLEAR:	EQU	$00010000
+_LVOSupervisor:	EQU	-$0000001E
+MH_UPPER:	EQU	$00000018
+CACRF_ClearI:	EQU	$00000008
+_LVOFindName:	EQU	-$00000114
+AttnFlags:	EQU	$00000128
+CDF_BADMEMORY:	EQU	$00000004
+LH_TAIL:	EQU	$00000004
+_LVOAddTail:	EQU	-$000000F6
+_LVOForbid:	EQU	-$00000084
+AFB_68882:	EQU	$00000005
+AFB_68881:	EQU	$00000004
+CACRF_ClearD:	EQU	$00000800
+DD_SIZE:	EQU	$00000022
+AFB_68040:	EQU	$00000003
+ex_CacheControl:	EQU	$0000023C
+_LVOFreeMem:	EQU	-$000000D2
+_LVOAddTask:	EQU	-$0000011A
+CACRF_CopyBack:	EQU	$80000000
+LN_SUCC:	EQU	$00000000
+_LVOCloseLibrary:	EQU	-$0000019E
+_LVOCachePostDMA:	EQU	-$00000300
+LN_PRED:	EQU	$00000004
+cd_Rom:	EQU	$00000010
+MEMF_PUBLIC:	EQU	$00000001
+PortList:	EQU	$00000188
+cd_BoardAddr:	EQU	$00000020
+_LVOCacheClearU:	EQU	-$0000027C
+_LVOOpenResource:	EQU	-$000001F2
+CACRF_FreezeI:	EQU	$00000002
+CACRF_DBE:	EQU	$00001000
+LIB_VERSION:	EQU	$00000014
+_LVOFindResident:	EQU	-$00000060
+CACRF_FreezeD:	EQU	$00000200
+cd_BoardSize:	EQU	$00000024
+_LVOAllocAbs:	EQU	-$000000CC
+_LVOAddResource:	EQU	-$000001E6
+IntrList:	EQU	$0000016C
+_LVOFreeVec:	EQU	-$000002B2
+LIB_POSSIZE:	EQU	$00000012
+_LVOCachePreDMA:	EQU	-$000002FA
+LibList:	EQU	$0000017A
+LIB_NEGSIZE:	EQU	$00000010
+_LVOAddDevice:	EQU	-$000001B0
+UNITF_FINTASK:	EQU	$00000002
+LIB_REVISION:	EQU	$00000016
+CACRF_EnableI:	EQU	$00000001
+_LVOPermit:	EQU	-$0000008A
+CACRF_EnableD:	EQU	$00000100
+CACRF_EnableE:	EQU	$40000000
+CDF_SHUTUP:	EQU	$00000001
+cli_Result2:	EQU	$00000000
+_LVOTypeOfMem:	EQU	-$00000216
+_LVOOpenLibrary:	EQU	-$00000228
+DMAB_NoModify:	EQU	$00000002
+_LVOAllocMem:	EQU	-$000000C6
+DeviceList:	EQU	$0000015E
+MH_LOWER:	EQU	$00000014
+_LVOAddLibrary:	EQU	-$0000018C
+nw_LeftEdge:	EQU	$00000000
+AFB_FPU40:	EQU	$00000006
+_LVOParentDir:	EQU	-$000000D2
+DMAF_Continue:	EQU	$00000002
+_LVOFindConfigDev:	EQU	-$00000048
+_LVOAddIntServer:	EQU	-$000000A8
+rp_SIZEOF:	EQU	$00000064
+MemList:	EQU	$00000142
+_LVOSetIntVector:	EQU	-$000000A2
+DMAB_Continue:	EQU	$00000001
+LH_HEAD:	EQU	$00000000
+****************************************************************************
+	SECTION	68040oldlibraryrs000000,CODE
+ProgStart:
+LibStub:	MOVEQ	#0,D0
+	RTS
+
+; -----------------------------------------------------------------------------------
+_NewVBR:	dcb.l	$0000003F,0
+	dcb.l	$0000003F,0
+	dcb.l	$0000003F,0
+	dcb.l	$0000003F,0
+	dcb.l	4,0
+
+RomTag:	ILLEGAL
+;fiX Label expected
+	dc.l	RomTag
+	dc.l	RomTagEnd
+	dc.b	128,37,9,130
+	dc.l	library.MSG
+	dc.l	ascii.MSG
+	dc.l	lbL000452
+library.MSG:	dc.b	'68040.library',0
+ascii.MSG:	dc.b	'68040 37.30 (18.1.93)',$D,$A,0
+inputdevice.MSG:	dc.b	'input.device',0,0
+lbL000452:	dc.l	$00000022
+	dc.l	InitData,0
+	dc.l	InitCode
+
+
+InitData:	dc.w	$FFFF
+	dc.w	.return_libcode-InitData	;Open
+	dc.w	.lib_nop-InitData	;Open
+	dc.w	.lib_nop-InitData	;Expunge
+	dc.w	.lib_nop-InitData	;Reserved
+	dc.w	.lib_nop2-InitData	;unkown1
+	dc.w	.lib_nop2-InitData	;unknown2
+	dc.w	$FFFF
+
+
+InitCode:	
+	MOVEA.L	D0,A1
+	MOVE.W	#30,(LIB_REVISION,A1)
+	CMPI.W	#37,(LIB_VERSION,A6)
+	BCS.B	.wrongkick
+	BTST	#AFB_68040,(AttnFlags+1,A6)
+	BNE.B	.Init_040
+
+.wrongkick:	MOVEM.L	A5/A6,-(SP)
+	MOVEA.L	A1,A5
+	MOVEQ	#0,D0
+	MOVE.W	(LIB_NEGSIZE,A5),D0
+	SUBA.L	D0,A1
+	ADD.W	(LIB_POSSIZE,A5),D0
+	JSR	(_LVOFreeMem,A6)
+	MOVEM.L	(SP)+,A5/A6
+
+.lib_nop:	MOVEQ	#0,D0
+	RTS
+
+
+.return_libcode:	MOVE.L	A6,D0
+	RTS
+
+.lib_nop2:	MOVEQ	#0,D0
+	RTS
+
+.Init_040:	MOVE.W	#1,($0020,A1)
+	MOVE.L	A1,-(SP)
+	MOVE.L	A5,-(SP)
+
+	JSR	(_LVOForbid,A6)
+
+	MOVEQ	#0,D0
+	MOVEQ	#(CACRF_EnableI|CACRF_FreezeI|CACRF_ClearI|CACRF_IBE|CACRF_EnableD|CACRF_FreezeD|CACRF_ClearD|CACRF_DBE|CACRF_WriteAllocate|CACRF_EnableE|CACRF_CopyBack|$3FFFC4E4),D1
+	JSR	(_LVOCacheControl,A6)
+	MOVE.L	D0,-(SP)
+; -----------------------------------------------------------------------------------
+	LEA	(_NewCachePreDMA,PC),A0
+	MOVE.L	A0,D0
+	MOVEA.L	A6,A1
+	MOVEA.W	#_LVOCachePreDMA,A0
+	JSR	(_LVOSetFunction,A6)
+
+	LEA	(_NewCachePostDMA,PC),A0
+	MOVE.L	A0,D0
+	MOVEA.L	A6,A1
+	MOVEA.W	#_LVOCachePostDMA,A0
+	JSR	(_LVOSetFunction,A6)
+
+	LEA	(_NewCacheControl,PC),A0
+	MOVE.L	A0,D0
+	MOVEA.L	A6,A1
+	MOVEA.W	#_LVOCacheControl,A0
+	JSR	(_LVOSetFunction,A6)
+; -----------------------------------------------------------------------------------
+	LEA	(_NewAddLibrary,PC),A0
+	MOVE.L	A0,D0
+	MOVEA.L	A6,A1
+	MOVEA.W	#_LVOAddLibrary,A0
+	JSR	(_LVOSetFunction,A6)
+	LEA	(_OldAddLibrary,PC),A0
+	MOVE.L	D0,(A0)
+
+	LEA	(_NewAddDevice,PC),A0
+	MOVE.L	A0,D0
+	MOVEA.L	A6,A1
+	MOVEA.W	#_LVOAddDevice,A0
+	JSR	(_LVOSetFunction,A6)
+	LEA	(_OldAddDevice,PC),A0
+	MOVE.L	D0,(A0)
+
+	LEA	(_AddNewResource,PC),A0
+	MOVE.L	A0,D0
+	MOVEA.L	A6,A1
+	MOVEA.W	#_LVOAddResource,A0
+	JSR	(_LVOSetFunction,A6)
+	LEA	(_OldAddResource,PC),A0
+	MOVE.L	D0,(A0)
+
+	LEA	(_NewAddTask,PC),A0
+	MOVE.L	A0,D0
+	MOVEA.L	A6,A1
+	MOVEA.W	#_LVOAddTask,A0
+	JSR	(_LVOSetFunction,A6)
+	LEA	(_OldAddTask,PC),A0
+	MOVE.L	D0,(A0)
+
+	LEA	(_NewAddIntServer,PC),A0
+	MOVE.L	A0,D0
+	MOVEA.L	A6,A1
+	MOVEA.W	#_LVOAddIntServer,A0
+	JSR	(_LVOSetFunction,A6)
+	LEA	(_OldAddIntServer,PC),A0
+	MOVE.L	D0,(A0)
+
+	LEA	(_NewSetIntVector,PC),A0
+	MOVE.L	A0,D0
+	MOVEA.L	A6,A1
+	MOVEA.W	#_LVOSetIntVector,A0
+	JSR	(_LVOSetFunction,A6)
+	LEA	(_OldSetIntServer,PC),A0
+	MOVE.L	D0,(A0)
+; -----------------------------------------------------------------------------------
+	LEA	(DeviceList,A6),A0
+	LEA	(inputdevice.MSG,PC),A1
+	JSR	(_LVOFindName,A6)
+	MOVEA.L	D0,A1
+	TST.L	D0
+	BEQ.B	.noInputDev
+
+	LEA	(_NewInputDeviceBeginIO,PC),A0
+	MOVE.L	A0,D0
+	MOVEA.W	#$FFE2,A0
+	JSR	(_LVOSetFunction,A6)
+	LEA	(_OldInputDeviceBeginIO,PC),A0
+	MOVE.L	D0,(A0)
+
+.noInputDev:	BTST	#AFB_FPU40,(AttnFlags+1,A6)
+	BEQ.B	.no040FPU
+
+	LEA	(_Add_FPU_EmuCode,PC),A5
+	JSR	(_LVOSupervisor,A6)
+	BSET	#AFB_68881,(AttnFlags+1,A6)
+	BSET	#AFB_68882,(AttnFlags+1,A6)
+
+.no040FPU:
+
+	LEA	(_CheckMMU,PC),A5	;Check For MMU
+	JSR	(_LVOSupervisor,A6)
+	TST.L	D0
+	BEQ.B	.no_MMU
+
+	JSR	(_BuildMMUTables).L	;Build the tables now
+	TST.L	D0
+	BEQ.B	.no_MMU
+
+	LEA	(_Set040MMUTables,PC),A5	;setup MMU
+	JSR	(_LVOSupervisor,A6)
+
+.no_MMU:	MOVE.L	(SP)+,D0
+	MOVEQ	#-1,D1
+	JSR	(_LVOCacheControl,A6)
+	JSR	(_LVOPermit,A6)
+	MOVEA.L	(SP)+,A5
+	MOVE.L	(SP)+,D0
+	RTS
+
+; -----------------------------------------------------------------------------------
+_CheckMMU:	MOVEC	DTT1,D1	;transparent data set to nocache, precise
+	AND.B	#$9F,D1
+	OR.B	#$20,D1
+	MOVEC	D1,DTT1
+
+	MOVEQ	#0,D0
+	ORI.W	#$0700,SR	;stop any irq
+
+	MOVEC	TC,D1	;mmu paging on ?
+	TST.W	D1
+	BMI.B	.is_set
+
+	BSET	#15,D1	;set mmu paging
+	MOVEC	D1,TC
+	MOVEC	TC,D1	;set & readback
+	MOVEC	D0,TC	;no mmu paging!
+	TST.W	D1	;was paging set ?
+	BPL.B	.no_MMU
+
+.is_set:	MOVE.L	#$00F80000,D0
+	MOVEQ	#1,D1
+	MOVEC	D1,DFC
+	MOVEC	D1,SFC
+	MOVEA.L	D0,A0
+	FRESTORE	($4E7A,A0)
+
+	MOVE.B	D5,D4
+	BTST	#1,D1
+	BNE.B	.no_MMU
+	AND.W	#$F000,D1
+	MOVE.L	D1,D0
+.no_MMU:	RTE
+
+; -----------------------------------------------------------------------------------
+_Set040MMUTables:	LEA	(_040MMUTables,PC),A0	;store mmu frame
+	MOVE.L	D0,(A0)
+
+	MOVEA.L	D0,A0
+	ORI.W	#$0700,SR
+	PFLUSHA		;MC68040
+	MOVE.L	(A0)+,D0
+	MOVEC	D0,URP	;SetUserRootPtr
+	MOVE.L	(A0)+,D0
+	MOVEC	D0,SRP	;Set RootPtr
+	MOVE.L	(A0)+,D0	;set Translation Ctrl Reg - go !
+	MOVEC	D0,TC
+	PFLUSHA		;MC68040
+	MOVEQ	#0,D0	;Disable all transparent translation
+	MOVEC	D0,ITT0
+	MOVEC	D0,ITT1
+	MOVEC	D0,DTT0
+	MOVEC	D0,DTT1
+	RTE
+
+_040MMUTables:	dc.l	0
+; -----------------------------------------------------------------------------------
+_OldAddLibrary:	dc.l	0
+
+_NewAddLibrary:	MOVE.L	(_OldAddLibrary,PC),-(SP)
+	MOVE.L	A1,-(SP)
+	JSR	(_LVOCacheClearU,A6)
+	MOVEA.L	(SP)+,A1
+	RTS
+
+_OldAddDevice:	dc.l	0
+
+_NewAddDevice:	MOVE.L	(_OldAddDevice,PC),-(SP)
+	MOVE.L	A1,-(SP)
+	JSR	(_LVOCacheClearU,A6)
+	MOVEA.L	(SP)+,A1
+	RTS
+
+_OldAddResource:	dc.l	0
+
+_AddNewResource:	MOVE.L	(_OldAddResource,PC),-(SP)
+	MOVE.L	A1,-(SP)
+	JSR	(_LVOCacheClearU,A6)
+	MOVEA.L	(SP)+,A1
+	RTS
+
+_OldAddTask:	dc.l	0
+
+_NewAddTask:	MOVE.L	(_OldAddTask,PC),-(SP)
+	MOVE.L	A1,-(SP)
+	JSR	(_LVOCacheClearU,A6)
+	MOVEA.L	(SP)+,A1
+	RTS
+
+_OldAddIntServer:	dc.l	0
+
+_NewAddIntServer:	MOVE.L	(_OldAddIntServer,PC),-(SP)
+	MOVEM.L	D0/A1,-(SP)
+	JSR	(_LVOCacheClearU,A6)
+	MOVEM.L	(SP)+,D0/A1
+	RTS
+
+_OldSetIntServer:	dc.l	0
+
+_NewSetIntVector:	MOVE.L	(_OldSetIntServer,PC),-(SP)
+	MOVEM.L	D0/A1,-(SP)
+	JSR	(_LVOCacheClearU,A6)
+	MOVEM.L	(SP)+,D0/A1
+	RTS
+
+; -----------------------------------------------------------------------------------
+_OldInputDeviceBeginIO:
+	dc.l	0
+
+_NewInputDeviceBeginIO:
+	MOVE.L	(_OldInputDeviceBeginIO,PC),-(SP)
+	CMPI.W	#9,($001C,A1)
+	BNE.B	.quit
+	MOVEM.L	A1/A6,-(SP)
+	MOVEA.L	(4).L,A6
+	JSR	(_LVOCacheClearU,A6)
+	MOVEM.L	(SP)+,A1/A6
+.quit:	RTS
+
+; -----------------------------------------------------------------------------------
+
+_NewCachePostDMA:	BTST	#DMAB_NoModify+1,D0	;; Read from Ram
+	BNE.B	Return_D0
+
+	MOVE.L	A0,D1	;simply push caches if len <= 15
+	OR.L	(A1),D1
+	AND.B	#15,D1
+	BEQ.B	Return_D0
+
+	MOVE.L	(_040MMUTables,PC),D1	;trace tables to dec use cnter
+	BNE.B	TraceMMUPostMapping
+
+	LEA	(DMAPending,PC),A1
+	SUBQ.L	#1,(A1)
+	BRA.B	Return_D0
+
+TraceMMUPostMapping:
+	MOVE.L	A0,-(SP)
+	MOVE.L	A4,-(SP)
+	LEA	(DecPtr_PushLine,PC),A4
+	BRA.B	TraceTree
+
+; -----------------------------------------------------------------------------------
+
+_NewCachePreDMA:	BTST	#DMAB_Continue,D0
+	BNE.B	Return_A0
+	BTST	#DMAB_NoModify+1,D0	;DMAB_ReadFromRAM
+	BNE.B	Return_A0
+
+	MOVE.L	A0,D1	;DMA_ADDR OR DMA_LEN
+	OR.L	(A1),D1
+	AND.B	#15,D1	;Get lower 4 bits of result
+	BEQ.B	Return_A0	;; no odd length
+
+	MOVE.L	(_040MMUTables,PC),D1	;; Trace Down MMU Tree for DMA run ?
+	BNE.B	TraceMMUPreMapping
+
+	LEA	(DMAPending,PC),A1
+	ADDQ.L	#1,(A1)
+Return_A0:	MOVE.L	A0,D0	;Called if no MMU tables installed
+Return_D0:	MOVE.L	D0,-(SP)	;Store the real addr for dma
+
+TriggerExternalCache:
+	MOVEQ	#0,D0	;Donothing call to trigger external caches ????
+	MOVEQ	#0,D1
+	BSR.B	_NewCacheControl
+	MOVE.L	(SP)+,D0
+	RTS
+
+; -----------------------------------------------------------------------------------
+TraceMMUPreMapping:	MOVE.L	A0,-(SP)	;Find Memory Run for Virtual->Real DMA Operation
+	MOVE.L	A4,-(SP)
+	LEA	(BumpPtr_DumpCacheLine,PC),A4
+; ------------------------------------
+TraceTree:	MOVE.L	A5,-(SP)
+	LEA	(_MMUPath,PC),A5
+	JSR	(_LVOSupervisor,A6)
+	MOVEA.L	(SP)+,A5
+	MOVEA.L	(SP)+,A4
+	BRA.B	TriggerExternalCache
+
+**@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@2
+; -----------------------------------------------------------------------------------
+
+_NewCacheControl:	MOVEM.L	D2/D3,-(SP)
+	AND.L	D1,D0
+	NOT.L	D1
+	MOVEA.L	A5,A1
+	LEA	(_SUPER_NewCacheControl,PC),A5
+	JSR	(_LVOSupervisor,A6)
+	MOVE.L	D3,D0
+	MOVEM.L	(SP)+,D2/D3
+	RTS
+
+;fiX Label expected
+	NOP
+_otherCCRFlags:	dc.l	0
+DMAPending:	dc.l	0
+
+_SUPER_NewCacheControl:
+	ORI.W	#$0700,SR
+	MOVEC	CACR,D2
+	AND.L	#$80008000,D2	;get d & i enable bits
+
+	SWAP	D2
+	ROR.W	#8,D2
+	ROL.L	#1,D2
+	OR.L	(_otherCCRFlags,PC),D2
+
+	MOVE.L	D2,D3
+	ROL.L	#4,D3
+	OR.L	D3,D2
+	BTST	#8,D2
+	BEQ.B	lbC0007D4
+
+	BSET	#31,D2
+lbC0007D4:	MOVE.L	D2,D3
+	AND.L	D1,D2
+	OR.L	D0,D2
+
+	MOVEQ	#1,D0
+	ROL.L	#8,D0
+	AND.L	D2,D0
+	MOVE.L	D0,(-8,A5)
+
+	TST.L	(DMAPending,PC)	;Disable Data Cache while in Operatopm
+	BEQ.B	lbC0007EE
+	BCLR	#8,D2
+
+lbC0007EE:	ROR.L	#1,D2
+	ROL.W	#8,D2
+	SWAP	D2
+	AND.L	#$80008000,D2
+	NOP
+	CPUSHA	BC	;Push BothCaches
+	NOP
+	MOVEC	D2,CACR
+	NOP
+	MOVEA.L	A1,A5
+	RTE
+
+; -----------------------------------------------------------------------------------
+_MMUPath:	MOVEA.L	D1,A5	;move mmutable to a5
+	MOVE.L	A0,D0	;push virt address to sp
+	MOVE.L	D0,-(SP)
+	ADD.L	(A1),D0	;get virt END addr
+	BSR.B	TrackDownMMU
+	MOVE.L	(SP)+,D0
+	BSR.B	TrackDownMMU
+	RTE
+
+; -----------------------------------------------------------------------------------
+TrackDownMMU:	MOVEQ	#15,D1
+	AND.L	D0,D1
+	BEQ.B	.quit
+
+	MOVE.L	D0,-(SP)
+	BFEXTU	D0{1:19},D0
+	MOVE.L	($002C,A5),D1	;get ptr to mmusegment list
+
+.searchPageList:	MOVEA.L	D1,A0	;search for right segment
+	MOVE.L	(LN_SUCC,A0),D1
+	BEQ.B	lbC00088C
+
+	CMP.L	(8,A0),D0	; range right
+	BCS.B	.searchPageList
+	CMP.L	(12,A0),D0
+	BHI.B	.searchPageList
+
+	SUB.L	(8,A0),D0
+	LEA	($0010,A0),A1
+	ADDA.L	D0,A1
+	ADDA.L	D0,A1
+	MOVE.L	(SP)+,D0
+
+	MOVEC	URP,A0
+	BFEXTU	D0{0:7},D1
+	ASL.L	#2,D1
+	ADDA.L	D1,A0
+	MOVE.L	(A0),D1
+	AND.L	#$FFFFFE00,D1
+	MOVEA.L	D1,A0
+	BFEXTU	D0{7:7},D1
+	ASL.L	#2,D1
+	ADDA.L	D1,A0
+	MOVE.L	(A0),D1
+	AND.L	#$FFFFFF00,D1
+	MOVEA.L	D1,A0
+	BFEXTU	D0{14:6},D1
+	ASL.L	#2,D1
+	ADDA.L	D1,A0
+	MOVE.L	(A0),D1
+	BTST	#0,D1
+	BNE.B	lbC00088A
+	BCLR	#1,D1
+	BEQ.B	lbC00088A
+	MOVEA.L	D1,A0
+lbC00088A:	JMP	(A4)
+
+lbC00088C:	MOVE.L	(SP)+,D0
+.quit:	RTS
+
+; -----------------------------------------------------------------------------------
+BumpPtr_DumpCacheLine:
+	MOVE.W	(A1),D0	;Inc TraceAddr to next addr
+	ADDQ.W	#1,(A1)
+	TST.W	D0
+	BNE.B	.quit	;; return if not cacheline start
+	ADDQ.L	#3,A0
+	CPUSHA	DC	;dump all caches to mem
+	PFLUSHA		;MC68040
+	BCLR	#5,(A0)
+	CPUSHL	DC,(A0)
+	RTS
+
+; -----------------------------------------------------------------------------------
+DecPtr_PushLine:	SUBQ.W	#1,(A1)                        ;Dec TraceAddr to next addr
+	MOVE.W	(A1),D0
+	BNE.B	.quit
+
+	ADDQ.L	#3,A0
+	PFLUSHA		;MC68040
+	BSET	#5,(A0)
+	CPUSHL	DC,(A0)
+	RTS
+
+; ---------------------------------------------------------------------------
+_FPUExceptionHandler_DivByZero:
+	LINK.W	A6,#-$00C0
+	FSAVE	-(SP)
+	BCLR	#2,(-$00DC,A6)
+	FRESTORE	(SP)+
+	UNLK	A6
+	RTE
+
+; -------------------------------------------------------
+_FPUExceptionHandler_InexactResult:
+	LINK.W	A6,#-$00C0
+	FSAVE	-(SP)
+	CMPI.B	#$40,(SP)
+	BNE.B	lbC00092A
+	FMOVE.L	FPSR,-(SP)
+	BTST	#2,(-$00DC,A6)
+	BEQ.B	lbC00091E
+	BTST	#6,(2,SP)
+	BEQ.B	lbC0008F6
+	ADDQ.L	#4,SP
+	FRESTORE	(SP)+
+	UNLK	A6
+	JMP	(_FPUExceptionHandler_SNAN).L
+
+lbC0008F6:	BTST	#4,(2,SP)
+	BEQ.B	lbC00090A
+	ADDQ.L	#4,SP
+	FRESTORE	(SP)+
+	UNLK	A6
+	JMP	(_FPUExceptionHandler_Overflow).L
+
+lbC00090A:	BTST	#3,(2,SP)
+	BEQ.B	lbC00091E
+	ADDQ.L	#4,SP
+	FRESTORE	(SP)+
+	UNLK	A6
+	JMP	(_FPUExceptionHandler_Underflow).L
+
+lbC00091E:	ADDQ.L	#4,SP
+	FRESTORE	(SP)+
+	UNLK	A6
+lbC000924:	LINK.W	A6,#-$00C0
+	FSAVE	-(SP)
+lbC00092A:	BCLR	#1,(-$00DC,A6)
+	BEQ.B	lbC00094E
+	MOVEM.L	D0/D1,(-$00C0,A6)
+	BFEXTU	(-$00E4,A6){6:3},D0
+	BCLR	D0,(-$011B,A6)
+	BSR.W	lbC000F90
+	MOVEM.L	(-$00C0,A6),D0/D1
+	BRA.B	lbC000954
+
+lbC00094E:	BCLR	#2,(-$00DC,A6)
+lbC000954:	FRESTORE	(SP)+
+	UNLK	A6
+	RTE
+
+lbC00095A:	LINK.W	A6,#-$00C0
+	FSAVE	-(SP)
+	BCLR	#1,(-$00DC,A6)
+	BNE.B	lbC00096E
+	BCLR	#2,(-$00DC,A6)
+lbC00096E:	FRESTORE	(SP)+
+	UNLK	A6
+	RTE
+
+lbC000974:	LINK.W	A6,#-$00C0
+	FSAVE	-(SP)
+	BCLR	#1,(-$00DC,A6)
+	BNE.B	lbC000988
+	BCLR	#2,(-$00DC,A6)
+lbC000988:	FRESTORE	(SP)+
+	UNLK	A6
+	RTE
+
+lbC00098E:	LINK.W	A6,#-$00C0
+	FSAVE	-(SP)
+	BCLR	#2,(-$00DC,A6)
+	FRESTORE	(SP)+
+	UNLK	A6
+	RTE
+
+lbC0009A0:	LINK.W	A6,#-$00C0
+	FSAVE	-(SP)
+	BCLR	#2,(-$00DC,A6)
+	FRESTORE	(SP)+
+	UNLK	A6
+	RTE
+
+lbC0009B2:	LINK.W	A6,#-$00C0
+	FSAVE	-(SP)
+	BCLR	#2,(-$00DC,A6)
+	FMOVE.L	FPSR,-(SP)
+	BCLR	#0,(SP)
+	FMOVE.L	(SP)+,FPSR
+	FRESTORE	(SP)+
+	UNLK	A6
+	RTE
+
+lbC0009D0:	ORI.B	#0,D0
+lbC0009D4:	MOVE.L	(lbC0009D0,PC),-(SP)
+;fiX Data reference expected
+	RTS
+
+;fiX Label expected
+	LINK.W	A6,#-$00C0
+	FSAVE	-(SP)
+	BCLR	#2,(-$00DC,A6)
+	FRESTORE	(SP)+
+	UNLK	A6
+	RTE
+
+lbC0009EC:	RTE
+
+lbC0009EE:	MOVE.L	(lbC0009D0,PC),-(SP)
+;fiX Data reference expected
+	RTS
+
+lbC0009F4:	RTE
+
+lbC0009F6:	MOVE.B	(A0)+,(A1)+
+lbC0009F8:	DBRA	D0,lbC0009F6
+	RTS
+
+; -----------------------------------------------------------------------------------
+_Add_FPU_EmuCode:	ORI.W	#$0700,SR
+	MOVEC	VBR,A1
+	LEA	(_NewVBR,PC),A0
+	MOVE.W	#$00FF,D0
+.copyvbr:	MOVE.L	(A1)+,(A0)+
+	DBRA	D0,.copyvbr
+
+	LEA	(_NewVBR,PC),A0
+	MOVEC	A0,VBR
+	MOVE.L	($002C,A0),(lbC0009D0).L
+;fiX Data reference expected
+	MOVE.L	#_ExceptionHandler_11,($002C,A0)
+	MOVE.L	#_FPUExceptionHandler_InexactResult,($00C4,A0)
+	MOVE.L	#_FPUExceptionHandler_DivByZero,($00C8,A0)
+	MOVE.L	#_FPUExceptionHandler_UnorderedCond,($00C0,A0)
+	MOVE.L	#_FPUExceptionHandler_Underflow,($00CC,A0)
+	MOVE.L	#_FPUExceptionHandler_OpError,($00D0,A0)
+	MOVE.L	#_FPUExceptionHandler_Overflow,($00D4,A0)
+	MOVE.L	#_FPUExceptionHandler_SNAN,($00D8,A0)
+	MOVE.L	#_FPUExceptionHandler_UnimplDType,($00DC,A0)
+	CPUSHA	DC
+	RTE
+
+; ----------------------------------------------------------------------------
+lbW000A70:	dc.w	$3FFD,0,$9A20,$9A84,$FBCF,$F798,0,0
+lbB000A80:	dc.b	$3F,$FD,0,0,$9A,$20,$9A,$84,$FB,$CF,$F7,$99,0,0,0,0
+lbS000A90:	dc.s	1.0,0.0,0.0,0.0
+	dc.w	$4000,0,0,0,0,0,0,0
+lbS000AB0:	dc.s	10.0,0.0,0.0,0.0
+lbS000AC0:	dc.s	4933.0,0.0,0.0,0.0
+lbL000AD0:	dc.l	0,$03030202,$03020203,$02030302
+
+lbC000AE0:	MOVEM.L	D2-D7/A2,-(SP)
+	FMOVEM.X	FP0/FP1/FP2,-(SP)
+	FMOVE.L	#$00000020,FPCR
+	MOVE.L	(A0),(-$0050,A6)
+	MOVE.L	D0,D7
+	CLR.B	(-$004B,A6)
+	MOVE.W	(-$00E8,A6),D0
+	ANDI.W	#$E000,D0
+	BEQ.B	lbC000B32
+	MOVE.W	(A0),D0
+	ANDI.W	#$7FFF,D0
+	MOVE.L	(4,A0),D1
+	MOVE.L	(8,A0),D2
+lbC000B12:	SUBQ.W	#1,D0
+	LSL.L	#1,D2
+	ADDX.L	D1,D1
+	TST.L	D1
+	BGE.B	lbC000B12
+	TST.W	D0
+	BGT.B	lbC000B24
+	ST	(-$004B,A6)
+lbC000B24:	ANDI.W	#$7FFF,D0
+	MOVE.W	D0,(A0)
+	MOVE.L	D1,(4,A0)
+	MOVE.L	D2,(8,A0)
+lbC000B32:	MOVE.L	(A0),(-$0064,A6)
+	MOVE.L	(4,A0),(-$0060,A6)
+	MOVE.L	(8,A0),(-$005C,A6)
+	ANDI.L	#$7FFFFFFF,(-$0064,A6)
+	TST.B	(-$004B,A6)
+	BEQ.B	lbC000B58
+	MOVE.L	#$FFFFECBB,D6
+	BRA.B	lbC000B90
+
+lbC000B58:	MOVE.W	(-$0064,A6),D0
+	MOVE.W	#$3FFF,(-$0064,A6)
+	FMOVE.X	(-$0064,A6),FP0
+	SUB.W	#$3FFF,D0
+	FADD.W	D0,FP0
+	FSUB.S	(lbS000A90,PC),FP0
+	FBGE.W	lbC000B86
+	FMUL.X	(lbB000A80,PC),FP0
+	FMOVE.L	FP0,D6
+	BRA.B	lbC000B90
+
+lbC000B86:	FMUL.X	(lbW000A70,PC),FP0
+	FMOVE.L	FP0,D6
+lbC000B90:	FMOVE.L	#0,FPSR
+	CLR.W	D5
+lbC000B9A:	TST.L	D7
+	BLE.B	lbC000BA2
+	MOVE.L	D7,D4
+	BRA.B	lbC000BA8
+
+lbC000BA2:	MOVE.L	D6,D4
+	SUB.L	D7,D4
+	ADDQ.L	#1,D4
+lbC000BA8:	TST.L	D4
+	BLE.B	lbC000BC4
+	CMP.L	#$00000011,D4
+	BLE.B	lbC000BC6
+	MOVEQ	#$11,D4
+	TST.L	D7
+	BLE.B	lbC000BC6
+	ORI.L	#$00002080,(-$007C,A6)
+	BRA.B	lbC000BC6
+
+lbC000BC4:	MOVEQ	#1,D4
+lbC000BC6:	TST.L	D7
+	BGT.B	lbC000BD0
+	CMP.L	D6,D7
+	BLT.B	lbC000BD0
+	MOVE.L	D7,D6
+lbC000BD0:	MOVE.L	D6,D0
+	ADDQ.L	#1,D0
+	SUB.L	D4,D0
+	SWAP	D5
+	CLR.W	D5
+	CLR.W	D2
+	TST.L	D0
+	BGE.B	lbC000BF4
+	ADDQ.W	#1,D5
+	CMP.L	#$FFFFECD4,D0
+	BGT.B	lbC000BF2
+	ADDI.L	#$00000018,D0
+	MOVEQ	#$18,D2
+lbC000BF2:	NEG.L	D0
+lbC000BF4:	FMOVE.S	(lbS000A90,PC),FP1
+	BFEXTU	(-$0080,A6){$1A:2},D1
+	LSL.W	#1,D1
+	ADD.W	D5,D1
+	LSL.W	#1,D1
+	TST.L	(-$0050,A6)
+	BGE.B	lbC000C0E
+	ADDQ.L	#1,D1
+lbC000C0E:	LEA	(lbL000AD0,PC),A2
+	MOVE.B	(A2,D1.W),D3
+	LSL.L	#4,D3
+	FMOVE.L	D3,FPCR
+	LSR.L	#4,D3
+	TST.B	D3
+	BNE.B	lbC000C2A
+	LEA	(lbL001D10).L,A1
+	BRA.B	lbC000C3C
+
+lbC000C2A:	LSR.B	#1,D3
+	BCC.B	lbC000C36
+	LEA	(lbL001E90).L,A1
+	BRA.B	lbC000C3C
+
+lbC000C36:	LEA	(lbL001DD0).L,A1
+lbC000C3C:	MOVEQ	#0,D3
+lbC000C3E:	LSR.L	#1,D0
+	BCC.B	lbC000C48
+	FMUL.X	(A1,D3.W),FP1
+lbC000C48:	ADDQ.L	#8,D3
+	ADDQ.L	#4,D3
+	TST.L	D0
+	BNE.B	lbC000C3E
+	FMOVE.L	#0,FPSR
+	FMOVE.L	#$00000010,FPCR
+	FMOVE.X	(A0),FP0
+	FABS.X	FP0
+	TST.W	D5
+	BNE.B	lbC000C72
+	FDIV.X	FP1,FP0
+	BRA.B	lbC000CCE
+
+lbC000C72:	TST.B	(-$004B,A6)
+	BEQ.B	lbC000CBA
+	FMOVEM.X	D1,-(SP)
+	MOVE.L	(8,A0),-(SP)
+	MOVE.L	(4,A0),-(SP)
+	MOVE.L	(A0),-(SP)
+	MOVEQ	#$12,D3
+lbC000C88:	CLR.L	-(SP)
+	DBRA	D3,lbC000C88
+	MOVE.B	(-$0045,A6),(SP)
+	MOVE.B	#$60,(1,SP)
+	MOVE.B	#$10,($0044,SP)
+	MOVE.W	#$0023,($0040,SP)
+	MOVE.B	#$FE,(8,SP)
+	FRESTORE	(SP)+
+	FMUL.X	($0024,A1),FP0
+	FMUL.X	($0030,A1),FP0
+	BRA.B	lbC000CCE
+
+lbC000CBA:	TST.W	D2
+	BEQ.B	lbC000CCA
+	FMUL.X	($0024,A1),FP0
+	FMUL.X	($0030,A1),FP0
+lbC000CCA:	FMUL.X	FP1,FP0
+lbC000CCE:	FMOVE.L	FPSR,D0
+	FMOVE.X	FP0,(-$0064,A6)
+	LEA	(-$0064,A6),A2
+	BTST	#9,D0
+	BEQ.B	lbC000CF0
+	ORI.L	#1,(8,A2)
+	FMOVE.X	(-$0064,A6),FP0
+lbC000CF0:	MOVE.L	(-$0080,A6),(-$0054,A6)
+	ANDI.L	#$00000030,(-$0080,A6)
+	MOVEM.L	D0/D1/A0/A1,-(SP)
+	MOVE.L	(-$0054,A6),-(SP)
+	MOVE.L	(-$0050,A6),-(SP)
+	LEA	(-$0064,A6),A0
+	FMOVE.X	FP0,(A0)
+	TST.L	(-$0050,A6)
+	BGE.B	lbC000D1E
+	ORI.L	#$80000000,(A0)
+lbC000D1E:	MOVE.L	(-$007C,A6),-(SP)
+	BSR.W	lbC006410
+	MOVE.B	(SP),(-$007C,A6)
+	ADDQ.L	#4,SP
+	MOVE.L	(SP)+,(-$0050,A6)
+	MOVE.L	(SP)+,(-$0054,A6)
+	MOVEM.L	(SP)+,D0/D1/A0/A1
+	MOVE.L	(-$0050,A6),(-$0064,A6)
+	MOVE.L	(-$0054,A6),(-$0080,A6)
+	SWAP	D5
+	TST.W	D5
+	BNE.B	lbC000DC6
+	FMOVE.S	(lbS000A90,PC),FP2
+	MOVE.L	D4,D0
+	SUBQ.L	#1,D0
+	MOVEQ	#0,D3
+lbC000D56:	LSR.L	#1,D0
+	BCC.B	lbC000D60
+	FMUL.X	(A1,D3.W),FP2
+lbC000D60:	ADDQ.L	#8,D3
+	ADDQ.L	#4,D3
+	TST.L	D0
+	BNE.B	lbC000D56
+	TST.B	(-$004B,A6)
+	BEQ.B	lbC000D74
+	FABS.X	FP0
+	BRA.B	lbC000D98
+
+lbC000D74:	FABS.X	FP0
+	FCMP.X	FP2,FP0
+	FBGE.W	lbC000D98
+	SUBQ.L	#1,D6
+	MOVE.W	#1,D5
+	FMOVE.L	#$00000020,FPCR
+	FMUL.S	(lbS000AB0,PC),FP2
+	BRA.W	lbC000B9A
+
+lbC000D98:	FMUL.S	(lbS000AB0,PC),FP2
+	FCMP.X	FP2,FP0
+	FBLT.W	lbC000DFE
+	FBGT.W	lbC000DB4
+	FDIV.S	(lbS000AB0,PC),FP0
+	ADDQ.L	#1,D6
+	BRA.B	lbC000DFE
+
+lbC000DB4:	ADDQ.L	#1,D6
+	MOVE.W	#1,D5
+	FMOVE.L	#$00000020,FPCR
+	BRA.W	lbC000B9A
+
+lbC000DC6:	FMOVE.S	(lbS000A90,PC),FP2
+	MOVE.L	D4,D0
+	MOVEQ	#0,D3
+lbC000DD0:	LSR.L	#1,D0
+	BCC.B	lbC000DDA
+	FMUL.X	(A1,D3.W),FP2
+lbC000DDA:	ADDQ.L	#8,D3
+	ADDQ.L	#4,D3
+	TST.L	D0
+	BNE.B	lbC000DD0
+	FABS.X	FP0
+	FCMP.X	FP2,FP0
+	FBNE.W	lbC000DFE
+	FDIV.S	(lbS000AB0,PC),FP0
+	ADDQ.L	#1,D6
+	ADDQ.L	#1,D4
+	FMUL.S	(lbS000AB0,PC),FP2
+lbC000DFE:	FMOVE.L	#$00000010,FPCR
+	FDIV.X	FP2,FP0
+	LEA	(-$0074,A6),A0
+	FMOVE.X	FP0,(A0)
+	MOVE.L	(4,A0),D2
+	MOVE.L	(8,A0),D3
+	CLR.L	(4,A0)
+	CLR.L	(8,A0)
+	MOVE.L	(A0),D0
+	SWAP	D0
+	BEQ.B	lbC000E3C
+	SUBI.L	#$00003FFD,D0
+	TST.L	D0
+	BGT.B	lbC000E3C
+	NEG.L	D0
+lbC000E34:	LSR.L	#1,D2
+	ROXR.L	#1,D3
+	DBRA	D0,lbC000E34
+lbC000E3C:	TST.L	D2
+	BNE.B	lbC000E44
+	TST.L	D3
+	BEQ.B	lbC000E54
+lbC000E44:	MOVEQ	#0,D1
+	ADDI.L	#$00000080,D3
+	ADDX.L	D1,D2
+	ANDI.L	#$FFFFFF80,D3
+lbC000E54:	MOVE.L	D4,D0
+	ADDQ.L	#3,A0
+	BSR.W	lbC000F34
+	TST.B	(-$004B,A6)
+	BEQ.B	lbC000E8A
+	FTST.X	FP0
+	FBEQ.W	lbC000E74
+	FMOVE.L	D6,FP0
+	FABS.X	FP0
+	BRA.B	lbC000EA2
+
+lbC000E74:	TST.L	D7
+	BLT.B	lbC000E80
+	FMOVE.S	(lbS000AC0,PC),FP0
+	BRA.B	lbC000EA2
+
+lbC000E80:	FMOVE.L	D6,FP0
+	FABS.X	FP0
+	BRA.B	lbC000EA2
+
+lbC000E8A:	FTST.X	FP0
+	FBNE.W	lbC000E9A
+	FMOVE.S	(lbS000A90,PC),FP0
+	BRA.B	lbC000EA2
+
+lbC000E9A:	FMOVE.L	D6,FP0
+	FABS.X	FP0
+lbC000EA2:	FDIV.X	($0018,A1),FP0
+	FMOVE.X	FP0,(-$0064,A6)
+	MOVE.L	(4,A2),D2
+	MOVE.L	(8,A2),D3
+	MOVE.W	(A2),D0
+	BEQ.B	lbC000EC8
+	SUBI.W	#$3FFD,D0
+	NEG.W	D0
+lbC000EC0:	LSR.L	#1,D2
+	ROXR.L	#1,D3
+	DBRA	D0,lbC000EC0
+lbC000EC8:	MOVEQ	#0,D1
+	ADDI.L	#$00000080,D3
+	ADDX.L	D1,D2
+	ANDI.L	#$FFFFFF80,D3
+	MOVEQ	#4,D0
+	LEA	(-$0054,A6),A0
+	BSR.W	lbC000F34
+	MOVE.L	(-$0054,A6),D0
+	MOVEQ	#12,D1
+	LSR.L	D1,D0
+	BFINS	D0,(-$0074,A6){4:12}
+	LSR.L	D1,D0
+	BFINS	D0,(-$0074,A6){$10:4}
+	TST.B	D0
+	BEQ.B	lbC000F04
+	ORI.L	#$00002080,(-$007C,A6)
+lbC000F04:	MOVEQ	#0,D0
+	ANDI.B	#15,(-$0074,A6)
+	TST.L	(-$0050,A6)
+	BGE.B	lbC000F14
+	MOVEQ	#2,D0
+lbC000F14:	TST.L	D6
+	BGE.B	lbC000F1A
+	ADDQ.L	#1,D0
+lbC000F1A:	BFINS	D0,(-$0074,A6){0:2}
+	FMOVE.L	#0,FPSR
+	FMOVEM.X	(SP)+,FP0/FP1/FP2
+	MOVEM.L	(SP)+,D2-D7/A2
+	RTS
+
+;fiX Label expected
+	dc.w	0
+
+lbC000F34:	MOVEM.L	D0-D7,-(SP)
+	MOVEQ	#1,D7
+	SUBQ.L	#1,D0
+lbC000F3C:	MOVE.L	D2,D4
+	MOVE.L	D3,D5
+	BFEXTU	D2{0:3},D1
+	ASL.L	#3,D2
+	BFEXTU	D3{0:3},D6
+	ASL.L	#3,D3
+	OR.L	D6,D2
+	ADD.L	D5,D5
+	ADDX.L	D4,D4
+	SWAP	D6
+	ADDX.W	D6,D1
+	ADD.L	D5,D3
+	NOP
+	ADDX.L	D4,D2
+	NOP
+	ADDX.W	D6,D1
+	SWAP	D6
+	TST.W	D7
+	BEQ.B	lbC000F78
+	SWAP	D7
+	ASL.W	#4,D7
+	ADD.W	D1,D7
+	MOVE.B	D7,(A0)+
+	SWAP	D7
+	CLR.W	D7
+	DBRA	D0,lbC000F3C
+	BRA.B	lbC000F8A
+
+lbC000F78:	SWAP	D7
+	MOVE.W	D1,D7
+	SWAP	D7
+	ADDQ.W	#1,D7
+	DBRA	D0,lbC000F3C
+	SWAP	D7
+	LSL.W	#4,D7
+	MOVE.B	D7,(A0)+
+lbC000F8A:	MOVEM.L	(SP)+,D0-D7
+	RTS
+
+lbC000F90:	CMPI.B	#$40,(4,SP)
+	BNE.W	lbC001220
+	MOVE.B	(-$011C,A6),D0
+	ANDI.B	#$FE,D0
+	BEQ.W	lbC001220
+	MOVE.W	(-$00E4,A6),D0
+	ANDI.W	#$E000,D0
+	BNE.W	lbC0010EE
+	BFEXTU	(-$00E4,A6){3:3},D0
+	BFEXTU	(-$00F0,A6){6:3},D1
+	CMP.B	D0,D1
+	BEQ.B	lbC000FE4
+	BFEXTU	(-$00E4,A6){6:3},D0
+	CMP.B	D0,D1
+	BEQ.B	lbC000FE4
+	BFEXTU	(-$00F4,A6){6:3},D1
+	CMP.B	D0,D1
+	BEQ.B	lbC00101E
+	BFEXTU	(-$00E4,A6){3:3},D0
+	CMP.B	D0,D1
+	BEQ.B	lbC00101E
+	BNE.W	lbC001220
+lbC000FE4:	BFEXTU	(-$00E4,A6){3:3},D0
+	MOVEQ	#7,D1
+	SUB.L	D0,D1
+	MOVEQ	#0,D0
+	BSET	D1,D0
+	FMOVEM.X	D0,(-$00CC,A6)
+	MOVE.B	#$12,D0
+	BFINS	D0,(-$00E4,A6){0:6}
+	BTST	#6,(-$00CC,A6)
+	BEQ.B	lbC001014
+	BCLR	#4,(-$00E8,A6)
+	BRA.W	lbC001220
+
+lbC001014:	BSET	#4,(-$00E8,A6)
+	BRA.W	lbC001220
+
+lbC00101E:	MOVE.L	(-$00E8,A6),(-$0054,A6)
+	MOVE.L	(-$00E4,A6),(-$0050,A6)
+	MOVE.L	(-$00E0,A6),(-$0044,A6)
+	ANDI.L	#$E0000000,(-$0044,A6)
+	MOVE.B	#0,(-$011C,A6)
+	MOVE.L	(SP)+,D1
+	FRESTORE	(SP)+
+	FSAVE	-(SP)
+	CMPI.W	#$4060,(SP)
+	BEQ.W	lbC0010E8
+	BFEXTU	(-$00F4,A6){6:3},D0
+	CMPI.L	#3,D0
+	BGT.B	lbC001084
+	BEQ.B	lbC00107E
+	CMPI.L	#1,D0
+	BLT.B	lbC001076
+	BEQ.B	lbC00106E
+	FMOVEM.X	FP2,(-$0098,A6)
+	BRA.B	lbC001084
+
+lbC00106E:	FMOVEM.X	FP1,(-$00A4,A6)
+	BRA.B	lbC001084
+
+lbC001076:	FMOVEM.X	FP0,(-$00B0,A6)
+	BRA.B	lbC001084
+
+lbC00107E:	FMOVEM.X	FP3,(-$008C,A6)
+lbC001084:	MOVEQ	#$16,D0
+	CLR.L	(SP)
+lbC001088:	CLR.L	-(SP)
+	DBRA	D0,lbC001088
+	MOVE.L	#$40600000,-(SP)
+	MOVE.L	(-$0054,A6),(-$00E8,A6)
+	MOVE.L	(-$0050,A6),(-$00E4,A6)
+	MOVE.L	(-$0044,A6),(-$00E0,A6)
+	MOVE.B	#6,(-$011C,A6)
+	MOVE.L	D1,-(SP)
+	BFEXTU	(-$00E4,A6){3:3},D0
+	MOVEQ	#7,D1
+	SUB.L	D0,D1
+	MOVEQ	#0,D0
+	BSET	D1,D0
+	FMOVEM.X	D0,(-$00CC,A6)
+	MOVE.B	#$12,D0
+	BFINS	D0,(-$00E4,A6){0:6}
+	BTST	#6,(-$00CC,A6)
+	BEQ.B	lbC0010DE
+	BCLR	#4,(-$00E8,A6)
+	BRA.W	lbC001220
+
+lbC0010DE:	BSET	#4,(-$00E8,A6)
+	BRA.W	lbC001220
+
+lbC0010E8:	JMP	(lbC0009EE).L
+
+lbC0010EE:	MOVE.W	(-$00E4,A6),D0
+	ANDI.W	#$FC00,D0
+	CMPI.W	#$4400,D0
+	BNE.W	lbC001220
+	BFEXTU	(-$00E4,A6){6:3},D0
+	BFEXTU	(-$00F0,A6){6:3},D1
+	CMP.B	D0,D1
+	BEQ.W	lbC0011D0
+	BFEXTU	(-$00F4,A6){6:3},D1
+	CMP.B	D0,D1
+	BNE.W	lbC001220
+	MOVE.L	(-$00E8,A6),(-$0054,A6)
+	MOVE.L	(-$00E4,A6),(-$0050,A6)
+	MOVE.L	(-$00E0,A6),(-$0044,A6)
+	ANDI.L	#$E0000000,(-$0044,A6)
+	MOVE.B	#0,(-$011C,A6)
+	MOVE.L	(-$00CC,A6),(-$0064,A6)
+	MOVE.L	(-$00C8,A6),(-$0060,A6)
+	MOVE.L	(-$00C4,A6),(-$005C,A6)
+	MOVE.L	(SP)+,D1
+	FRESTORE	(SP)+
+	FSAVE	-(SP)
+	CMPI.W	#$4060,(SP)
+	BEQ.W	lbC00121A
+	BFEXTU	(-$00F4,A6){6:3},D0
+	CMPI.L	#3,D0
+	BGT.B	lbC001194
+	BEQ.B	lbC00118E
+	CMPI.L	#1,D0
+	BLT.B	lbC001186
+	BEQ.B	lbC00117E
+	FMOVEM.X	FP2,(-$0098,A6)
+	BRA.B	lbC001194
+
+lbC00117E:	FMOVEM.X	FP1,(-$00A4,A6)
+	BRA.B	lbC001194
+
+lbC001186:	FMOVEM.X	FP0,(-$00B0,A6)
+	BRA.B	lbC001194
+
+lbC00118E:	FMOVEM.X	FP3,(-$008C,A6)
+lbC001194:	MOVEQ	#$16,D0
+	CLR.L	(SP)
+lbC001198:	CLR.L	-(SP)
+	DBRA	D0,lbC001198
+	MOVE.L	#$40600000,-(SP)
+	MOVE.L	(-$0054,A6),(-$00E8,A6)
+	MOVE.L	(-$0050,A6),(-$00E4,A6)
+	MOVE.L	(-$0044,A6),(-$00E0,A6)
+	MOVE.B	#6,(-$011C,A6)
+	MOVE.L	(-$0064,A6),(-$00CC,A6)
+	MOVE.L	(-$0060,A6),(-$00C8,A6)
+	MOVE.L	(-$005C,A6),(-$00C4,A6)
+	MOVE.L	D1,-(SP)
+lbC0011D0:	MOVE.B	#$15,D0
+	BFINS	D0,(-$00E4,A6){0:6}
+	CMPI.W	#$407F,(-$00CC,A6)
+	BNE.B	lbC0011EA
+	MOVE.W	#$43FF,(-$00CC,A6)
+	BRA.B	lbC001220
+
+lbC0011EA:	CMPI.W	#$C07F,(-$00CC,A6)
+	BNE.B	lbC0011FA
+	MOVE.W	#$C3FF,(-$00CC,A6)
+	BRA.B	lbC001220
+
+lbC0011FA:	CMPI.W	#$3F80,(-$00CC,A6)
+	BNE.B	lbC00120A
+	MOVE.W	#$3C00,(-$00CC,A6)
+	BRA.B	lbC001220
+
+lbC00120A:	CMPI.W	#$BF80,(-$00CC,A6)
+	BNE.B	lbC001220
+	MOVE.W	#$BC00,(-$00CC,A6)
+	BRA.B	lbC001220
+
+lbC00121A:	JMP	(lbC0009EE).L
+
+lbC001220:	RTS
+
+;fiX Label expected
+	dc.w	0
+lbL001224:	dc.l	0,$02030203,$02030302,$03020203
+lbL001234:	dc.l	0
+lbS001238:	dc.s	1.0
+lbS00123C:	dc.s	10.0
+
+lbC001240:	FMOVE.L	#0,FPCR
+	MOVEM.L	D2-D5,-(SP)
+	MOVEQ	#2,D2
+	MOVEQ	#4,D3
+	LEA	(-$0074,A6),A0
+	MOVE.L	(-$00CC,A6),(A0)
+	MOVE.L	(-$00C8,A6),(4,A0)
+	MOVE.L	(-$00C4,A6),(8,A0)
+	MOVE.L	(A0),D4
+	MOVEQ	#0,D1
+lbC001268:	MULU.L	#10,D1
+	BFEXTU	D4{D3:4},D0
+	ADD.L	D0,D1
+	ADDQ.B	#4,D3
+	DBRA	D2,lbC001268
+	BTST	#$1E,D4
+	BEQ.B	lbC001284
+	NEG.L	D1
+lbC001284:	SUBQ.L	#8,D1
+	SUBQ.L	#8,D1
+	BGE.B	lbC001298
+	NEG.L	D1
+	OR.L	#$40000000,D4
+	ORI.L	#$40000000,(A0)
+lbC001298:	MOVE.L	D1,(-$0054,A6)
+	MOVEQ	#1,D1
+	FMOVE.S	(lbL001234,PC),FP0
+	BFEXTU	(A0){$1C:4},D0
+	FADD.B	D0,FP0
+lbC0012ac:	MOVE.L	(A0,D1.L*4),D4
+	MOVEQ	#0,D3
+	MOVEQ	#7,D2
+lbC0012B4:	FMUL.S	(lbS00123C,PC),FP0
+	BFEXTU	D4{D3:4},D0
+	FADD.B	D0,FP0
+	ADDQ.B	#4,D3
+	DBRA	D2,lbC0012B4
+	ADDQ.L	#1,D1
+	CMP.L	#2,D1
+	BLE.B	lbC0012ac
+	BTST	#7,(A0)
+	BEQ.B	lbC0012DC
+	FNEG.X	FP0
+lbC0012DC:	MOVE.L	(-$0054,A6),D1
+	CMP.L	#$0000001B,D1
+	BLE.W	lbC0013C4
+	BTST	#6,(A0)
+	BNE.B	lbC001360
+	MOVEQ	#0,D1
+	MOVE.L	(A0),D4
+	BFEXTU	D4{$1C:4},D0
+	BNE.B	lbC00131E
+	ADDQ.L	#1,D1
+	MOVEQ	#1,D5
+	MOVE.L	(A0,D5.L*4),D4
+	BNE.B	lbC00130C
+	ADDQ.L	#8,D1
+	ADDQ.L	#1,D5
+	MOVE.L	(A0,D5.L*4),D4
+lbC00130C:	MOVEQ	#0,D3
+	MOVEQ	#7,D2
+lbC001310:	BFEXTU	D4{D3:4},D0
+	BNE.B	lbC00131E
+	ADDQ.L	#4,D3
+	ADDQ.L	#1,D1
+	DBRA	D2,lbC001310
+lbC00131E:	MOVE.L	D1,D0
+	MOVE.L	(-$0054,A6),D1
+	SUB.L	D0,D1
+	BGE.B	lbC001338
+	NEG.L	D1
+	MOVE.L	(A0),D4
+	OR.L	#$40000000,D4
+	ORI.L	#$40000000,(A0)
+lbC001338:	MOVEA.L	#lbL001D10,A1
+	MOVEQ	#0,D3
+	FMOVE.S	(lbS001238,PC),FP1
+	MOVEQ	#3,D2
+lbC001348:	ASR.L	#1,D0
+	BCC.B	lbC001352
+	FMUL.X	(A1,D3.W),FP1
+lbC001352:	ADDQ.L	#8,D3
+	ADDQ.L	#4,D3
+	TST.L	D0
+	BNE.B	lbC001348
+	FMUL.X	FP1,FP0
+	BRA.B	lbC0013C4
+
+lbC001360:	MOVEQ	#0,D1
+	MOVEQ	#2,D5
+	MOVE.L	(A0,D5.L*4),D4
+	BNE.B	lbC001372
+	SUBQ.L	#1,D5
+	ADDQ.L	#8,D1
+	MOVE.L	(A0,D5.L*4),D4
+lbC001372:	MOVEQ	#$1C,D3
+	MOVEQ	#7,D2
+lbC001376:	BFEXTU	D4{D3:4},D0
+	BNE.B	lbC001384
+	SUBQ.L	#4,D3
+	ADDQ.L	#1,D1
+	DBRA	D2,lbC001376
+lbC001384:	MOVE.L	D1,D0
+	MOVE.L	(-$0054,A6),D1
+	SUB.L	D0,D1
+	BGT.B	lbC00139e
+	NEG.L	D1
+	MOVE.L	(A0),D4
+	AND.L	#$BFFFFFFF,D4
+	ANDI.L	#$BFFFFFFF,(A0)
+lbC00139e:	MOVEA.L	#lbL001D10,A1
+	MOVEQ	#0,D3
+	FMOVE.S	(lbS001238,PC),FP1
+	MOVEQ	#3,D2
+lbC0013ae:	ASR.L	#1,D0
+	BCC.B	lbC0013B8
+	FMUL.X	(A1,D3.W),FP1
+lbC0013B8:	ADDQ.L	#8,D3
+	ADDQ.L	#4,D3
+	TST.L	D0
+	BNE.B	lbC0013ae
+	FDIV.X	FP1,FP0
+lbC0013C4:	MOVE.L	(-$0080,A6),D3
+	BFEXTU	D3{$1A:2},D2
+	MOVE.L	(A0),D4
+	ASL.L	#2,D2
+	BFEXTU	D4{0:2},D0
+	ADD.L	D0,D2
+	LEA	(lbL001224,PC),A1
+	MOVE.B	(A1,D2.W),D0
+	MOVEQ	#0,D3
+	BFINS	D0,D3{$1A:2}
+	FMOVE.L	D3,FPCR
+	ASR.L	#1,D0
+	BCC.B	lbC0013F4
+	LEA	(lbL001E90).L,A1
+	BRA.B	lbC001406
+
+lbC0013F4:	ASR.L	#1,D0
+	BCC.B	lbC001400
+	LEA	(lbL001DD0).L,A1
+	BRA.B	lbC001406
+
+lbC001400:	LEA	(lbL001D10).L,A1
+lbC001406:	MOVE.L	D1,D0
+	BPL.B	lbC001412
+	NEG.L	D0
+	ORI.L	#$40000000,(A0)
+lbC001412:	MOVEQ	#0,D3
+	FMOVE.S	(lbS001238,PC),FP1
+lbC00141A:	ASR.L	#1,D0
+	BCC.B	lbC001424
+	FMUL.X	(A1,D3.W),FP1
+lbC001424:	ADDQ.L	#8,D3
+	ADDQ.L	#4,D3
+	TST.L	D0
+	BNE.B	lbC00141A
+	BTST	#6,(A0)
+	BEQ.B	lbC001438
+	FDIV.X	FP1,FP0
+	BRA.B	lbC00143C
+
+lbC001438:	FMUL.X	FP1,FP0
+lbC00143C:	FMOVE.L	FPSR,D0
+	BCLR	#9,D0
+	FMOVE.L	D0,FPSR
+	BEQ.B	lbC001452
+	ORI.L	#$00000108,(-$007C,A6)
+lbC001452:	MOVEM.L	(SP)+,D2-D5
+	RTS
+
+lbL001458:	dc.l	$3FFF0000,$80000000,0
+lbB001464:	dc.b	$BF,$FF,0,0,$80,0,0,0,0,0,0,0
+lbB001470:	dcb.b	12,0
+lbB00147C:	dc.b	$80,0,0,0,0,0,0,0,0,0,0,0
+lbB001488:	dc.b	$7F,$FF,0,0,0,0,0,0,0,0,0,0
+lbB001494:	dcb.b	2,$FF
+	dcb.b	10,0
+lbB0014A0:	dc.b	$7F,$FF,0,0,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF
+lbB0014AC:	dc.b	$3F,$FF,0,0,$C9,15,$DA,$A2,$21,$68,$C2,$35
+lbB0014B8:	dc.b	$BF,$FF,0,0,$C9,15,$DA,$A2,$21,$68,$C2,$35
+
+lbC0014C4:	CLR.B	(-$0046,A6)
+	BFEXTU	(-$00E4,A6){0:6},D0
+	CMPI.L	#$00000017,D0
+	BNE.B	lbC0014DC
+	JMP	(lbC0071A8).L
+
+lbC0014DC:	MOVE.W	(-$00E4,A6),D0
+	AND.L	#$0000007F,D0
+	CMPI.L	#$00000038,D0
+	BGE.B	lbC00151A
+	BFEXTU	(-$00E8,A6){0:3},D1
+	LSL.L	#3,D0
+	ADD.L	D1,D0
+	LEA	(lbL008CD4).L,A1
+	MOVEA.L	(A1,D0.W*4),A1
+	LEA	(-$00CC,A6),A0
+	MOVE.L	(-$0080,A6),D1
+	AND.L	#$000000FF,D1
+	FMOVE.L	#0,FPCR
+	JMP	(A1)
+
+lbC00151A:	ST	(-$004C,A6)
+	RTS
+
+lbC001520:	BTST	#7,(A0)
+	BNE.B	lbC00152E
+	BSR.W	lbC00190E
+	BRA.W	lbC002502
+
+lbC00152E:	BSR.W	lbC00191E
+	BRA.W	lbC002502
+
+lbC001536:	BTST	#7,(A0)
+	BNE.W	lbC00191E
+	BRA.W	lbC00190E
+
+lbC001542:	BTST	#7,(A0)
+	BNE.W	lbC0018E6
+	BRA.W	lbC0018D6
+
+lbC00154E:	BTST	#7,(A0)
+	BNE.W	lbC0018FE
+	BRA.W	lbC0018F6
+
+lbC00155A:	BTST	#7,(A0)
+	BNE.W	lbC0018C4
+	BRA.W	lbC0018BA
+
+lbC001566:	BTST	#7,(A0)
+	BNE.W	lbC00190E
+	BRA.W	lbC0018D6
+
+lbC001572:	BTST	#7,(A0)
+	BNE.W	lbC0023CE
+	BRA.W	lbC0018D6
+
+lbC00157E:	FMOVEM.X	(A0),FP0
+	FCMP.B	#$FF,FP0
+	FBGT.W	lbC007064
+	FBEQ.W	lbC002360
+	FMOVE.L	#0,FPSR
+	BRA.W	lbC0023CE
+
+lbC00159C:	BTST	#7,(A0)
+	BNE.W	lbC0018FE
+	BRA.W	lbC0018D6
+
+lbC0015A8:	BTST	#7,(A0)
+	BNE.W	lbC0023CE
+	CMPI.W	#$3FFF,(A0)
+	BNE.W	lbC006EC6
+	CMPI.L	#$80000000,(4,A0)
+	BNE.W	lbC006EC6
+	TST.L	(8,A0)
+	BNE.W	lbC006EC6
+	FMOVE.X	(lbB001470,PC),FP0
+	RTS
+
+lbC0015D4:	BTST	#7,(A0)
+	BEQ.W	lbC006E3C
+	BRA.W	lbC0023CE
+
+lbC0015E0:	BTST	#7,(A0)
+	BNE.W	lbC0023CE
+	CMPI.W	#$3FFF,(A0)
+	BNE.W	lbC00651C
+	CMPI.L	#$80000000,(4,A0)
+	BNE.W	lbC00651C
+	TST.L	(8,A0)
+	BNE.W	lbC00651C
+	FMOVE.X	(lbB001470,PC),FP0
+	RTS
+
+lbC00160C:	BTST	#7,(A0)
+	BEQ.W	lbC006500
+	BRA.W	lbC0023CE
+
+lbC001618:	BTST	#7,(A0)
+	BNE.W	lbC0023CE
+	CMPI.W	#$3FFF,(A0)
+	BNE.W	lbC006550
+	CMPI.L	#$80000000,(4,A0)
+	BNE.W	lbC006550
+	TST.L	(8,A0)
+	BNE.W	lbC006550
+	FMOVE.X	(lbB001470,PC),FP0
+	RTS
+
+lbC001644:	BTST	#7,(A0)
+	BEQ.W	lbC006536
+	BRA.W	lbC0023CE
+
+lbL001650:	dc.l	lbC0072F4
+	dc.l	lbC0016BA
+	dc.l	lbC0016E0
+	dc.l	lbC0016B2
+	dc.l	lbC0016BE
+	dc.l	lbC0016BA
+	dc.l	lbC0016BE
+	dc.l	lbC0016B2
+	dc.l	lbC0016BA
+	dc.l	lbC0016BA
+	dc.l	lbC0016BA
+	dc.l	lbC0016B2
+	dc.l	lbC0016B6
+	dc.l	lbC0016B6
+	dc.l	lbC0016B6
+	dc.l	lbC0016B6
+
+lbC001690:	BFEXTU	(-$00E8,A6){0:3},D0
+	BFEXTU	(-$00E0,A6){0:3},D1
+	BCLR	#2,D0
+	BCLR	#2,D1
+	LSL.B	#2,D1
+	OR.B	D0,D1
+	LEA	(lbL001650,PC),A1
+	MOVEA.L	(A1,D1.W*4),A1
+	JMP	(A1)
+
+lbC0016B2:	BRA.W	lbL00259A
+
+;fiX Code reference expected
+lbC0016B6:	BRA.W	lbC002524
+
+lbC0016BA:	BRA.W	lbC0023CE
+
+lbC0016BE:	MOVE.B	(-$00CC,A6),D1
+	MOVE.B	(-$00D8,A6),D0
+	EOR.B	D0,D1
+	BTST	#7,D1
+	BEQ.B	lbC0016D4
+	BSET	#7,(-$007B,A6)
+lbC0016D4:	BTST	#7,D0
+	BEQ.W	lbC00190E
+	BRA.W	lbC00191E
+
+lbC0016E0:	MOVE.B	(-$00CC,A6),D1
+	MOVE.B	(-$00D8,A6),D0
+	EOR.B	D0,D1
+	BTST	#7,D1
+	BEQ.B	lbC0016F6
+	BSET	#7,(-$007B,A6)
+lbC0016F6:	TST.B	(-$00E0,A6)
+	BPL.B	lbC001704
+	LEA	(-$00D8,A6),A0
+	BRA.W	lbC002608
+
+lbC001704:	FMOVE.L	(-$0080,A6),FPCR
+	FMOVE.X	(-$00D8,A6),FP0
+	RTS
+
+lbL001712:	dc.l	lbC0072FE
+	dc.l	lbC00177C
+	dc.l	lbC0017A2
+	dc.l	lbC001774
+	dc.l	lbC001780
+	dc.l	lbC00177C
+	dc.l	lbC001780
+	dc.l	lbC001774
+	dc.l	lbC00177C
+	dc.l	lbC00177C
+	dc.l	lbC00177C
+	dc.l	lbC001774
+	dc.l	lbC001778
+	dc.l	lbC001778
+	dc.l	lbC001778
+	dc.l	lbC001778
+
+lbC001752:	BFEXTU	(-$00E8,A6){0:3},D0
+	BFEXTU	(-$00E0,A6){0:3},D1
+	BCLR	#2,D0
+	BCLR	#2,D1
+	LSL.B	#2,D1
+	OR.B	D0,D1
+	LEA	(lbL001712,PC),A1
+	MOVEA.L	(A1,D1.W*4),A1
+	JMP	(A1)
+
+lbC001774:	BRA.W	lbL00259A
+
+;fiX Code reference expected
+lbC001778:	BRA.W	lbC002524
+
+lbC00177C:	BRA.W	lbC0023CE
+
+lbC001780:	MOVE.B	(-$00CC,A6),D1
+	MOVE.B	(-$00D8,A6),D0
+	EOR.B	D0,D1
+	BTST	#7,D1
+	BEQ.B	lbC001796
+	BSET	#7,(-$007B,A6)
+lbC001796:	BTST	#7,D0
+	BEQ.W	lbC00190E
+	BRA.W	lbC00191E
+
+lbC0017A2:	MOVE.B	(-$00CC,A6),D1
+	MOVE.B	(-$00D8,A6),D0
+	EOR.B	D0,D1
+	BTST	#7,D1
+	BEQ.B	lbC0017B8
+	BSET	#7,(-$007B,A6)
+lbC0017B8:	TST.B	(-$00E0,A6)
+	BPL.B	lbC0017C6
+	LEA	(-$00D8,A6),A0
+	BRA.W	lbC002608
+
+lbC0017C6:	FMOVE.L	(-$0080,A6),FPCR
+	FMOVE.X	(-$00D8,A6),FP0
+	RTS
+
+lbL0017D4:	dc.l	lbC004B5C
+	dc.l	lbC004B5C
+	dc.l	lbC001836
+	dc.l	lbC00185A
+	dc.l	lbC00183E
+	dc.l	lbC00183E
+	dc.l	lbC001836
+	dc.l	lbC00185A
+	dc.l	lbC00184C
+	dc.l	lbC00184C
+	dc.l	lbC001836
+	dc.l	lbC00185A
+	dc.l	lbC00183A
+	dc.l	lbC00183A
+	dc.l	lbC00183A
+	dc.l	lbC00183A
+
+lbC001814:	BFEXTU	(-$00E8,A6){0:3},D0
+	BFEXTU	(-$00E0,A6){0:3},D1
+	BCLR	#2,D0
+	BCLR	#2,D1
+	LSL.B	#2,D1
+	OR.B	D0,D1
+	LEA	(lbL0017D4,PC),A1
+	MOVEA.L	(A1,D1.W*4),A1
+	JMP	(A1)
+
+lbC001836:	BRA.W	lbC0023CE
+
+lbC00183A:	BRA.W	lbC002524
+
+lbC00183E:	BTST	#7,(-$00D8,A6)
+	BEQ.W	lbC00190E
+	BRA.W	lbC00191E
+
+lbC00184C:	BTST	#7,(-$00D8,A6)
+	BEQ.W	lbC0018D6
+	BRA.W	lbC0018E6
+
+lbC00185A:	BRA.W	lbL00259A
+
+;fiX Code reference expected
+lbC00185E:	BTST	#7,(-$00CC,A6)
+	BEQ.B	lbC00186E
+	FMOVE.X	(lbB00147C,PC),FP0
+	BRA.B	lbC001874
+
+lbC00186E:	FMOVE.X	(lbB001470,PC),FP0
+lbC001874:	FMOVEM.X	(lbL001458).L,FP1
+	BRA.W	lbC008554
+
+lbC001880:	FMOVE.X	(lbB0014A0,PC),FP1
+	BSR.W	lbC008554
+	FMOVE.X	(lbB0014A0,PC),FP0
+	BRA.W	lbC0023CE
+
+lbC001894:	MOVE.L	(-$00CC,A6),(-$0074,A6)
+	MOVE.L	(-$00C8,A6),(-$0070,A6)
+	MOVE.L	(-$00C4,A6),(-$006C,A6)
+	BSET	#6,(-$0070,A6)
+	FMOVEM.X	(-$0074,A6),FP1
+	BSR.W	lbC008554
+	BRA.W	lbL00259A
+
+;fiX Code reference expected
+lbC0018BA:	FMOVE.X	(lbB0014AC,PC),FP0
+	BRA.W	lbC002502
+
+lbC0018C4:	FMOVE.X	(lbB0014B8,PC),FP0
+	ORI.L	#$08000000,(-$007C,A6)
+	BRA.W	lbC002502
+
+lbC0018D6:	FMOVE.X	(lbB001488,PC),FP0
+	ORI.L	#$02000000,(-$007C,A6)
+	RTS
+
+lbC0018E6:	FMOVE.X	(lbB001494,PC),FP0
+	ORI.L	#$0A000000,(-$007C,A6)
+	RTS
+
+lbC0018F6:	FMOVE.X	(lbL001458,PC),FP0
+	RTS
+
+lbC0018FE:	FMOVE.X	(lbB001464,PC),FP0
+	ORI.L	#$08000000,(-$007C,A6)
+	RTS
+
+lbC00190E:	FMOVE.X	(lbB001470,PC),FP0
+	ORI.L	#$04000000,(-$007C,A6)
+	RTS
+
+lbC00191E:	FMOVE.X	(lbB00147C,PC),FP0
+	ORI.L	#$0C000000,(-$007C,A6)
+	RTS
+
+;fiX Label expected
+	dc.w	0
+lbL001930:	dc.l	lbC001A30
+	dc.l	lbC001A34
+	dc.l	lbC001A34
+	dc.l	lbC001AB2
+	dc.l	lbC001AB2
+	dc.l	lbC001A34
+	dc.l	lbC001A3C
+	dc.l	lbC001A3C
+	dc.l	lbC001A7A
+
+lbC001954:	CMPI.B	#0,(1,SP)
+	BEQ.W	lbC0019EA
+	CMPI.B	#$28,(1,SP)
+	BEQ.B	lbC0019BC
+	CMPI.B	#$30,(1,SP)
+	BEQ.B	lbC0019BC
+	CMPI.B	#$60,(1,SP)
+	BNE.W	lbC0009EE
+	LEA	($0124,SP),A1
+	MOVE.L	(-$00CC,A6),(-$00CC,A1)
+	MOVE.L	(-$00C8,A6),(-$00C8,A1)
+	MOVE.L	(-$00C4,A6),(-$00C4,A1)
+	MOVE.L	(-$00E4,A6),(-$00E4,A1)
+	MOVE.L	(-$00E4,A6),D0
+	AND.L	#$03800000,D0
+	MOVE.L	D0,(-$00F0,A1)
+	FMOVE.L	FPSR,D0
+	OR.L	D0,(-$007C,A6)
+	MOVE.L	(-$007C,A6),(-$0100,A1)
+	ORI.L	#$01800000,(-$00DC,A1)
+	BRA.W	lbC001B5A
+
+lbC0019BC:	CMPI.B	#$28,(1,SP)
+	BNE.B	lbC0019CA
+	LEA	($00EC,SP),A1
+	BRA.B	lbC0019D8
+
+lbC0019CA:	CMPI.B	#$30,(1,SP)
+	BNE.W	lbC0009EE
+	LEA	($00F4,SP),A1
+lbC0019D8:	MOVE.L	(-$00E4,A6),(-$00E4,A1)
+	FMOVE.L	FPSR,D0
+	OR.L	D0,(-$007C,A6)
+	BRA.W	lbC001B5A
+
+lbC0019EA:	ADDQ.L	#4,SP
+	FMOVE.L	FPSR,D0
+	OR.L	D0,(-$007C,A6)
+	CMPI.B	#$60,(1,SP)
+	BNE.B	lbC001A16
+	CLR.W	(-$00EC,A6)
+	BTST	#5,(-$00E4,A6)
+	BNE.B	lbC001A16
+	MOVE.L	(-$007C,A6),(-$0100,A6)
+	ORI.L	#$01800000,(-$00DC,A6)
+lbC001A16:	MOVE.B	(-$007E,A6),D0
+	AND.B	(-$007A,A6),D0
+	BFFFO	D0{$18:8},D1
+	LEA	(lbL001930,PC),A0
+	SUBI.B	#$18,D1
+	MOVEA.L	(A0,D1.W*4),A0
+	JMP	(A0)
+
+lbC001A30:	BRA.W	lbC001B5A
+
+lbC001A34:	BSET	#2,(-$00DC,A6)
+	BRA.B	lbC001A70
+
+lbC001A3C:	TST.B	(-$0047,A6)
+	BNE.B	lbC001A50
+	BSET	#1,(-$00DC,A6)
+	BCLR	#2,(-$00DC,A6)
+	BRA.B	lbC001A70
+
+lbC001A50:	TST.B	(-$0049,A6)
+	BNE.B	lbC001A5C
+	BSET	#1,(-$00DC,A6)
+lbC001A5C:	BCLR	#2,(-$00DC,A6)
+	MOVE.L	(-$00E4,A6),D0
+	AND.L	#$03800000,D0
+	MOVE.L	D0,(-$00F0,A6)
+lbC001A70:	BCLR	#5,(-$00DB,A6)
+	BRA.W	lbC001B5A
+
+lbC001A7A:	BTST	#1,(-$007E,A6)
+	BEQ.B	lbC001A8C
+	BTST	#4,(-$007A,A6)
+	BEQ.B	lbC001A8C
+	BRA.B	lbC001AB2
+
+lbC001A8C:	TST.B	(-$0047,A6)
+	BEQ.B	lbC001A9A
+	TST.B	(-$0049,A6)
+	BNE.W	lbC001B5A
+lbC001A9A:	MOVEM.L	(-$00C0,A6),D0/D1/A0/A1
+	FMOVEM.X	(-$00B0,A6),FP0/FP1/FP2/FP3
+	FMOVEM.L	(-$0080,A6),FPCR/FPSR/FPIAR
+	UNLK	A6
+	BRA.W	lbC001BD4
+
+lbC001AB2:	TST.B	(-$0047,A6)
+	BEQ.B	lbC001AE8
+	TST.B	(-$0046,A6)
+	BEQ.B	lbC001A50
+	CLR.B	(-$011C,A6)
+	BSET	#2,(-$00DC,A6)
+	MOVE.W	(-$00CC,A6),(-$00D8,A6)
+	MOVE.L	(-$00C8,A6),(-$00D4,A6)
+	MOVE.L	(-$00C4,A6),(-$00D0,A6)
+	BSET	#4,(-$00E0,A6)
+	BCLR	#5,(-$00DB,A6)
+	BRA.B	lbC001B5A
+
+lbC001AE8:	MOVE.B	(SP),(-$0045,A6)
+	CMPI.B	#$60,(1,SP)
+	BEQ.B	lbC001B1A
+	CMPI.B	#$40,(SP)
+	BNE.B	lbC001AFE
+	MOVEQ	#13,D0
+	BRA.B	lbC001B08
+
+lbC001AFE:	CMPI.B	#$41,(SP)
+	BNE.W	lbC0009EE
+	MOVEQ	#11,D0
+lbC001B08:	CLR.L	(SP)
+lbC001B0A:	CLR.L	-(SP)
+	DBRA	D0,lbC001B0A
+	MOVE.B	(-$0045,A6),(SP)
+	MOVE.B	#$60,(1,SP)
+lbC001B1A:	MOVE.L	(-$0074,A6),(-$010C,A6)
+	MOVE.L	(-$0070,A6),(-$0108,A6)
+	MOVE.L	(-$006C,A6),(-$0104,A6)
+	BSET	#1,(-$00DC,A6)
+	BCLR	#2,(-$00DC,A6)
+	BCLR	#5,(-$00DB,A6)
+	MOVE.L	(-$007C,A6),(-$0100,A6)
+	ORI.L	#$01800000,(-$00DC,A6)
+	MOVE.L	(-$00E4,A6),D0
+	AND.L	#$03800000,D0
+	MOVE.L	D0,(-$00F0,A6)
+lbC001B5A:	CMPI.B	#$28,(1,SP)
+	BNE.B	lbC001B66
+	MOVEQ	#13,D0
+	BRA.B	lbC001B70
+
+lbC001B66:	CMPI.B	#$30,(1,SP)
+	BNE.B	lbC001BBE
+	MOVEQ	#11,D0
+lbC001B70:	MOVE.B	(SP),(-$0045,A6)
+	CLR.L	(SP)
+lbC001B76:	CLR.L	-(SP)
+	DBRA	D0,lbC001B76
+	LEA	($0124,SP),A1
+	MOVE.B	(-$0045,A6),(SP)
+	MOVE.B	#$60,(1,SP)
+	MOVE.L	(-$0074,A6),(-$010C,A1)
+	MOVE.L	(-$0070,A6),(-$0108,A1)
+	MOVE.L	(-$006C,A6),(-$0104,A1)
+	BTST	#2,(-$00DC,A1)
+	BEQ.B	lbC001BBE
+	BFEXTU	(-$007C,A6){$11:4},D0
+	BFINS	D0,(-$00EB,A1){4:4}
+	MOVE.L	(-$007C,A6),(-$0100,A1)
+	ORI.L	#$01800000,(-$00DC,A1)
+lbC001BBE:	MOVEM.L	(-$00C0,A6),D0/D1/A0/A1
+	FMOVEM.X	(-$00B0,A6),FP0/FP1/FP2/FP3
+	FMOVEM.L	(-$0080,A6),FPCR/FPSR/FPIAR
+	FRESTORE	(SP)+
+	UNLK	A6
+lbC001BD4:	BTST	#7,(SP)
+	BNE.B	lbC001BE4
+	BTST	#6,(SP)
+	BNE.B	lbC001BE4
+	BRA.W	lbC0009F4
+
+lbC001BE4:	BFTST	(6,SP){0:4}
+	BNE.B	lbC001C0A
+	SUBQ.W	#4,SP
+	MOVE.L	(4,SP),(SP)
+	MOVE.L	(8,SP),(4,SP)
+	SUBA.W	#$0064,SP
+	FSAVE	(SP)
+	FMOVE.L	FPIAR,($006C,SP)
+	FRESTORE	(SP)
+	ADDA.W	#$0064,SP
+lbC001C0A:	MOVE.W	#$2024,(6,SP)
+	BRA.W	lbC0009EC
+
+lbW001C14:	dc.w	$4000,0,$C90F,$DAA2,$2168,$C235
+lbW001C20:	dc.w	$4000,0,$C90F,$DAA2,$2168,$C234
+lbW001C2C:	dc.w	$4000,0,$C90F,$DAA2,$2168,$C235
+lbL001C38:	dc.l	$3FFD0000,$9A209A84,$FBCFF798,$40000000,$ADF85458,$A2BB4A9A,$3FFF0000
+	dc.l	$B8AA3B29,$5C17F0BC,$3FFD0000,$DE5BD8A9,$37287195,0,0,0
+lbL001C74:	dc.l	$3FFD0000,$9A209A84,$FBCFF798,$40000000,$ADF85458,$A2BB4A9A,$3FFF0000
+	dc.l	$B8AA3B29,$5C17F0BB,$3FFD0000,$DE5BD8A9,$37287195,0,0,0
+lbL001CB0:	dc.l	$3FFD0000,$9A209A84,$FBCFF799,$40000000,$ADF85458,$A2BB4A9B,$3FFF0000
+	dc.l	$B8AA3B29,$5C17F0BC,$3FFD0000,$DE5BD8A9,$37287195,0,0,0
+lbL001CEC:	dc.l	$3FFE0000,$B17217F7,$D1CF79AC,$40000000,$935D8DDD,$AAA8AC17,$3FFF0000
+	dc.l	$80000000,0
+lbL001D10:	dc.l	$40020000,$A0000000,0,$40050000,$C8000000,0,$400C0000,$9C400000,0,$40190000
+	dc.l	$BEBC2000,0,$40340000,$8E1BC9BF,$04000000,$40690000,$9DC5ADA8,$2B70B59E
+	dc.l	$40D30000,$C2781F49,$FFCFA6D5,$41A80000,$93BA47C9,$80E98CE0,$43510000
+	dc.l	$AA7EEBFB,$9DF9DE8E,$46A30000,$E319A0AE,$A60E91C7,$4D480000,$C9767586
+	dc.l	$81750C17,$5A920000,$9E8B3B5D,$C53D5DE5,$75250000,$C4605202,$8A20979B
+lbL001DAC:	dc.l	$3FFE0000,$B17217F7,$D1CF79AB,$40000000,$935D8DDD,$AAA8AC16,$3FFF0000
+	dc.l	$80000000,0
+lbL001DD0:	dc.l	$40020000,$A0000000,0,$40050000,$C8000000,0,$400C0000,$9C400000,0,$40190000
+	dc.l	$BEBC2000,0,$40340000,$8E1BC9BF,$04000000,$40690000,$9DC5ADA8,$2B70B59D
+	dc.l	$40D30000,$C2781F49,$FFCFA6D5,$41A80000,$93BA47C9,$80E98CDF,$43510000
+	dc.l	$AA7EEBFB,$9DF9DE8D,$46A30000,$E319A0AE,$A60E91C6,$4D480000,$C9767586
+	dc.l	$81750C17,$5A920000,$9E8B3B5D,$C53D5DE5,$75250000,$C4605202,$8A20979A
+lbL001E6C:	dc.l	$3FFE0000,$B17217F7,$D1CF79AC,$40000000,$935D8DDD,$AAA8AC17,$3FFF0000
+	dc.l	$80000000,0
+lbL001E90:	dc.l	$40020000,$A0000000,0,$40050000,$C8000000,0,$400C0000,$9C400000,0,$40190000
+	dc.l	$BEBC2000,0,$40340000,$8E1BC9BF,$04000000,$40690000,$9DC5ADA8,$2B70B59E
+	dc.l	$40D30000,$C2781F49,$FFCFA6D6,$41A80000,$93BA47C9,$80E98CE0,$43510000
+	dc.l	$AA7EEBFB,$9DF9DE8E,$46A30000,$E319A0AE,$A60E91C7,$4D480000,$C9767586
+	dc.l	$81750C18,$5A920000,$9E8B3B5D,$C53D5DE6,$75250000,$C4605202,$8A20979B
+
+lbC001F2C:	CLR.B	(-$0048,A6)
+	TST.B	(-$0047,A6)
+	BEQ.B	lbC001F6A
+	BTST	#5,(-$00E4,A6)
+	BNE.W	lbC00207C
+	BTST	#6,(-$00E4,A6)
+	BEQ.B	lbC001F56
+	BFEXTU	(-$00E4,A6){3:3},D0
+	CMP.B	#3,D0
+	BEQ.W	lbC00202A
+lbC001F56:	BSR.W	lbC002090
+	TST.B	(-$0048,A6)
+	BEQ.B	lbC001FBA
+	BTST	#7,(-$00E0,A6)
+	BEQ.B	lbC001FBA
+	BRA.B	lbC001FA2
+
+lbC001F6A:	BFEXTU	(-$00E4,A6){0:6},D0
+	CMPI.L	#$00000017,D0
+	BNE.B	lbC001F7A
+	RTS
+
+lbC001F7A:	BTST	#2,(-$00DC,A6)
+	BNE.W	lbC00202A
+	MOVE.B	(-$00E8,A6),D0
+	OR.B	(-$00E0,A6),D0
+	BMI.B	lbC001F90
+	RTS
+
+lbC001F90:	BTST	#7,(-$00E0,A6)
+	BEQ.B	lbC001FBA
+	BSR.W	lbC002090
+	TST.B	(-$0048,A6)
+	BEQ.B	lbC001FBA
+lbC001FA2:	MOVE.W	(-$00D8,A6),D0
+	ANDI.W	#$7FFF,D0
+	BEQ.B	lbC001FBA
+	LEA	(-$00D8,A6),A0
+	BSR.W	lbC0020B6
+	MOVE.B	(-$0054,A6),(-$00E0,A6)
+lbC001FBA:	BTST	#7,(-$00E8,A6)
+	BEQ.W	lbC00208E
+	BTST	#5,(-$00E8,A6)
+	BNE.B	lbC001FE8
+lbC001FCC:	MOVE.W	(-$00CC,A6),D0
+	ANDI.W	#$7FFF,D0
+	BEQ.W	lbC00208E
+	LEA	(-$00CC,A6),A0
+	BSR.W	lbC0020B6
+	MOVE.B	(-$0054,A6),(-$00E8,A6)
+	RTS
+
+lbC001FE8:	BTST	#4,(-$00E4,A6)
+	BNE.B	lbC001FF6
+	MOVE.W	#$3F81,D1
+	BRA.B	lbC001FFA
+
+lbC001FF6:	MOVE.W	#$3C01,D1
+lbC001FFA:	BTST	#7,(-$00CC,A6)
+	BEQ.B	lbC002006
+	BSET	#15,D1
+lbC002006:	MOVE.W	D1,(-$00CC,A6)
+	MOVE.W	(-$00E4,A6),D1
+	AND.W	#$E3FF,D1
+	OR.W	#$0800,D1
+	MOVE.W	D1,(-$00E4,A6)
+	LEA	(-$00CC,A6),A0
+	BSR.W	lbC0020B6
+	MOVE.B	(-$0054,A6),(-$00E8,A6)
+	RTS
+
+lbC00202A:	MOVE.L	(-$00D0,A6),(-$00CC,A6)
+	BSR.B	lbC002090
+	BSR.W	lbC002148
+	TST.B	(-$0048,A6)
+	BEQ.B	lbC00208E
+	BFEXTU	(-$00E4,A6){6:3},D0
+	MOVEQ	#7,D1
+	SUB.L	D0,D1
+	MOVEQ	#0,D0
+	BSET	D1,D0
+	FMOVEM.X	D0,(-$00D8,A6)
+	BTST	#7,(-$00E0,A6)
+	BNE.W	lbC001FA2
+	MOVE.B	(-$00E0,A6),D0
+	ANDI.B	#$F0,D0
+	TST.B	D0
+	BNE.B	lbC00208E
+	MOVE.W	(-$00D8,A6),D0
+	ANDI.W	#$7FFF,D0
+	CMPI.W	#$3FFF,D0
+	BGE.B	lbC00208E
+	ORI.B	#$10,(-$00E0,A6)
+	BRA.B	lbC00208E
+
+lbC00207C:	CLR.B	(-$0048,A6)
+	BFEXTU	(-$00E4,A6){4:2},D0
+	CMPI.B	#3,D0
+	BNE.W	lbC001FCC
+lbC00208E:	RTS
+
+lbC002090:	MOVE.W	(-$00E4,A6),D0
+	BTST	#5,D0
+	BEQ.B	lbC0020B0
+	BTST	#4,D0
+	BEQ.B	lbC0020AA
+	ANDI.W	#$007F,D0
+	CMPI.W	#$0038,D0
+	BNE.B	lbC0020B0
+lbC0020AA:	ST	(-$0048,A6)
+	RTS
+
+lbC0020B0:	CLR.B	(-$0048,A6)
+	RTS
+
+lbC0020B6:	CLR.L	(-$0054,A6)
+	BCLR	#7,(A0)
+	SNE	(2,A0)
+	CMPI.B	#$2C,(11,A6)
+	BNE.B	lbC0020CE
+	BSR.B	lbC00212C
+	BRA.B	lbC0020DC
+
+lbC0020CE:	BTST	#5,(-$00E4,A6)
+	BNE.B	lbC0020DA
+	BSR.B	lbC002110
+	BRA.B	lbC0020DC
+
+lbC0020DA:	BSR.B	lbC0020F6
+lbC0020DC:	CMPI.W	#$3FFF,(A0)
+	BGT.B	lbC0020E8
+	BSET	#4,(-$0054,A6)
+lbC0020E8:	BFCLR	(2,A0){0:8}
+	BEQ.B	lbC0020F4
+	BSET	#7,(A0)
+lbC0020F4:	RTS
+
+lbC0020F6:	BSR.W	lbC003C04
+	BTST	#7,(4,A0)
+	BNE.B	lbC00210E
+	ORI.W	#$0080,(-$0054,A6)
+	BSET	#3,(-$007A,A6)
+lbC00210E:	RTS
+
+lbC002110:	BSR.W	lbC003C04
+	BTST	#7,(4,A0)
+	BEQ.B	lbC002124
+	ORI.B	#0,(-$0054,A6)
+	RTS
+
+lbC002124:	ORI.B	#$80,(-$0054,A6)
+	RTS
+
+lbC00212C:	BSR.W	lbC003C04
+	BTST	#7,(4,A0)
+	BEQ.B	lbC002140
+	ORI.B	#0,(-$0054,A6)
+	RTS
+
+lbC002140:	ORI.B	#$80,(-$0054,A6)
+	RTS
+
+lbC002148:	MOVE.W	(-$00E4,A6),D0
+	AND.W	#$003B,D0
+	BEQ.W	lbC0021F2
+	MOVE.W	(-$00CC,A6),D0
+	BFEXTU	D0{$14:12},D1
+	CMPI.W	#$0FFF,D1
+	BNE.B	lbC002192
+	BFEXTU	D0{$11:3},D1
+	CMPI.W	#7,D1
+	BNE.B	lbC002192
+	TST.L	(-$00C8,A6)
+	BNE.B	lbC00217C
+	TST.L	(-$00C4,A6)
+	BNE.B	lbC00217C
+	BRA.W	lbC0022CE
+
+lbC00217C:	BTST	#6,(-$00C8,A6)
+	BNE.W	lbC0022CE
+	ORI.L	#$01004080,(-$007C,A6)
+	BRA.W	lbC0022CE
+
+lbC002192:	MOVE.W	(-$00CA,A6),D0
+	ANDI.W	#15,D0
+	TST.W	D0
+	BNE.B	lbC0021D4
+	TST.L	(-$00C8,A6)
+	BNE.B	lbC0021D4
+	TST.L	(-$00C4,A6)
+	BNE.B	lbC0021D4
+	TST.L	(-$00CC,A6)
+	BGE.B	lbC0021C4
+	MOVE.L	#$80000000,(-$00CC,A6)
+	CLR.L	(-$00C8,A6)
+	CLR.L	(-$00C4,A6)
+	BRA.W	lbC0022CE
+
+lbC0021C4:	CLR.L	(-$00CC,A6)
+	CLR.L	(-$00C8,A6)
+	CLR.L	(-$00C4,A6)
+	BRA.W	lbC0022CE
+
+lbC0021D4:	FMOVEM.X	FP0,-(SP)
+	BSR.W	lbC001240
+	FMOVE.X	FP0,(-$00CC,A6)
+	FMOVEM.X	(SP)+,FP0
+	FMOVE.L	#0,FPSR
+	BRA.W	lbC0022CE
+
+lbC0021F2:	MOVE.W	(-$00CC,A6),D0
+	BFEXTU	D0{$14:12},D1
+	CMPI.W	#$0FFF,D1
+	BNE.B	lbC00226E
+	BFEXTU	D0{$11:3},D1
+	CMPI.W	#7,D1
+	BNE.B	lbC00226E
+	TST.L	(-$00C8,A6)
+	BNE.B	lbC002232
+	TST.L	(-$00C4,A6)
+	BNE.B	lbC002232
+	ORI.L	#$02000000,(-$007C,A6)
+	TST.L	(-$00CC,A6)
+	BGE.W	lbC0022CE
+	ORI.L	#$08000000,(-$007C,A6)
+	BRA.W	lbC0022CE
+
+lbC002232:	ORI.L	#$01000000,(-$007C,A6)
+	MOVE.B	#$60,(-$00E8,A6)
+	BTST	#6,(-$00C8,A6)
+	BNE.B	lbC00225E
+	ORI.L	#$01004080,(-$007C,A6)
+	BTST	#6,(-$007E,A6)
+	BNE.B	lbC00225E
+	BSET	#6,(-$00C8,A6)
+lbC00225E:	TST.L	(-$00CC,A6)
+	BGE.B	lbC0022CE
+	ORI.L	#$08000000,(-$007C,A6)
+	BRA.B	lbC0022CE
+
+lbC00226E:	MOVE.W	(-$00CA,A6),D0
+	ANDI.W	#15,D0
+	TST.W	D0
+	BNE.B	lbC0022BC
+	TST.L	(-$00C8,A6)
+	BNE.B	lbC0022BC
+	TST.L	(-$00C4,A6)
+	BNE.B	lbC0022BC
+	TST.L	(-$00CC,A6)
+	BGE.B	lbC0022A6
+	ORI.L	#$0C000000,(-$007C,A6)
+	MOVE.L	#$80000000,(-$00CC,A6)
+	CLR.L	(-$00C8,A6)
+	CLR.L	(-$00C4,A6)
+	BRA.B	lbC0022CE
+
+lbC0022A6:	ORI.L	#$04000000,(-$007C,A6)
+	CLR.L	(-$00CC,A6)
+	CLR.L	(-$00C8,A6)
+	CLR.L	(-$00C4,A6)
+	BRA.B	lbC0022CE
+
+lbC0022BC:	FMOVEM.X	FP0,-(SP)
+	BSR.W	lbC001240
+	FMOVE.X	FP0,(-$00CC,A6)
+	FMOVEM.X	(SP)+,FP0
+lbC0022CE:	MOVE.W	(-$00E4,A6),D0
+	AND.W	#$FBFF,D0
+	MOVE.W	D0,(-$00E4,A6)
+	MOVE.W	(-$00CC,A6),D1
+	ANDI.W	#$7FFF,D1
+	CMP.W	#$7FFF,D1
+	BNE.B	lbC002308
+	MOVE.L	(-$00C8,A6),D1
+	BNE.B	lbC0022FE
+	MOVE.L	(-$00C4,A6),D1
+	BNE.B	lbC0022FE
+	MOVE.B	#$40,(-$00E8,A6)
+	MOVEQ	#$40,D0
+	RTS
+
+lbC0022FE:	MOVE.B	#$60,(-$00E8,A6)
+	MOVEQ	#$60,D0
+	RTS
+
+lbC002308:	TST.W	D1
+	BNE.B	lbC002316
+	MOVE.B	#$30,(-$00E8,A6)
+	MOVEQ	#$20,D0
+	RTS
+
+lbC002316:	CMPI.W	#$3FFF,D1
+	BLE.B	lbC002324
+	MOVE.B	#0,(-$00E8,A6)
+	BRA.B	lbC00232A
+
+lbC002324:	MOVE.B	#$10,(-$00E8,A6)
+lbC00232A:	MOVEQ	#0,D0
+	RTS
+
+;fiX Label expected
+	RTS
+
+lbL002330:	dc.l	$FFFF0000,0,0
+lbL00233C:	dc.l	$7FFF0000,0,0
+lbL002348:	dc.l	$7FFF0000,$FFFFFFFF,$FFFFFFFF,$7FFE0000,$FFFFFFFF,$FFFFFFFF
+
+lbC002360:	BSET	#3,(-$007C,A6)
+	FMOVE.L	#0,FPSR
+	BTST	#2,(-$007E,A6)
+	BNE.B	lbC0023C0
+	BRA.B	lbC002390
+
+lbC002378:	FMOVE.L	#0,FPSR
+	BTST	#2,(-$007E,A6)
+	BNE.B	lbC0023B2
+	BTST	#7,(-$00CC,A6)
+	BEQ.B	lbC0023A0
+lbC002390:	FMOVEM.X	(lbL002330).L,FP0
+	BSET	#3,(-$007C,A6)
+	BRA.B	lbC0023A8
+
+lbC0023A0:	FMOVEM.X	(lbL00233C).L,FP0
+lbC0023A8:	ORI.L	#$02000410,(-$007C,A6)
+	RTS
+
+lbC0023B2:	BTST	#7,(-$00CC,A6)
+	BEQ.B	lbC0023C0
+	BSET	#3,(-$007C,A6)
+lbC0023C0:	ORI.L	#$02000410,(-$007C,A6)
+	ST	(-$004C,A6)
+	RTS
+
+lbC0023CE:	ORI.L	#$01002080,(-$007C,A6)
+	BTST	#5,(-$007E,A6)
+	BNE.B	lbC0023E8
+	FMOVEM.X	(lbL002348).L,FP0
+	RTS
+
+lbC0023E8:	ST	(-$004C,A6)
+	RTS
+
+lbC0023EE:	CLR.L	(-$0074,A6)
+	CLR.L	(-$0070,A6)
+	CLR.L	(-$006C,A6)
+	TST.B	(A0)
+	BPL.B	lbC002404
+	BSET	#7,(-$0074,A6)
+lbC002404:	LEA	(-$0074,A6),A0
+	ORI.L	#$00000A28,(-$007C,A6)
+	BTST	#3,(-$007E,A6)
+	BEQ.B	lbC002430
+	BFCLR	(-$00E8,A6){5:3}
+	BSET	#4,(-$00DF,A6)
+	BSET	#7,(-$00E7,A6)
+	BCLR	#2,(-$00DC,A6)
+lbC002430:	BFEXTU	(-$007D,A6){0:2},D0
+	BCLR	#7,(A0)
+	SNE	(2,A0)
+	BSR.W	lbC009790
+	BFCLR	(2,A0){0:8}
+	BEQ.B	lbC002454
+	BSET	#7,(A0)
+	BSET	#7,(-$0074,A6)
+lbC002454:	FMOVEM.X	(A0),FP0
+	RTS
+
+lbC00245A:	ORI.L	#$00001048,(-$007C,A6)
+	MOVE.L	(-$00CC,A6),(-$0074,A6)
+	MOVE.L	(-$00C8,A6),(-$0070,A6)
+	MOVE.L	(-$00C4,A6),(-$006C,A6)
+	MOVE.B	(-$007D,A6),D0
+	ANDI.B	#$C0,D0
+	BEQ.B	lbC0024B6
+	CMPI.B	#$40,D0
+	BNE.B	lbC002498
+	TST.B	(-$00C4,A6)
+	BNE.B	lbC0024A4
+	MOVE.L	(-$00C8,A6),D0
+	ANDI.L	#$000000FF,D0
+	BNE.B	lbC0024A4
+	BRA.B	lbC0024B6
+
+lbC002498:	MOVE.L	(-$00C4,A6),D0
+	ANDI.L	#$000007FF,D0
+	BEQ.B	lbC0024B6
+lbC0024A4:	ORI.L	#$00000200,(-$007C,A6)
+	BRA.B	lbC0024B6
+
+lbC0024AE:	ORI.L	#$00001248,(-$007C,A6)
+lbC0024B6:	BTST	#4,(-$007E,A6)
+	BEQ.B	lbC0024E2
+	CLR.L	(-$0074,A6)
+	CLR.L	(-$0070,A6)
+	CLR.L	(-$006C,A6)
+	BFCLR	(-$00E8,A6){5:3}
+	BCLR	#4,(-$00DF,A6)
+	BSET	#7,(-$00E7,A6)
+	BCLR	#2,(-$00DC,A6)
+lbC0024E2:	BSR.W	lbC009454
+	BFCLR	(-$00CA,A6){0:8}
+	BEQ.B	lbC0024FA
+	BSET	#7,(-$00CC,A6)
+	BSET	#7,(-$0074,A6)
+lbC0024FA:	FMOVEM.X	(-$00CC,A6),FP0
+	RTS
+
+lbC002502:	ORI.L	#$00000208,(-$007C,A6)
+	RTS
+
+lbC00250C:	ORI.L	#$00000208,(-$007C,A6)
+	BTST	#3,(-$007A,A6)
+	BEQ.B	lbC002522
+	BSET	#5,(-$0079,A6)
+lbC002522:	RTS
+
+lbC002524:	BTST	#7,(-$00D8,A6)
+	BEQ.B	lbC002532
+	BSET	#3,(-$007C,A6)
+lbC002532:	BTST	#6,(-$00D4,A6)
+	BEQ.B	lbC002564
+	FMOVE.L	D1,FPCR
+	FMOVE.X	(-$00D8,A6),FP0
+	MOVE.B	(-$00E8,A6),D0
+	ANDI.B	#$E0,D0
+	CMPI.B	#$60,D0
+	BNE.B	lbC002562
+	BTST	#6,(-$00C8,A6)
+	BNE.B	lbC002562
+	ORI.L	#$01004080,(-$007C,A6)
+lbC002562:	RTS
+
+lbC002564:	BTST	#6,(-$007E,A6)
+	BEQ.B	lbC002580
+	ORI.B	#$60,(-$00E0,A6)
+	ST	(-$004C,A6)
+	ORI.L	#$01004080,(-$007C,A6)
+	RTS
+
+lbC002580:	BSET	#6,(-$00D4,A6)
+	FMOVE.L	D1,FPCR
+	FMOVE.X	(-$00D8,A6),FP0
+	ORI.L	#$01004080,(-$007C,A6)
+	RTS
+
+lbL00259A:	dc.l	$082E0007,$FF346706,$08EE0003,$FF84082E,$0006FF38,$670CF201,$9000F22E
+	dc.l	$4800FF34,$4E75082E,$0006FF82,$672008EE,$0006FF38,$002E0000,$FF20002E
+	dc.l	$0060FF18,$50EEFFB4,$00AE0100,$4080FF84,$4E7508EE,$0006FF38,$F2019000
+	dc.l	$F22E4800,$FF3400AE,$01004080,$FF844E75
+
+lbC0025FE:	ORI.L	#$00000A28,(-$007C,A6)
+	BRA.B	lbC002610
+
+lbC002608:	ORI.L	#$00000800,(-$007C,A6)
+lbC002610:	BTST	#3,(-$007E,A6)
+	BEQ.B	lbC002668
+	MOVE.L	A0,-(SP)
+	MOVE.L	(A0),(-$0074,A6)
+	MOVE.L	(4,A0),(-$0070,A6)
+	MOVE.L	(8,A0),(-$006C,A6)
+	LEA	(-$0074,A6),A0
+	BCLR	#7,(A0)
+	SNE	(2,A0)
+	TST.W	(A0)
+	BEQ.B	lbC00263E
+	BSR.W	lbC003C6E
+lbC00263E:	BCLR	#7,(A0)
+	BFCLR	(2,A0){0:8}
+	BEQ.B	lbC00264E
+	BSET	#7,(A0)
+lbC00264E:	BFCLR	(-$00E8,A6){5:3}
+	BSET	#4,(-$00DF,A6)
+	BCLR	#7,(-$00E7,A6)
+	BCLR	#2,(-$00DC,A6)
+	MOVEA.L	(SP)+,A0
+lbC002668:	BFEXTU	(-$007D,A6){0:2},D0
+	BNE.B	lbC00267E
+	BTST	#7,(A0)
+	BEQ.B	lbC002696
+	BSET	#3,(-$007C,A6)
+	BRA.B	lbC002696
+
+lbC00267E:	BCLR	#7,(A0)
+	SNE	(2,A0)
+	BSR.W	lbC009790
+	BFCLR	(2,A0){0:8}
+	BEQ.B	lbC002696
+	BSET	#7,(A0)
+lbC002696:	FMOVEM.X	(A0),FP0
+	RTS
+
+lbC00269C:	LINK.W	A2,#-$00C0
+	FSAVE	-(SP)
+	TST.B	(1,SP)
+	BEQ.B	lbC002722
+	BTST	#2,(-$00DC,A2)
+	BEQ.B	lbC00271C
+	BTST	#7,(-$00E0,A2)
+	BEQ.B	lbC0026E6
+	LEA	(-$00D8,A2),A0
+	BTST	#7,(A0)
+	SNE	(2,A0)
+	BCLR	#7,(-$00E0,A2)
+	BSR.W	lbC003C6E
+	BCLR	#7,(A0)
+	BFCLR	(2,A0){0:8}
+	BEQ.B	lbC0026DE
+	BSET	#7,(A0)
+lbC0026DE:	BTST	#7,(-$00E8,A2)
+	BEQ.B	lbC00271C
+lbC0026E6:	LEA	(-$00CC,A2),A0
+	BTST	#7,(A0)
+	SNE	(2,A0)
+	BCLR	#7,(-$00E8,A2)
+	BSR.W	lbC003C6E
+	BCLR	#7,(A0)
+	BFCLR	(2,A0){0:8}
+	BEQ.B	lbC00270C
+	BSET	#7,(A0)
+lbC00270C:	MOVE.B	#$FE,(-$011C,A2)
+	CLR.W	(-$00EC,A2)
+	BCLR	#2,(-$00DC,A2)
+lbC00271C:	FRESTORE	(SP)+
+	UNLK	A2
+	RTS
+
+lbC002722:	ADDQ.L	#4,SP
+	UNLK	A2
+	RTS
+
+lbW002728:	dc.w	$3F81,$407E,$3F6A,0
+lbW002730:	dc.w	$3C01,$43FE,$3BCD,0
+
+lbC002738:	CLR.B	(-$004A,A6)
+	CLR.B	(-$0049,A6)
+	CLR.B	(-$0046,A6)
+	TST.B	(-$0048,A6)
+	BEQ.B	lbC002784
+	BTST	#7,(-$00E0,A6)
+	BEQ.B	lbC002784
+	LEA	(-$00D8,A6),A0
+	BCLR	#7,(A0)
+	SNE	(2,A0)
+	BSR.W	lbC003C6E
+	BCLR	#7,(A0)
+	BFCLR	(2,A0){0:8}
+	BEQ.B	lbC002772
+	BSET	#7,(A0)
+lbC002772:	BFCLR	(-$00E0,A6){0:4}
+	BSET	#4,(-$00E0,A6)
+	ORI.B	#15,(-$004A,A6)
+lbC002784:	LEA	(-$00CC,A6),A0
+	BTST	#5,(-$00E4,A6)
+	BNE.W	lbC0034DE
+	BTST	#7,(-$00E8,A6)
+	BNE.W	lbC0029C4
+	TST.B	(-$0048,A6)
+	BNE.W	lbC002A0E
+	MOVE.W	(-$00E4,A6),D0
+	ANDI.L	#$0000007F,D0
+	BTST	#0,D0
+	BNE.W	lbC002A0E
+	ST	(-$0046,A6)
+	MOVE.W	(-$00E4,A6),D0
+	ANDI.B	#$3B,D0
+	TST.B	D0
+	BEQ.W	lbC00284C
+	CMPI.B	#$18,D0
+	BEQ.B	lbC00282A
+	CMPI.B	#$1A,D0
+	BEQ.B	lbC00283C
+	MOVE.W	(A0),D0
+	BCLR	#15,D0
+	SNE	(2,A0)
+	BEQ.B	lbC0027E8
+	ORI.L	#$08000000,(-$007C,A6)
+lbC0027E8:	CMPI.W	#$7FFF,D0
+	BNE.B	lbC002814
+	TST.L	(4,A0)
+	BNE.B	lbC002804
+	TST.L	(8,A0)
+	BNE.B	lbC002804
+	ORI.L	#$02000000,(-$007C,A6)
+	RTS
+
+lbC002804:	ORI.L	#$01000000,(-$007C,A6)
+	MOVE.L	(-$00CC,A6),(-$00D8,A6)
+	RTS
+
+lbC002814:	TST.L	(4,A0)
+	BNE.B	lbC002828
+	TST.L	(8,A0)
+	BNE.B	lbC002828
+	ORI.L	#$04000000,(-$007C,A6)
+lbC002828:	RTS
+
+lbC00282A:	MOVE.B	(-$00E8,A6),D0
+	BTST	#5,D0
+	BNE.W	lbC0033CE
+	BCLR	#7,(A0)
+	BRA.B	lbC00284C
+
+lbC00283C:	MOVE.B	(-$00E8,A6),D0
+	BTST	#5,D0
+	BNE.W	lbC0033CE
+	BCHG	#7,(A0)
+lbC00284C:	MOVE.B	(-$00E8,A6),D0
+	ANDI.B	#$E0,D0
+	BNE.W	lbC0033CE
+	BTST	#2,(-$00E3,A6)
+	BNE.B	lbC00287A
+	BTST	#6,(-$00E3,A6)
+	BNE.B	lbC0028B8
+	BFEXTU	(-$007D,A6){0:2},D0
+	TST.B	D0
+	BEQ.W	lbC0029A0
+	CMPI.B	#1,D0
+	BEQ.B	lbC0028B8
+lbC00287A:	BFEXTU	(-$007D,A6){2:2},D1
+	OR.L	#$00020000,D1
+	MOVEQ	#0,D0
+	BCLR	#7,(A0)
+	SNE	(2,A0)
+	BSR.W	lbC003A70
+	BFCLR	(2,A0){0:8}
+	BEQ.B	lbC0028A0
+	BSET	#7,(A0)
+lbC0028A0:	MOVEQ	#2,D0
+	MOVE.W	(A0),D1
+	AND.W	#$7FFF,D1
+	CMP.W	#$3C01,D1
+	BLS.B	lbC0028FC
+	CMP.W	#$43FF,D1
+	BGE.B	lbC0028F4
+	BRA.W	lbC0029A0
+
+lbC0028B8:	BFEXTU	(-$007D,A6){2:2},D1
+	OR.L	#$00010000,D1
+	MOVEQ	#0,D0
+	BCLR	#7,(A0)
+	SNE	(2,A0)
+	BSR.W	lbC003A70
+	BFCLR	(2,A0){0:8}
+	BEQ.B	lbC0028DE
+	BSET	#7,(A0)
+lbC0028DE:	MOVEQ	#1,D0
+	MOVE.W	(A0),D1
+	AND.W	#$7FFF,D1
+	CMP.W	#$3F81,D1
+	BLS.B	lbC0028FC
+	CMP.W	#$407F,D1
+	BLT.W	lbC0029A0
+lbC0028F4:	BSR.W	lbC0024AE
+	BRA.W	lbC0029A0
+
+lbC0028FC:	BCLR	#7,(A0)
+	SNE	(2,A0)
+	BSR.W	lbC003CC0
+	BFCLR	(2,A0){0:8}
+	BEQ.B	lbC002914
+	BSET	#7,(A0)
+lbC002914:	BTST	#1,(-$007A,A6)
+	BEQ.B	lbC002924
+	ORI.L	#$00000020,(-$007C,A6)
+lbC002924:	TST.L	(4,A0)
+	BNE.B	lbC002988
+	TST.L	(8,A0)
+	BNE.B	lbC002988
+	MOVE.L	(-$0080,A6),D0
+	ANDI.L	#$00000030,D0
+	CMPI.L	#$00000020,D0
+	BLT.B	lbC002972
+	BNE.B	lbC002952
+	TST.W	(A0)
+	BGE.B	lbC002972
+	BTST	#7,(-$007D,A6)
+	BEQ.B	lbC002968
+	BRA.B	lbC00295E
+
+lbC002952:	TST.W	(A0)
+	BLT.B	lbC002972
+	BTST	#7,(-$007D,A6)
+	BEQ.B	lbC002968
+lbC00295E:	ORI.L	#$00000800,(8,A0)
+	BRA.B	lbC002988
+
+lbC002968:	ORI.L	#$00000100,(4,A0)
+	BRA.B	lbC002988
+
+lbC002972:	ORI.L	#$04000000,(-$007C,A6)
+	MOVE.B	(-$00E8,A6),D0
+	ANDI.B	#$E0,D0
+	CMPI.B	#$40,D0
+	BEQ.B	lbC002990
+lbC002988:	ORI.L	#$00000800,(-$007C,A6)
+lbC002990:	MOVE.L	(A0),(-$00CC,A6)
+	MOVE.L	(4,A0),(-$00C8,A6)
+	MOVE.L	(8,A0),(-$00C4,A6)
+lbC0029A0:	TST.W	(A0)
+	BEQ.B	lbC0029AA
+	CMPI.W	#$8000,(A0)
+	BNE.B	lbC0029B2
+lbC0029AA:	ORI.L	#$04000000,(-$007C,A6)
+lbC0029B2:	TST.W	(A0)
+	BPL.W	lbC0033CE
+	ORI.L	#$08000000,(-$007C,A6)
+	BRA.W	lbC0033CE
+
+lbC0029C4:	TST.B	(-$0048,A6)
+	BNE.B	lbC0029E0
+	MOVE.W	(-$00E4,A6),D0
+	ANDI.L	#$0000007F,D0
+	BTST	#0,D0
+	BNE.B	lbC0029E0
+	ST	(-$0046,A6)
+	BRA.B	lbC002A2C
+
+lbC0029E0:	BCLR	#7,(A0)
+	SNE	(2,A0)
+	BSR.W	lbC003C6E
+	BCLR	#7,(A0)
+	BFCLR	(2,A0){0:8}
+	BEQ.B	lbC0029FC
+	BSET	#7,(A0)
+lbC0029FC:	BFCLR	(-$00E8,A6){0:4}
+	BSET	#4,(-$00E8,A6)
+	ORI.B	#$F0,(-$004A,A6)
+lbC002A0E:	TST.B	(-$004A,A6)
+	BNE.W	lbC002C42
+lbC002A16:	MOVE.B	#$FE,(-$011C,A6)
+	BCLR	#2,(-$00DC,A6)
+	CLR.W	(-$00EC,A6)
+	ST	(-$0049,A6)
+	RTS
+
+lbC002A2C:	ST	(-$0046,A6)
+	MOVE.W	(-$00E4,A6),D0
+	ANDI.B	#$3B,D0
+	TST.B	D0
+	BEQ.B	lbC002AA8
+	CMPI.B	#$18,D0
+	BEQ.B	lbC002A9E
+	CMPI.B	#$1A,D0
+	BEQ.B	lbC002AA4
+	MOVE.W	(A0),D0
+	BCLR	#15,D0
+	SNE	(2,A0)
+	BEQ.B	lbC002A5C
+	ORI.L	#$08000000,(-$007C,A6)
+lbC002A5C:	CMPI.W	#$7FFF,D0
+	BNE.B	lbC002A88
+	TST.L	(4,A0)
+	BNE.B	lbC002A78
+	TST.L	(8,A0)
+	BNE.B	lbC002A78
+	ORI.L	#$02000000,(-$007C,A6)
+	RTS
+
+lbC002A78:	ORI.L	#$01000000,(-$007C,A6)
+	MOVE.L	(-$00CC,A6),(-$00D8,A6)
+	RTS
+
+lbC002A88:	TST.L	(4,A0)
+	BNE.B	lbC002A9C
+	TST.L	(8,A0)
+	BNE.B	lbC002A9C
+	ORI.L	#$04000000,(-$007C,A6)
+lbC002A9C:	RTS
+
+lbC002A9E:	BCLR	#7,(A0)
+	BRA.B	lbC002AA8
+
+lbC002AA4:	BCHG	#7,(A0)
+lbC002AA8:	BTST	#2,(-$00E3,A6)
+	BNE.B	lbC002AC8
+	BTST	#6,(-$00E3,A6)
+	BNE.B	lbC002AE6
+	BFEXTU	(-$007D,A6){0:2},D0
+	TST.B	D0
+	BEQ.B	lbC002B08
+	CMPI.B	#1,D0
+	BEQ.B	lbC002AE6
+lbC002AC8:	BFEXTU	(-$007D,A6){2:2},D1
+	TST.W	(A0)
+	BLT.B	lbC002ADA
+	CMPI.B	#3,D1
+	BNE.B	lbC002B22
+	BRA.B	lbC002B44
+
+lbC002ADA:	CMPI.B	#2,D1
+	BNE.W	lbC002B62
+	BRA.W	lbC002B8C
+
+lbC002AE6:	BFEXTU	(-$007D,A6){2:2},D1
+	TST.W	(A0)
+	BLT.B	lbC002AFC
+	CMPI.B	#3,D1
+	BNE.W	lbC002BB2
+	BRA.W	lbC002BD4
+
+lbC002AFC:	CMPI.B	#2,D1
+	BNE.W	lbC002BF2
+	BRA.W	lbC002C1C
+
+lbC002B08:	ORI.L	#$00000800,(-$007C,A6)
+	TST.W	(A0)
+	BEQ.W	lbC0033CE
+	ORI.L	#$08000000,(-$007C,A6)
+	BRA.W	lbC0033CE
+
+lbC002B22:	MOVE.L	#$3C010000,(A0)
+	CLR.L	(4,A0)
+	CLR.L	(8,A0)
+	ORI.L	#$04000000,(-$007C,A6)
+	ORI.L	#$00000A28,(-$007C,A6)
+	BRA.W	lbC0033CE
+
+lbC002B44:	MOVE.L	#$3C010000,(A0)
+	CLR.L	(4,A0)
+	MOVE.L	#$00000800,(8,A0)
+	ORI.L	#$00000A28,(-$007C,A6)
+	BRA.W	lbC0033CE
+
+lbC002B62:	MOVE.L	#$BC010000,(A0)
+	CLR.L	(4,A0)
+	CLR.L	(8,A0)
+	ORI.L	#$04000000,(-$007C,A6)
+	ORI.L	#$08000000,(-$007C,A6)
+	ORI.L	#$00000A28,(-$007C,A6)
+	BRA.W	lbC0033CE
+
+lbC002B8C:	MOVE.L	#$BC010000,(A0)
+	CLR.L	(4,A0)
+	MOVE.L	#$00000800,(8,A0)
+	ORI.L	#$08000000,(-$007C,A6)
+	ORI.L	#$00000A28,(-$007C,A6)
+	BRA.W	lbC0033CE
+
+lbC002BB2:	MOVE.L	#$3F810000,(A0)
+	CLR.L	(4,A0)
+	CLR.L	(8,A0)
+	ORI.L	#$04000000,(-$007C,A6)
+	ORI.L	#$00000A28,(-$007C,A6)
+	BRA.W	lbC0033CE
+
+lbC002BD4:	MOVE.L	#$3F810000,(A0)
+	MOVE.L	#$00000100,(4,A0)
+	CLR.L	(8,A0)
+	ORI.L	#$00000A28,(-$007C,A6)
+	BRA.W	lbC0033CE
+
+lbC002BF2:	MOVE.L	#$BF810000,(A0)
+	CLR.L	(4,A0)
+	CLR.L	(8,A0)
+	ORI.L	#$04000000,(-$007C,A6)
+	ORI.L	#$08000000,(-$007C,A6)
+	ORI.L	#$00000A28,(-$007C,A6)
+	BRA.W	lbC0033CE
+
+lbC002C1C:	MOVE.L	#$BF810000,(A0)
+	MOVE.L	#$00000100,(4,A0)
+	CLR.L	(8,A0)
+	ORI.L	#$08000000,(-$007C,A6)
+	ORI.L	#$00000A28,(-$007C,A6)
+	BRA.W	lbC0033CE
+
+lbC002C42:	TST.B	(-$0048,A6)
+	BEQ.W	lbC002A16
+	MOVE.W	(-$00E4,A6),D0
+	ANDI.W	#$003B,D0
+	CMPI.W	#$0022,D0
+	BEQ.W	lbC002D6A
+	CMPI.W	#$0028,D0
+	BEQ.W	lbC002FAE
+	CMPI.W	#$0023,D0
+	BEQ.W	lbC003264
+	CMPI.W	#$0038,D0
+	BEQ.W	lbC0031F8
+	CMPI.B	#$FF,(-$004A,A6)
+	BEQ.W	lbC002A16
+	CMPI.B	#15,(-$004A,A6)
+	BNE.B	lbC002CE8
+	BSR.B	lbC002CC0
+	BNE.W	lbC002A16
+	BFEXTU	(-$00CC,A6){1:15},D0
+	BFEXTS	(-$00D8,A6){1:15},D1
+	SUB.L	D1,D0
+	CMP.L	#$00007FFF,D0
+	BLT.W	lbC002A16
+	CLR.B	(-$010A,A6)
+	MOVE.W	(-$00CC,A6),D0
+	MOVE.W	(-$00D8,A6),D1
+	EOR.W	D1,D0
+	ANDI.W	#$8000,D0
+	BEQ.W	lbC0032AA
+	ST	(-$010A,A6)
+	BRA.W	lbC0032AA
+
+lbC002CC0:	MOVE.B	(-$00E8,A6),D0
+	BRA.B	lbC002CCA
+
+lbC002CC6:	MOVE.B	(-$00E0,A6),D0
+lbC002CCA:	ANDI.B	#$60,D0
+	CMP.B	#$40,D0
+	BEQ.B	lbC002CE4
+	CMP.B	#$60,D0
+	BEQ.B	lbC002CE4
+	CMP.B	#$20,D0
+	BEQ.B	lbC002CE4
+	MOVEQ	#0,D0
+	RTS
+
+lbC002CE4:	MOVEQ	#-1,D0
+	RTS
+
+lbC002CE8:	BSR.B	lbC002CC6
+	BNE.W	lbC002A16
+	BFEXTU	(-$00D8,A6){1:15},D0
+	BFEXTS	(-$00CC,A6){1:15},D1
+	SUB.L	D1,D0
+	CMP.L	#$00008000,D0
+	BLT.W	lbC002A16
+	CLR.B	(-$010A,A6)
+	MOVE.W	(-$00CC,A6),D0
+	MOVE.W	(-$00D8,A6),D1
+	EOR.W	D1,D0
+	ANDI.W	#$8000,D0
+	BEQ.B	lbC002D1E
+	ST	(-$010A,A6)
+lbC002D1E:	BCLR	#2,(-$00DC,A6)
+	ORI.L	#$00001048,(-$007C,A6)
+	CLR.W	(-$00EC,A6)
+	LEA	(-$010C,A6),A0
+	MOVE.W	(-$00E4,A6),D0
+	BTST	#6,D0
+	BEQ.B	lbC002D4C
+	BTST	#2,D0
+	BNE.B	lbC002D48
+	MOVEQ	#1,D0
+	BRA.B	lbC002D52
+
+lbC002D48:	MOVEQ	#2,D0
+	BRA.B	lbC002D52
+
+lbC002D4C:	BFEXTU	(-$007D,A6){0:2},D0
+lbC002D52:	BSR.W	lbC0094F6
+	BFCLR	(-$010A,A6){0:8}
+	BEQ.W	lbC003350
+	BSET	#7,(-$010C,A6)
+	BRA.W	lbC003350
+
+lbC002D6A:	CMPI.B	#$FF,(-$004A,A6)
+	BEQ.W	lbC002A16
+	CMPI.B	#15,(-$004A,A6)
+	BNE.B	lbC002D9E
+	BSR.W	lbC002CC0
+	BNE.W	lbC002A16
+	BFEXTU	(-$00CC,A6){1:15},D0
+	BFEXTS	(-$00D8,A6){1:15},D1
+	SUB.L	D1,D0
+	CMP.L	#$00008000,D0
+	BLT.W	lbC002A16
+	BRA.B	lbC002DBE
+
+lbC002D9E:	BSR.W	lbC002CC6
+	BNE.W	lbC002A16
+	BFEXTU	(-$00D8,A6){1:15},D0
+	BFEXTS	(-$00CC,A6){1:15},D1
+	SUB.L	D1,D0
+	CMP.L	#$00008000,D0
+	BLT.W	lbC002A16
+lbC002DBE:	MOVE.W	(-$00CC,A6),D0
+	MOVE.W	(-$00D8,A6),D1
+	EOR.W	D1,D0
+	ANDI.W	#$8000,D0
+	BEQ.W	lbC002EBC
+	CMPI.B	#15,(-$004A,A6)
+	BNE.B	lbC002E4A
+	MOVE.W	(-$00D8,A6),D0
+	ANDI.W	#$8000,D0
+	OR.W	#$3FFF,D0
+	MOVE.W	D0,(-$00D8,A6)
+	MOVE.L	(-$0080,A6),D0
+	ANDI.L	#$00000030,D0
+	FMOVE.L	D0,FPCR
+	FMOVE.X	(-$00CC,A6),FP0
+	FADD.X	(-$00D8,A6),FP0
+	LEA	(-$010C,A6),A0
+	FMOVE.L	FPSR,D1
+	OR.L	D1,(-$007C,A6)
+	FMOVE.X	FP0,(-$010C,A6)
+	LSR.L	#4,D0
+	MOVE.L	(-$0080,A6),D1
+	ANDI.L	#$000000C0,D1
+	LSR.L	#6,D1
+	SWAP	D1
+	OR.L	D0,D1
+	MOVEQ	#0,D0
+	BCLR	#7,(-$010C,A6)
+	SNE	(-$010A,A6)
+	BSR.W	lbC003A70
+	BFCLR	(-$010A,A6){0:8}
+	BEQ.W	lbC00330A
+	BSET	#7,(-$010C,A6)
+	BRA.W	lbC00330A
+
+lbC002E4A:	MOVE.W	(-$00CC,A6),D0
+	ANDI.W	#$8000,D0
+	OR.W	#$3FFF,D0
+	MOVE.W	D0,(-$00CC,A6)
+	MOVE.L	(-$0080,A6),D0
+	ANDI.L	#$00000030,D0
+	FMOVE.L	D0,FPCR
+	FMOVE.X	(-$00CC,A6),FP0
+	FADD.X	(-$00D8,A6),FP0
+	FMOVE.L	FPSR,D1
+	OR.L	D1,(-$007C,A6)
+	LEA	(-$010C,A6),A0
+	FMOVE.X	FP0,(-$010C,A6)
+	LSR.L	#4,D0
+	MOVE.L	(-$0080,A6),D1
+	ANDI.L	#$000000C0,D1
+	LSR.L	#6,D1
+	SWAP	D1
+	OR.L	D0,D1
+	MOVEQ	#0,D0
+	BCLR	#7,(-$010C,A6)
+	SNE	(-$010A,A6)
+	BSR.W	lbC003A70
+	BFCLR	(-$010A,A6){0:8}
+	BEQ.W	lbC00330A
+	BSET	#7,(-$010C,A6)
+	BRA.W	lbC00330A
+
+lbC002EBC:	CMPI.B	#15,(-$004A,A6)
+	BNE.B	lbC002F2A
+	LEA	(-$00CC,A6),A0
+	MOVE.L	(-$0080,A6),D0
+	ANDI.L	#$00000030,D0
+	LSR.L	#4,D0
+	MOVE.L	(-$0080,A6),D1
+	ANDI.L	#$000000C0,D1
+	LSR.L	#6,D1
+	SWAP	D1
+	OR.L	D0,D1
+	MOVE.L	#$20000000,D0
+	BCLR	#7,(-$00CC,A6)
+	SNE	(-$00CA,A6)
+	BSR.W	lbC003A70
+	BFCLR	(-$00CA,A6){0:8}
+	BEQ.B	lbC002F06
+	BSET	#7,(-$00CC,A6)
+lbC002F06:	LEA	(-$010C,A6),A0
+	MOVE.L	(-$00CC,A6),(A0)
+	MOVE.L	(-$00C8,A6),(4,A0)
+	MOVE.L	(-$00C4,A6),(8,A0)
+	TST.W	(-$00CC,A6)
+	BGT.B	lbC002F8E
+	ORI.L	#$08000000,(-$007C,A6)
+	BRA.B	lbC002F8E
+
+lbC002F2A:	LEA	(-$00D8,A6),A0
+	MOVE.L	(-$0080,A6),D0
+	ANDI.L	#$00000030,D0
+	LSR.L	#4,D0
+	MOVE.L	(-$0080,A6),D1
+	ANDI.L	#$000000C0,D1
+	LSR.L	#6,D1
+	SWAP	D1
+	OR.L	D0,D1
+	MOVE.L	#$20000000,D0
+	BCLR	#7,(-$00D8,A6)
+	SNE	(-$00D6,A6)
+	BSR.W	lbC003A70
+	BFCLR	(-$00D6,A6){0:8}
+	BEQ.B	lbC002F6C
+	BSET	#7,(-$00D8,A6)
+lbC002F6C:	LEA	(-$010C,A6),A0
+	MOVE.L	(-$00D8,A6),(A0)
+	MOVE.L	(-$00D4,A6),(4,A0)
+	MOVE.L	(-$00D0,A6),(8,A0)
+	TST.W	(-$00D8,A6)
+	BGT.B	lbC002F8E
+	ORI.L	#$08000000,(-$007C,A6)
+lbC002F8E:	MOVE.W	(-$010C,A6),D0
+	ANDI.W	#$7FFF,D0
+	CMPI.W	#$7FFF,D0
+	BNE.W	lbC00330A
+	ORI.L	#$02001048,(-$007C,A6)
+	CLR.L	(4,A0)
+	BRA.W	lbC00330A
+
+lbC002FAE:	CMPI.B	#$FF,(-$004A,A6)
+	BEQ.W	lbC002A16
+	CMPI.B	#15,(-$004A,A6)
+	BNE.B	lbC002FE2
+	BSR.W	lbC002CC0
+	BNE.W	lbC002A16
+	BFEXTU	(-$00CC,A6){1:15},D0
+	BFEXTS	(-$00D8,A6){1:15},D1
+	SUB.L	D1,D0
+	CMP.L	#$00008000,D0
+	BLT.W	lbC002A16
+	BRA.B	lbC003002
+
+lbC002FE2:	BSR.W	lbC002CC6
+	BNE.W	lbC002A16
+	BFEXTU	(-$00D8,A6){1:15},D0
+	BFEXTS	(-$00CC,A6){1:15},D1
+	SUB.L	D1,D0
+	CMP.L	#$00008000,D0
+	BLT.W	lbC002A16
+lbC003002:	MOVE.W	(-$00CC,A6),D0
+	MOVE.W	(-$00D8,A6),D1
+	EOR.W	D1,D0
+	ANDI.W	#$8000,D0
+	BNE.W	lbC003100
+	CMPI.B	#15,(-$004A,A6)
+	BNE.B	lbC00308E
+	MOVE.W	(-$00D8,A6),D0
+	ANDI.W	#$8000,D0
+	OR.W	#$3FFF,D0
+	MOVE.W	D0,(-$00D8,A6)
+	MOVE.L	(-$0080,A6),D0
+	ANDI.L	#$00000030,D0
+	FMOVE.L	D0,FPCR
+	FMOVE.X	(-$00D8,A6),FP0
+	FSUB.X	(-$00CC,A6),FP0
+	FMOVE.L	FPSR,D1
+	OR.L	D1,(-$007C,A6)
+	LEA	(-$010C,A6),A0
+	FMOVE.X	FP0,(-$010C,A6)
+	LSR.L	#4,D0
+	MOVE.L	(-$0080,A6),D1
+	ANDI.L	#$000000C0,D1
+	LSR.L	#6,D1
+	SWAP	D1
+	OR.L	D0,D1
+	MOVEQ	#0,D0
+	BCLR	#7,(-$010C,A6)
+	SNE	(-$010A,A6)
+	BSR.W	lbC003A70
+	BFCLR	(-$010A,A6){0:8}
+	BEQ.W	lbC00330A
+	BSET	#7,(-$010C,A6)
+	BRA.W	lbC00330A
+
+lbC00308E:	MOVE.W	(-$00CC,A6),D0
+	ANDI.W	#$8000,D0
+	OR.W	#$3FFF,D0
+	MOVE.W	D0,(-$00CC,A6)
+	MOVE.L	(-$0080,A6),D0
+	ANDI.L	#$00000030,D0
+	FMOVE.L	D0,FPCR
+	FMOVE.X	(-$00D8,A6),FP0
+	FSUB.X	(-$00CC,A6),FP0
+	FMOVE.L	FPSR,D1
+	OR.L	D1,(-$007C,A6)
+	LEA	(-$010C,A6),A0
+	FMOVE.X	FP0,(-$010C,A6)
+	LSR.L	#4,D0
+	MOVE.L	(-$0080,A6),D1
+	ANDI.L	#$000000C0,D1
+	LSR.L	#6,D1
+	SWAP	D1
+	OR.L	D0,D1
+	MOVEQ	#0,D0
+	BCLR	#7,(-$010C,A6)
+	SNE	(-$010A,A6)
+	BSR.W	lbC003A70
+	BFCLR	(-$010A,A6){0:8}
+	BEQ.W	lbC00330A
+	BSET	#7,(-$010C,A6)
+	BRA.W	lbC00330A
+
+lbC003100:	CMPI.B	#15,(-$004A,A6)
+	BNE.B	lbC003174
+	LEA	(-$00CC,A6),A0
+	MOVE.L	(-$0080,A6),D0
+	ANDI.L	#$00000030,D0
+	LSR.L	#4,D0
+	MOVE.L	(-$0080,A6),D1
+	ANDI.L	#$000000C0,D1
+	LSR.L	#6,D1
+	SWAP	D1
+	OR.L	D0,D1
+	MOVE.L	#$20000000,D0
+	EORI.W	#$8000,(-$00CC,A6)
+	TST.W	(-$00CC,A6)
+	BGT.B	lbC003142
+	ORI.L	#$08000000,(-$007C,A6)
+lbC003142:	BCLR	#7,(-$00CC,A6)
+	SNE	(-$00CA,A6)
+	BSR.W	lbC003A70
+	BFCLR	(-$00CA,A6){0:8}
+	BEQ.B	lbC00315E
+	BSET	#7,(-$00CC,A6)
+lbC00315E:	LEA	(-$010C,A6),A0
+	MOVE.L	(-$00CC,A6),(A0)
+	MOVE.L	(-$00C8,A6),(4,A0)
+	MOVE.L	(-$00C4,A6),(8,A0)
+	BRA.B	lbC0031D8
+
+lbC003174:	LEA	(-$00D8,A6),A0
+	MOVE.L	(-$0080,A6),D0
+	ANDI.L	#$00000030,D0
+	LSR.L	#4,D0
+	MOVE.L	(-$0080,A6),D1
+	ANDI.L	#$000000C0,D1
+	LSR.L	#6,D1
+	SWAP	D1
+	OR.L	D0,D1
+	MOVE.L	#$20000000,D0
+	BCLR	#7,(-$00D8,A6)
+	SNE	(-$00D6,A6)
+	BSR.W	lbC003A70
+	BFCLR	(-$00D6,A6){0:8}
+	BEQ.B	lbC0031B6
+	BSET	#7,(-$00D8,A6)
+lbC0031B6:	LEA	(-$010C,A6),A0
+	MOVE.L	(-$00D8,A6),(A0)
+	MOVE.L	(-$00D4,A6),(4,A0)
+	MOVE.L	(-$00D0,A6),(8,A0)
+	TST.W	(-$00D8,A6)
+	BGT.B	lbC0031D8
+	ORI.L	#$08000000,(-$007C,A6)
+lbC0031D8:	MOVE.W	(-$010C,A6),D0
+	ANDI.W	#$7FFF,D0
+	CMPI.W	#$7FFF,D0
+	BNE.W	lbC00330A
+	ORI.L	#$02001048,(-$007C,A6)
+	CLR.L	(4,A0)
+	BRA.W	lbC00330A
+
+lbC0031F8:	CMPI.B	#$FF,(-$004A,A6)
+	BEQ.W	lbC002A16
+	CMPI.B	#15,(-$004A,A6)
+	BNE.B	lbC003232
+	BSR.W	lbC002CC0
+	BNE.W	lbC002A16
+	BFEXTU	(-$00CC,A6){1:15},D0
+	BFEXTS	(-$00D8,A6){1:15},D1
+	SUB.L	D1,D0
+	CMP.L	#$00008000,D0
+	BLT.W	lbC002A16
+	TST.W	(-$00CC,A6)
+	BGE.B	lbC00325A
+	RTS
+
+lbC003232:	BSR.W	lbC002CC6
+	BNE.W	lbC002A16
+	BFEXTU	(-$00D8,A6){1:15},D0
+	BFEXTS	(-$00CC,A6){1:15},D1
+	SUB.L	D1,D0
+	CMP.L	#$00008000,D0
+	BLT.W	lbC002A16
+	TST.W	(-$00D8,A6)
+	BLT.B	lbC00325A
+	RTS
+
+lbC00325A:	ORI.L	#$08000000,(-$007C,A6)
+	RTS
+
+lbC003264:	CMPI.B	#$FF,(-$004A,A6)
+	BEQ.B	lbC0032AA
+	CMPI.B	#15,(-$004A,A6)
+	BNE.B	lbC003290
+	BSR.W	lbC002CC0
+	BNE.W	lbC002A16
+	BFEXTU	(-$00CC,A6){1:15},D0
+	BFEXTS	(-$00D8,A6){1:15},D1
+	ADD.L	D1,D0
+	BGT.W	lbC002A16
+	BRA.B	lbC0032AA
+
+lbC003290:	BSR.W	lbC002CC6
+	BNE.W	lbC002A16
+	BFEXTU	(-$00D8,A6){1:15},D0
+	BFEXTS	(-$00CC,A6){1:15},D1
+	ADD.L	D1,D0
+	BGT.W	lbC002A16
+lbC0032AA:	BCLR	#2,(-$00DC,A6)
+	ORI.L	#$00000A28,(-$007C,A6)
+	CLR.W	(-$00EC,A6)
+	CLR.B	(-$010A,A6)
+	MOVE.W	(-$00CC,A6),D0
+	MOVE.W	(-$00D8,A6),D1
+	EOR.W	D1,D0
+	ANDI.W	#$8000,D0
+	BEQ.B	lbC0032D4
+	ST	(-$010A,A6)
+lbC0032D4:	LEA	(-$010C,A6),A0
+	MOVE.W	(-$00E4,A6),D0
+	BTST	#6,D0
+	BEQ.B	lbC0032F0
+	BTST	#2,D0
+	BNE.B	lbC0032EC
+	MOVEQ	#1,D0
+	BRA.B	lbC0032F6
+
+lbC0032EC:	MOVEQ	#2,D0
+	BRA.B	lbC0032F6
+
+lbC0032F0:	BFEXTU	(-$007D,A6){0:2},D0
+lbC0032F6:	BSR.W	lbC009790
+	BFCLR	(-$010A,A6){0:8}
+	BEQ.B	lbC003350
+	BSET	#7,(-$010C,A6)
+	BRA.B	lbC003350
+
+lbC00330A:	MOVE.W	(-$00E4,A6),D0
+	BTST	#6,D0
+	BEQ.B	lbC003322
+	BTST	#2,D0
+	BNE.B	lbC00331E
+	MOVEQ	#1,D0
+	BRA.B	lbC00332C
+
+lbC00331E:	MOVEQ	#2,D0
+	BRA.B	lbC00332C
+
+lbC003322:	BFEXTU	(-$007D,A6){0:2},D0
+	TST.B	D0
+	BEQ.B	lbC003350
+lbC00332C:	BCLR	#7,(-$010C,A6)
+	SNE	(-$010A,A6)
+	BSR.W	lbC0094F6
+	BFCLR	(-$010A,A6){0:8}
+	BEQ.B	lbC003348
+	BSET	#7,(-$010C,A6)
+lbC003348:	ORI.L	#$00001248,(-$007C,A6)
+lbC003350:	BFEXTU	(-$00E4,A6){6:3},D0
+	CMPI.B	#3,D0
+	BLE.B	lbC00336C
+	MOVEQ	#7,D1
+	SUB.L	D0,D1
+	MOVEQ	#0,D0
+	BSET	D1,D0
+	FMOVEM.X	(-$010C,A6),D0
+	RTS
+
+lbC00336C:	CMPI.B	#0,D0
+	BEQ.B	lbC0033BA
+	CMPI.B	#1,D0
+	BEQ.B	lbC0033A6
+	CMPI.B	#2,D0
+	BEQ.B	lbC003392
+	MOVE.L	(-$010C,A6),(-$008C,A6)
+	MOVE.L	(-$0108,A6),(-$0088,A6)
+	MOVE.L	(-$0104,A6),(-$0084,A6)
+	RTS
+
+lbC003392:	MOVE.L	(-$010C,A6),(-$0098,A6)
+	MOVE.L	(-$0108,A6),(-$0094,A6)
+	MOVE.L	(-$0104,A6),(-$0090,A6)
+	RTS
+
+lbC0033A6:	MOVE.L	(-$010C,A6),(-$00A4,A6)
+	MOVE.L	(-$0108,A6),(-$00A0,A6)
+	MOVE.L	(-$0104,A6),(-$009C,A6)
+	RTS
+
+lbC0033BA:	MOVE.L	(-$010C,A6),(-$00B0,A6)
+	MOVE.L	(-$0108,A6),(-$00AC,A6)
+	MOVE.L	(-$0104,A6),(-$00A8,A6)
+	RTS
+
+lbC0033CE:	BTST	#6,(-$007A,A6)
+	BEQ.B	lbC0033F6
+	BTST	#6,(-$007E,A6)
+	BEQ.B	lbC0033F6
+	MOVE.L	(-$00CC,A6),(-$00D8,A6)
+	TST.B	(-$00CC,A6)
+	BLT.B	lbC0033EC
+	RTS
+
+lbC0033EC:	ORI.L	#3,(-$007C,A6)
+	RTS
+
+lbC0033F6:	CLR.W	(-$00EC,A6)
+	BCLR	#2,(-$00DC,A6)
+	MOVE.B	(-$00E8,A6),D0
+	ANDI.B	#$E0,D0
+	CMPI.B	#$40,D0
+	BNE.B	lbC003424
+	ORI.L	#$02000000,(-$007C,A6)
+	TST.W	(A0)
+	BGE.B	lbC003460
+	ORI.L	#$08000000,(-$007C,A6)
+	BRA.B	lbC003460
+
+lbC003424:	CMPI.B	#$60,D0
+	BNE.B	lbC003446
+	ORI.L	#$01000000,(-$007C,A6)
+	MOVE.L	(-$00CC,A6),(-$00D8,A6)
+	TST.W	(A0)
+	BGE.B	lbC003460
+	ORI.L	#$08000000,(-$007C,A6)
+	BRA.B	lbC003460
+
+lbC003446:	CMPI.B	#$20,D0
+	BNE.B	lbC003460
+	ORI.L	#$04000000,(-$007C,A6)
+	TST.W	(A0)
+	BGE.B	lbC003460
+	ORI.L	#$08000000,(-$007C,A6)
+lbC003460:	BFEXTU	(-$00E4,A6){6:3},D0
+	CMPI.B	#3,D0
+	BLE.B	lbC00347C
+	MOVEQ	#7,D1
+	SUB.L	D0,D1
+	MOVEQ	#0,D0
+	BSET	D1,D0
+	FMOVEM.X	(-$00CC,A6),D0
+	RTS
+
+lbC00347C:	CMPI.B	#0,D0
+	BEQ.B	lbC0034CA
+	CMPI.B	#1,D0
+	BEQ.B	lbC0034B6
+	CMPI.B	#2,D0
+	BEQ.B	lbC0034A2
+	MOVE.L	(-$00CC,A6),(-$008C,A6)
+	MOVE.L	(-$00C8,A6),(-$0088,A6)
+	MOVE.L	(-$00C4,A6),(-$0084,A6)
+	RTS
+
+lbC0034A2:	MOVE.L	(-$00CC,A6),(-$0098,A6)
+	MOVE.L	(-$00C8,A6),(-$0094,A6)
+	MOVE.L	(-$00C4,A6),(-$0090,A6)
+	RTS
+
+lbC0034B6:	MOVE.L	(-$00CC,A6),(-$00A4,A6)
+	MOVE.L	(-$00C8,A6),(-$00A0,A6)
+	MOVE.L	(-$00C4,A6),(-$009C,A6)
+	RTS
+
+lbC0034CA:	MOVE.L	(-$00CC,A6),(-$00B0,A6)
+	MOVE.L	(-$00C8,A6),(-$00AC,A6)
+	MOVE.L	(-$00C4,A6),(-$00A8,A6)
+	RTS
+
+lbC0034DE:	ST	(-$0046,A6)
+	MOVE.W	(-$00E4,A6),D0
+	ANDI.W	#$0C00,D0
+	CMPI.W	#$0C00,D0
+	BEQ.W	lbC0039C6
+	BRA.B	lbC003514
+
+lbL0034F4:	dc.l	lbC00357E
+	dc.l	lbC003782
+	dc.l	lbC003768
+	dc.l	lbC003524
+	dc.l	lbC003610
+	dc.l	lbC0037B0
+	dc.l	lbC00368E
+	dc.l	lbC003524
+
+lbC003514:	BFEXTU	(-$00E4,A6){3:3},D1
+	LEA	(lbL0034F4,PC),A0
+	MOVEA.L	(A0,D1.W*4),A0
+	JMP	(A0)
+
+lbC003524:	BTST	#1,(-$007A,A6)
+	BEQ.B	lbC00353A
+	BTST	#3,(-$007A,A6)
+	BEQ.B	lbC00353A
+	BSET	#5,(-$0079,A6)
+lbC00353A:	CLR.W	(-$00EC,A6)
+	BCLR	#2,(-$00DC,A6)
+	FMOVE.L	#0,FPSR
+	BFCLR	(-$00CA,A6){0:8}
+	BEQ.B	lbC00355A
+	BSET	#7,(-$00CC,A6)
+lbC00355A:	RTS
+
+lbC00355C:	CLR.W	(-$00EC,A6)
+	BCLR	#2,(-$00DC,A6)
+	FMOVE.L	#0,FPSR
+	BFCLR	(-$00CA,A6){0:8}
+	BEQ.B	lbC00357C
+	BSET	#7,(-$00CC,A6)
+lbC00357C:	RTS
+
+lbC00357E:	MOVEQ	#4,D0
+	BTST	#7,(-$00E8,A6)
+	BNE.W	lbC003704
+	FMOVEM.X	(-$00CC,A6),FP0
+	FCMP.D	#2.147483647E9,FP0
+	FBGE.W	lbC0035D0
+	FCMP.D	#-2.147483648E9,FP0
+	FBLE.W	lbC0035F0
+	MOVE.L	(-$0080,A6),D1
+	ANDI.L	#$00000030,D1
+	FMOVE.L	D1,FPCR
+	FMOVE.L	FP0,(-$0054,A6)
+	FMOVE.L	FPSR,D1
+	OR.L	D1,(-$007C,A6)
+	BRA.W	lbC003724
+
+lbC0035D0:	MOVE.L	#$7FFFFFFF,(-$0054,A6)
+	FBEQ.W	lbC003724
+	FCMP.D	#2.1474836475E9,FP0
+	FBGE.W	lbC003716
+	BRA.W	lbC00370C
+
+lbC0035F0:	MOVE.L	#$80000000,(-$0054,A6)
+	FBEQ.W	lbC003724
+	FCMP.D	#-2.1474836485E9,FP0
+	FBLT.W	lbC003716
+	BRA.W	lbC00370C
+
+lbC003610:	MOVEQ	#2,D0
+	BTST	#7,(-$00E8,A6)
+	BNE.W	lbC003704
+	FMOVEM.X	(-$00CC,A6),FP0
+	FCMP.S	#32767.0,FP0
+	FBGE.W	lbC00365A
+	FCMP.S	#-32768.0,FP0
+	FBLE.W	lbC003674
+	MOVE.L	(-$0080,A6),D1
+	ANDI.L	#$00000030,D1
+	FMOVE.L	D1,FPCR
+	FMOVE.W	FP0,(-$0054,A6)
+	FMOVE.L	FPSR,D1
+	OR.L	D1,(-$007C,A6)
+	BRA.W	lbC003724
+
+lbC00365A:	MOVE.W	#$7FFF,(-$0054,A6)
+	FBEQ.W	lbC003724
+	FCMP.S	#32767.5,FP0
+	FBGE.W	lbC003716
+	BRA.W	lbC00370C
+
+lbC003674:	MOVE.W	#$8000,(-$0054,A6)
+	FBEQ.W	lbC003724
+	FCMP.S	#-32768.5,FP0
+	FBLT.W	lbC003716
+	BRA.W	lbC00370C
+
+lbC00368E:	MOVEQ	#1,D0
+	BTST	#7,(-$00E8,A6)
+	BNE.B	lbC003704
+	FMOVEM.X	(-$00CC,A6),FP0
+	FCMP.S	#127.0,FP0
+	FBGE.W	lbC0036D4
+	FCMP.S	#-128.0,FP0
+	FBLE.W	lbC0036EC
+	MOVE.L	(-$0080,A6),D1
+	ANDI.L	#$00000030,D1
+	FMOVE.L	D1,FPCR
+	FMOVE.B	FP0,(-$0054,A6)
+	FMOVE.L	FPSR,D1
+	OR.L	D1,(-$007C,A6)
+	BRA.B	lbC003724
+
+lbC0036D4:	MOVE.B	#$7F,(-$0054,A6)
+	FBEQ.W	lbC003724
+	FCMP.S	#127.5,FP0
+	FBGE.W	lbC003716
+	BRA.B	lbC00370C
+
+lbC0036EC:	MOVE.B	#$80,(-$0054,A6)
+	FBEQ.W	lbC003724
+	FCMP.S	#-128.5,FP0
+	FBLT.W	lbC003716
+	BRA.B	lbC00370C
+
+lbC003704:	MOVE.L	#0,(-$0054,A6)
+lbC00370C:	ORI.L	#$00000208,(-$007C,A6)
+	BRA.B	lbC003724
+
+lbC003716:	FMOVEM.X	FP0,(-$00D8,A6)
+	ORI.L	#$00002080,(-$007C,A6)
+lbC003724:	MOVEA.L	(12,A6),A1
+	TST.L	A1
+	BEQ.B	lbC003738
+	LEA	(-$0054,A6),A0
+	BSR.W	lbC0009F8
+	BRA.W	lbC00355C
+
+lbC003738:	MOVE.L	D0,D1
+	MOVEA.L	(-$0078,A6),A0
+	MOVE.W	(A0),D0
+	CMPI.L	#4,D1
+	BEQ.B	lbC003758
+	CMPI.L	#2,D1
+	BNE.B	lbC00375E
+	OR.L	#8,D0
+	BRA.B	lbC00375E
+
+lbC003758:	OR.L	#$00000010,D0
+lbC00375E:	MOVE.L	D0,D1
+	BSR.W	lbC009922
+	BRA.W	lbC00355C
+
+lbC003768:	LEA	(-$00CC,A6),A0
+	BCLR	#7,(A0)
+	SNE	(2,A0)
+	BTST	#7,(-$00E8,A6)
+	BNE.W	lbC003818
+	MOVEQ	#0,D0
+	BRA.B	lbC0037DC
+
+lbC003782:	LEA	(-$00CC,A6),A0
+	BCLR	#7,(A0)
+	SNE	(2,A0)
+	BTST	#7,(-$00E8,A6)
+	BNE.W	lbC003882
+	MOVE.W	(A0),D0
+	LEA	(lbW002728,PC),A1
+	CMP.W	(A1),D0
+	BLT.W	lbC003836
+	CMP.W	(2,A1),D0
+	BGT.W	lbC0038D2
+	MOVEQ	#1,D0
+	BRA.B	lbC0037DC
+
+lbC0037B0:	LEA	(-$00CC,A6),A0
+	BCLR	#7,(A0)
+	SNE	(2,A0)
+	BTST	#7,(-$00E8,A6)
+	BNE.W	lbC0038AA
+	MOVE.W	(A0),D0
+	LEA	(lbW002730,PC),A1
+	CMP.W	(A1),D0
+	BLT.W	lbC00385C
+	CMP.W	(2,A1),D0
+	BGT.W	lbC00390A
+	MOVEQ	#2,D0
+lbC0037DC:	BFEXTU	(-$007D,A6){2:2},D1
+	SWAP	D0
+	ADD.L	D0,D1
+	MOVEQ	#0,D0
+	BSR.W	lbC003A70
+	MOVEA.L	A0,A1
+	MOVEA.L	(12,A6),A0
+	BFEXTU	(-$00E4,A6){3:3},D1
+	CMP.B	#2,D1
+	BGT.B	lbC003810
+	BNE.B	lbC003808
+	BSR.W	lbC0056A4
+	BRA.W	lbC003524
+
+lbC003808:	BSR.W	lbC005644
+	BRA.W	lbC003524
+
+lbC003810:	BSR.W	lbC0055DC
+	BRA.W	lbC003524
+
+lbC003818:	BSR.W	lbC00396C
+	BSET	#4,(-$00DF,A6)
+	MOVEA.L	A0,A1
+	MOVEA.L	(12,A6),A0
+	BSR.W	lbC0056A4
+	BSET	#3,(-$007A,A6)
+	BRA.W	lbC003524
+
+lbC003836:	BSET	#4,(-$00E8,A6)
+	CMP.W	(4,A1),D0
+	BLE.B	lbC003882
+	MOVEQ	#1,D0
+	MOVE.L	#$00003F81,D1
+	BSR.W	lbC003942
+	BSR.W	lbC005644
+	BSET	#3,(-$007A,A6)
+	BRA.W	lbC003524
+
+lbC00385C:	BSET	#4,(-$00E8,A6)
+	CMP.W	(4,A1),D0
+	BLE.B	lbC0038AA
+	MOVE.L	#$00003C01,D1
+	MOVEQ	#2,D0
+	BSR.W	lbC003942
+	BSR.W	lbC0055DC
+	BSET	#3,(-$007A,A6)
+	BRA.W	lbC003524
+
+lbC003882:	MOVE.L	(-$007C,A6),-(SP)
+	MOVEQ	#1,D0
+	BSR.W	lbC009790
+	MOVE.L	(SP)+,(-$007C,A6)
+	MOVEQ	#1,D0
+	SUB.W	D0,(A0)
+	MOVEA.L	A0,A1
+	MOVEA.L	(12,A6),A0
+	BSR.W	lbC005644
+	ORI.L	#$00000A28,(-$007C,A6)
+	BRA.W	lbC003524
+
+lbC0038AA:	MOVE.L	(-$007C,A6),-(SP)
+	MOVEQ	#2,D0
+	BSR.W	lbC009790
+	MOVE.L	(SP)+,(-$007C,A6)
+	MOVEQ	#1,D0
+	SUB.W	D0,(A0)
+	MOVEA.L	A0,A1
+	MOVEA.L	(12,A6),A0
+	BSR.W	lbC0055DC
+	ORI.L	#$00000A28,(-$007C,A6)
+	BRA.W	lbC003524
+
+lbC0038D2:	MOVE.L	(-$007C,A6),-(SP)
+	MOVEQ	#1,D0
+	LEA	(-$0074,A6),A0
+	MOVE.L	(-$00CC,A6),(A0)
+	MOVE.L	(-$00C8,A6),(4,A0)
+	MOVE.L	(-$00C4,A6),(8,A0)
+	BSR.W	lbC0094F6
+	MOVE.L	(SP)+,(-$007C,A6)
+	MOVEA.L	A0,A1
+	MOVEA.L	(12,A6),A0
+	BSR.W	lbC005644
+	ORI.L	#$00001248,(-$007C,A6)
+	BRA.W	lbC003524
+
+lbC00390A:	MOVE.L	(-$007C,A6),-(SP)
+	MOVEQ	#2,D0
+	LEA	(-$0074,A6),A0
+	MOVE.L	(-$00CC,A6),(A0)
+	MOVE.L	(-$00C8,A6),(4,A0)
+	MOVE.L	(-$00C4,A6),(8,A0)
+	BSR.W	lbC0094F6
+	MOVE.L	(SP)+,(-$007C,A6)
+	MOVEA.L	A0,A1
+	MOVEA.L	(12,A6),A0
+	BSR.W	lbC0055DC
+	ORI.L	#$00001248,(-$007C,A6)
+	BRA.W	lbC003524
+
+lbC003942:	MOVE.L	D0,-(SP)
+	MOVEQ	#0,D0
+	BSR.W	lbC003D4E
+	BFEXTU	(-$007D,A6){2:2},D1
+	SWAP	D1
+	MOVE.W	(2,SP),D1
+	SWAP	D1
+	BSR.W	lbC003A70
+	MOVE.W	#1,D0
+	SUB.W	D0,(A0)
+	MOVEA.L	A0,A1
+	MOVEA.L	(12,A6),A0
+	ADDQ.W	#4,SP
+	RTS
+
+lbC00396C:	MOVE.L	(A0),(-$010C,A6)
+	MOVE.L	(4,A0),(-$0108,A6)
+	MOVE.L	(8,A0),(-$0104,A6)
+	BFCLR	(-$010A,A6){0:8}
+	BEQ.B	lbC00398A
+	BSET	#7,(-$010C,A6)
+lbC00398A:	BFCLR	(-$00E8,A6){5:4}
+	RTS
+
+lbL003992:	dc.l	lbC0039F0
+	dc.l	lbC003A1E
+	dc.l	lbC003A30
+	dc.l	lbC003A42
+	dc.l	lbC0039F0
+lbL0039A6:	dc.l	lbC003A4C
+	dc.l	lbC003A52
+	dc.l	lbC003A58
+	dc.l	lbC003A5C
+	dc.l	lbC003A60
+	dc.l	lbC003A64
+	dc.l	lbC003A68
+	dc.l	lbC003A6C
+
+lbC0039C6:	LEA	(lbL003992,PC),A0
+	MOVE.W	(-$00E8,A6),D0
+	BFEXTU	D0{$10:3},D0
+	MOVEA.L	(A0,D0.W*4),A0
+	JMP	(A0)
+
+lbC0039D8:	MOVEQ	#12,D0
+	MOVEA.L	(12,A6),A1
+	BSR.W	lbC0009F8
+	MOVE.B	#0,(-$011C,A6)
+	BFCLR	(-$00E0,A6){0:3}
+	RTS
+
+lbC0039F0:	MOVE.W	(-$00E4,A6),D0
+	BTST	#12,D0
+	BEQ.B	lbC003A08
+	BFEXTU	D0{$19:3},D0
+	LEA	(lbL0039A6,PC),A0
+	MOVEA.L	(A0,D0.W*4),A0
+	JMP	(A0)
+
+lbC003A08:	ANDI.W	#$007F,D0
+	BFEXTS	D0{$19:7},D0
+	LEA	(-$00CC,A6),A0
+	BSR.W	lbC000AE0
+	LEA	(-$0074,A6),A0
+	BRA.B	lbC0039D8
+
+lbC003A1E:	LEA	(-$00CC,A6),A0
+	CLR.W	(2,A0)
+	CLR.L	(4,A0)
+	CLR.L	(8,A0)
+	BRA.B	lbC0039D8
+
+lbC003A30:	FMOVE.L	#0,FPSR
+	LEA	(-$00CC,A6),A0
+	CLR.W	(2,A0)
+	BRA.B	lbC0039D8
+
+lbC003A42:	LEA	(-$00CC,A6),A0
+	CLR.W	(2,A0)
+	BRA.B	lbC0039D8
+
+lbC003A4C:	MOVE.L	(-$00C0,A6),D0
+	BRA.B	lbC003A08
+
+lbC003A52:	MOVE.L	(-$00BC,A6),D0
+	BRA.B	lbC003A08
+
+lbC003A58:	MOVE.L	D2,D0
+	BRA.B	lbC003A08
+
+lbC003A5C:	MOVE.L	D3,D0
+	BRA.B	lbC003A08
+
+lbC003A60:	MOVE.L	D4,D0
+	BRA.B	lbC003A08
+
+lbC003A64:	MOVE.L	D5,D0
+	BRA.B	lbC003A08
+
+lbC003A68:	MOVE.L	D6,D0
+	BRA.B	lbC003A08
+
+lbC003A6C:	MOVE.L	D7,D0
+	BRA.B	lbC003A08
+
+lbC003A70:	BSR.B	lbC003AEA
+	TST.L	D0
+	BNE.B	lbC003A7C
+	SWAP	D1
+	BRA.W	lbC003BF8
+
+lbC003A7C:	ORI.L	#$00000208,(-$007C,A6)
+	LEA	(lbL003A90).L,A1
+	MOVEA.L	(A1,D1.W*4),A1
+	JMP	(A1)
+
+lbL003A90:	dc.l	lbC003AD6
+	dc.l	lbC003AD0
+	dc.l	lbC003AB8
+	dc.l	lbC003AA0
+
+lbC003AA0:	SWAP	D1
+	TST.B	(2,A0)
+	BMI.W	lbC003BF8
+	MOVEQ	#-1,D0
+	LEA	(lbL003B4A).L,A1
+	MOVEA.L	(A1,D1.W*4),A1
+	JMP	(A1)
+
+lbC003AB8:	SWAP	D1
+	TST.B	(2,A0)
+	BPL.W	lbC003BF8
+	MOVEQ	#-1,D0
+	LEA	(lbL003B4A).L,A1
+	MOVEA.L	(A1,D1.W*4),A1
+	JMP	(A1)
+
+lbC003AD0:	SWAP	D1
+	BRA.W	lbC003BF8
+
+lbC003AD6:	SWAP	D1
+	ADD.L	D0,D0
+	BCC.W	lbC003BF8
+	LEA	(lbL003B4A).L,A1
+	MOVEA.L	(A1,D1.W*4),A1
+	JMP	(A1)
+
+lbC003AEA:	SWAP	D1
+	CMPI.W	#0,D1
+	BNE.B	lbC003AF4
+	BRA.B	lbC003B46
+
+lbC003AF4:	MOVEM.L	D2/D3,-(SP)
+	CMPI.W	#1,D1
+	BNE.B	lbC003B20
+	BFEXTU	(4,A0){$18:2},D3
+	MOVEQ	#$1E,D2
+	LSL.L	D2,D3
+	MOVE.L	(4,A0),D2
+	ANDI.L	#$0000003F,D2
+	BNE.B	lbC003B3C
+	TST.L	(8,A0)
+	BNE.B	lbC003B3C
+	TST.L	D0
+	BNE.B	lbC003B3C
+	BRA.B	lbC003B40
+
+lbC003B20:	BFEXTU	(8,A0){$15:2},D3
+	MOVEQ	#$1E,D2
+	LSL.L	D2,D3
+	MOVE.L	(8,A0),D2
+	ANDI.L	#$000001FF,D2
+	BNE.B	lbC003B3C
+	TST.L	D0
+	BNE.B	lbC003B3C
+	BRA.B	lbC003B40
+
+lbC003B3C:	BSET	#$1D,D3
+lbC003B40:	MOVE.L	D3,D0
+	MOVEM.L	(SP)+,D2/D3
+lbC003B46:	SWAP	D1
+	RTS
+
+lbL003B4A:	dc.l	lbC003B86
+	dc.l	lbC003B5A
+	dc.l	lbC003BB0
+	dc.l	lbC003BB0
+
+lbC003B5A:	ADDI.L	#$00000100,(4,A0)
+	BCC.B	lbC003B6E
+	ROXR.W	(4,A0)
+	ROXR.W	(6,A0)
+	ADDQ.W	#1,(A0)
+lbC003B6E:	TST.L	D0
+	BNE.B	lbC003B78
+	ANDI.W	#$FE00,(6,A0)
+lbC003B78:	ANDI.L	#$FFFFFF00,(4,A0)
+	CLR.L	(8,A0)
+	RTS
+
+lbC003B86:	ADDQ.L	#1,(8,A0)
+	BCC.B	lbC003BA4
+	ADDQ.L	#1,(4,A0)
+	BCC.B	lbC003BA4
+	ROXR.W	(4,A0)
+	ROXR.W	(6,A0)
+	ROXR.W	(8,A0)
+	ROXR.W	(10,A0)
+	ADDQ.W	#1,(A0)
+lbC003BA4:	TST.L	D0
+	BNE.B	lbC003BAE
+	ANDI.B	#$FE,(11,A0)
+lbC003BAE:	RTS
+
+lbC003BB0:	ADDI.L	#$00000800,(8,A0)
+	BCC.B	lbC003BD2
+	ADDQ.L	#1,(4,A0)
+	BCC.B	lbC003BD2
+	ROXR.W	(4,A0)
+	ROXR.W	(6,A0)
+	ROXR.W	(8,A0)
+	ROXR.W	(10,A0)
+	ADDQ.W	#1,(A0)
+lbC003BD2:	TST.L	D0
+	BNE.B	lbC003BDC
+	ANDI.W	#$F000,(10,A0)
+lbC003BDC:	ANDI.L	#$FFFFF800,(8,A0)
+	RTS
+
+;fiX Label expected
+	RTS
+
+lbL003BE8:	dc.l	lbC003C02
+	dc.l	lbC003B78
+	dc.l	lbC003BDC
+	dc.l	lbC003BDC
+
+lbC003BF8:	LEA	(lbL003BE8,PC),A1
+	MOVEA.L	(A1,D1.W*4),A1
+	JMP	(A1)
+
+lbC003C02:	RTS
+
+lbC003C04:	MOVE.W	(A0),D0
+	CMP.W	#$0040,D0
+	BMI.B	lbC003C10
+	BSR.B	lbC003C6E
+	RTS
+
+lbC003C10:	MOVEM.L	D2/D3/D5/D6,-(SP)
+	MOVE.L	(4,A0),D1
+	MOVE.L	(8,A0),D2
+	BFFFO	D1{0:$20},D3
+	BEQ.B	lbC003C4E
+	CMP.W	D3,D0
+	BMI.B	lbC003C2E
+	BSR.B	lbC003C6E
+	MOVEM.L	(SP)+,D2/D3/D5/D6
+	RTS
+
+lbC003C2E:	MOVE.L	D2,D6
+	LSL.L	D0,D2
+	LSL.L	D0,D1
+	MOVEQ	#$20,D5
+	SUB.L	D0,D5
+	LSR.L	D5,D6
+	OR.L	D6,D1
+	MOVEQ	#0,D0
+	MOVE.W	D0,(A0)
+	MOVE.L	D1,(4,A0)
+	MOVE.L	D2,(8,A0)
+	MOVEM.L	(SP)+,D2/D3/D5/D6
+	RTS
+
+lbC003C4E:	BFFFO	D2{0:$20},D3
+	BEQ.B	lbC003C64
+	ADD.W	#$0020,D3
+	CMP.W	D3,D0
+	BMI.B	lbC003C2E
+	BSR.B	lbC003C6E
+	MOVEM.L	(SP)+,D2/D3/D5/D6
+	RTS
+
+lbC003C64:	MOVE.W	#0,(A0)
+	MOVEM.L	(SP)+,D2/D3/D5/D6
+	RTS
+
+lbC003C6E:	MOVE.L	D7,-(SP)
+	BFFFO	(4,A0){0:$20},D7
+	BEQ.B	lbC003CA0
+	MOVE.L	D6,-(SP)
+	SUB.W	D7,(A0)
+	MOVE.L	(4,A0),D0
+	MOVE.L	(8,A0),D1
+	LSL.L	D7,D0
+	MOVE.L	D1,D6
+	LSL.L	D7,D6
+	MOVE.L	D6,(8,A0)
+	MOVEQ	#$20,D6
+	SUB.L	D7,D6
+	LSR.L	D6,D1
+	OR.L	D1,D0
+	MOVE.L	D0,(4,A0)
+	MOVEM.L	(SP)+,D6/D7
+	RTS
+
+lbC003CA0:	MOVE.W	(A0),D0
+	MOVE.L	(8,A0),D1
+	SUB.W	#$0020,D0
+	BFFFO	D1{0:$20},D7
+	SUB.W	D7,D0
+	LSL.L	D7,D1
+	MOVE.W	D0,(A0)
+	MOVE.L	D1,(4,A0)
+	CLR.L	(8,A0)
+	MOVE.L	(SP)+,D7
+	RTS
+
+lbC003CC0:	BTST	#6,(A0)
+	BEQ.B	lbC003CCA
+	BSET	#7,(A0)
+lbC003CCA:	CMPI.B	#0,D0
+	BNE.B	lbC003CDC
+	MOVEQ	#0,D1
+	MOVEQ	#0,D0
+	BSR.B	lbC003D4E
+	TST.B	D1
+	BEQ.B	lbC003D4C
+	BRA.B	lbC003D44
+
+lbC003CDC:	CMPI.L	#1,D0
+	BEQ.B	lbC003CFC
+	MOVE.W	#$3C01,D1
+	MOVE.L	D1,D0
+	SUB.W	(A0),D0
+	CMP.W	#$0043,D0
+	BPL.B	lbC003D14
+	MOVEQ	#0,D0
+	BSR.B	lbC003D4E
+	TST.B	D1
+	BEQ.B	lbC003D4C
+	BRA.B	lbC003D44
+
+lbC003CFC:	MOVE.W	#$3F81,D1
+	MOVE.L	D1,D0
+	SUB.W	(A0),D0
+	CMP.W	#$0043,D0
+	BPL.B	lbC003D14
+	MOVEQ	#0,D0
+	BSR.B	lbC003D4E
+	TST.B	D1
+	BEQ.B	lbC003D4C
+	BRA.B	lbC003D44
+
+lbC003D14:	TST.L	(4,A0)
+	BNE.B	lbC003D22
+	TST.L	(8,A0)
+	BNE.B	lbC003D22
+	BRA.B	lbC003D30
+
+lbC003D22:	ORI.L	#$00000208,(-$007C,A6)
+	MOVE.L	#$20000000,D0
+lbC003D30:	MOVE.W	D1,(A0)
+	MOVE.L	#0,(4,A0)
+	MOVE.L	#0,(8,A0)
+	RTS
+
+lbC003D44:	ORI.L	#$00000208,(-$007C,A6)
+lbC003D4C:	RTS
+
+lbC003D4E:	BTST	#1,(-$00DC,A6)
+	BEQ.B	lbC003D5E
+	BFEXTU	(-$00E8,A6){6:3},D0
+	ROR.L	#3,D0
+lbC003D5E:	MOVE.L	(8,A0),(-$005C,A6)
+	MOVE.L	D0,(-$0058,A6)
+	MOVE.L	D1,D0
+	SUB.W	(A0),D1
+	BEQ.B	lbC003D7E
+	CMP.W	#$0020,D1
+	BLT.B	lbC003D86
+	CMP.W	#$0040,D1
+	BLT.B	lbC003DD6
+	BRA.W	lbC003E32
+
+lbC003D7E:	CLR.B	D1
+	MOVE.L	(-$0058,A6),D0
+	RTS
+
+lbC003D86:	MOVE.L	D2,-(SP)
+	MOVE.W	D0,(A0)
+	MOVEQ	#$20,D0
+	SUB.W	D1,D0
+	BFEXTU	(A0){D0:$20},D2
+	BFEXTU	D2{D1:D0},D2
+	BFEXTU	(4,A0){D0:$20},D1
+	BFEXTU	(-$005C,A6){D0:$20},D0
+	MOVE.L	D2,(4,A0)
+	MOVE.L	D1,(8,A0)
+	CLR.B	D1
+	BFTST	D0{2:$1E}
+	BEQ.B	lbC003DB8
+	BSET	#$1D,D0
+	ST	D1
+lbC003DB8:	MOVE.L	(-$0058,A6),D2
+	ANDI.L	#$E0000000,D2
+	TST.L	D2
+	BEQ.B	lbC003DCC
+	OR.L	#$20000000,D0
+lbC003DCC:	ANDI.L	#$E0000000,D0
+	MOVE.L	(SP)+,D2
+	RTS
+
+lbC003DD6:	MOVE.L	D2,-(SP)
+	MOVE.W	D0,(A0)
+	SUB.W	#$0020,D1
+	MOVEQ	#$20,D0
+	SUB.W	D1,D0
+	BFEXTU	(A0){D0:$20},D2
+	BFEXTU	D2{D1:D0},D2
+	BFEXTU	(4,A0){D0:$20},D1
+	BFTST	D1{2:$1E}
+	BNE.B	lbC003E04
+	BFTST	(-$005C,A6){D0:$20}
+	BNE.B	lbC003E04
+	MOVE.L	D1,D0
+	CLR.B	D1
+	BRA.B	lbC003E0C
+
+lbC003E04:	MOVE.L	D1,D0
+	BSET	#$1D,D0
+	ST	D1
+lbC003E0C:	CLR.L	(4,A0)
+	MOVE.L	D2,(8,A0)
+	MOVE.L	(-$0058,A6),D2
+	ANDI.L	#$E0000000,D2
+	TST.L	D2
+	BEQ.B	lbC003E28
+	OR.L	#$20000000,D0
+lbC003E28:	ANDI.L	#$E0000000,D0
+	MOVE.L	(SP)+,D2
+	RTS
+
+lbC003E32:	MOVE.W	D0,(A0)
+	TST.W	(2,A0)
+	BGE.B	lbC003E40
+	ORI.L	#$80000000,(A0)
+lbC003E40:	CMP.W	#$0040,D1
+	BEQ.B	lbC003E5E
+	CMP.W	#$0041,D1
+	BEQ.B	lbC003E6E
+	CLR.L	(4,A0)
+	CLR.L	(8,A0)
+	MOVE.L	#$20000000,D0
+	ST	D1
+	RTS
+
+lbC003E5E:	MOVE.L	(4,A0),D0
+	BFEXTU	D0{2:$1E},D1
+	ANDI.L	#$C0000000,D0
+	BRA.B	lbC003E7E
+
+lbC003E6E:	MOVE.L	(4,A0),D0
+	BFEXTU	D0{1:$1F},D1
+	ANDI.L	#$80000000,D0
+	LSR.L	#1,D0
+lbC003E7E:	TST.L	D1
+	BNE.B	lbC003E92
+	TST.L	(8,A0)
+	BNE.B	lbC003E92
+	TST.B	(-$0058,A6)
+	BNE.B	lbC003E92
+	CLR.B	D1
+	BRA.B	lbC003E98
+
+lbC003E92:	BSET	#$1D,D0
+	ST	D1
+lbC003E98:	CLR.L	(4,A0)
+	CLR.L	(8,A0)
+	RTS
+
+;fiX Label expected
+	dc.w	0
+lbB003EA4:	dc.b	$40,0,0,0,$C9,15,$DA,$A2,$21,$68,$C2,$35,0,0,0,0
+lbB003EB4:	dc.b	$3F,$FF,0,0,$C9,15,$DA,$A2,$21,$68,$C2,$35,0,0,0,0
+
+lbC003EC4:	FMOVE.L	D1,FPCR
+	FMOVE.X	(lbB003EB4,PC),FP0
+	BRA.W	lbC00250C
+
+lbC003ED2:	FMOVE.X	(A0),FP0
+	MOVE.L	(A0),D0
+	MOVE.W	(4,A0),D0
+	ANDI.L	#$7FFFFFFF,D0
+	CMPI.L	#$3FFF8000,D0
+	BGE.B	lbC003F22
+	FMOVE.S	#1.0,FP1
+	FADD.X	FP0,FP1
+	FNEG.X	FP0
+	FADD.S	#1.0,FP0
+	FDIV.X	FP1,FP0
+	FSQRT.X	FP0
+	FMOVEM.X	FP0,(A0)
+	MOVE.L	D1,-(SP)
+	MOVEQ	#0,D1
+	BSR.W	lbC0048C0
+	FMOVE.L	(SP)+,FPCR
+	FADD.X	FP0
+	BRA.W	lbC00250C
+
+lbC003F22:	FABS.X	FP0
+	FCMP.S	#1.0,FP0
+	FBGT.W	lbC0023CE
+	MOVE.L	(A0),D0
+	MOVE.W	(4,A0),D0
+	CMP.L	#0,D0
+	BGT.B	lbC003F56
+	FMOVE.X	(lbB003EA4,PC),FP0
+	FMOVE.L	D1,FPCR
+	FADD.S	#1.17549435E-38,FP0
+	BRA.W	lbC00250C
+
+lbC003F56:	FMOVE.L	D1,FPCR
+	FMOVE.S	#0.0,FP0
+	RTS
+
+lbW003F64:	dc.w	$3FFF,0,$C90F,$DAA2,$2168,$C235,0,0
+
+lbC003F74:	BRA.W	lbC0025FE
+
+lbC003F78:	FMOVE.X	(A0),FP0
+	MOVE.L	(A0),D0
+	MOVE.W	(4,A0),D0
+	ANDI.L	#$7FFFFFFF,D0
+	CMPI.L	#$3FFF8000,D0
+	BGE.B	lbC003FC8
+	FMOVE.S	#1.0,FP1
+	FSUB.X	FP0,FP1
+	FMOVEM.X	FP2,-(SP)
+	FMOVE.S	#1.0,FP2
+	FADD.X	FP0,FP2
+	FMUL.X	FP2,FP1
+	FMOVEM.X	(SP)+,FP2
+	FSQRT.X	FP1
+	FDIV.X	FP1,FP0
+	FMOVEM.X	FP0,(A0)
+	BSR.W	lbC0048C0
+	BRA.W	lbC00250C
+
+lbC003FC8:	FABS.X	FP0
+	FCMP.S	#1.0,FP0
+	FBGT.W	lbC0023CE
+	FMOVE.X	(lbW003F64,PC),FP0
+	MOVE.L	(A0),D0
+	ANDI.L	#$80000000,D0
+	ORI.L	#$3F800000,D0
+	MOVE.L	D0,-(SP)
+	FMOVE.L	D1,FPCR
+	FMUL.S	(SP)+,FP0
+	BRA.W	lbC00250C
+
+;fiX Label expected
+	dc.w	0,$3FFB,$8000,$4002,$FFFF,$3F80,0,0,0
+lbD00400C:	dc.d	-1.4005109715731034
+lbD004014:	dc.d	2.3341850387639282
+lbD00401C:	dc.d	-0.14280501665350125
+lbD004024:	dc.d	0.075260430464743191
+lbD00402C:	dc.d	-0.090895563290608036
+lbD004034:	dc.d	0.11111106131648584
+lbD00403C:	dc.d	-0.14285714276856945
+lbD004044:	dc.d	0.19999999999992937
+lbD00404C:	dc.d	-0.33333333333333331
+lbD004054:	dc.d	-0.090026116074676615
+lbD00405C:	dc.d	0.11110732475673575
+lbD004064:	dc.d	-0.14285713547911682
+lbD00406C:	dc.d	0.19999999999372336
+lbD004074:	dc.d	-0.33333333333333159
+lbB00407C:	dc.b	$3F,$FF,0,0,$C9,15,$DA,$A2,$21,$68,$C2,$35,0,0,0,0
+lbB00408C:	dc.b	$BF,$FF,0,0,$C9,15,$DA,$A2,$21,$68,$C2,$35,0,0,0,0
+lbB00409C:	dc.b	0,1,0,0,$80,0,0,0,0,0,0,0,0,0,0,0
+lbB0040AC:	dc.b	$80,1,0,0,$80,0,0,0,0,0,0,0,0,0,0,0
+lbW0040BC:	dc.w	$3FFB,0,$83D1,$52C5,$060B,$7A51,0,0,$3FFB,0,$8BC8,$5445,$6549,$8B8B,0,0,$3FFB
+	dc.w	0,$93BE,$4060,$1762,$6B0D,0,0,$3FFB,0,$9BB3,$078D,$35AE,$C202,0,0,$3FFB,0
+	dc.w	$A3A6,$9A52,$5DDC,$E7DE,0,0,$3FFB,0,$AB98,$E943,$6276,$5619,0,0,$3FFB,0,$B389
+	dc.w	$E502,$F9C5,$9862,0,0,$3FFB,0,$BB79,$7E43,$6B09,$E6FB,0,0,$3FFB,0,$C367,$A5C7
+	dc.w	$39E5,$F446,0,0,$3FFB,0,$CB54,$4C61,$CFF7,$D5C6,0,0,$3FFB,0,$D33F,$62F8,$2488
+	dc.w	$533E,0,0,$3FFB,0,$DB28,$DA81,$6240,$4C77,0,0,$3FFB,0,$E310,$A407,$8AD3,$4F18
+	dcb.w	2,0
+	dc.w	$3FFB,0,$EAF6,$B0A8,$188E,$E1EB,0,0,$3FFB,0,$F2DA,$F194,$9DBE,$79D5,0,0,$3FFB
+	dc.w	0,$FABD,$5813,$61D4,$7E3E,0,0,$3FFC,0,$8346,$AC21,$0959,$ECC4,0,0,$3FFC,0
+	dc.w	$8B23,$2A08,$3042,$82D8,0,0,$3FFC,0,$92FB,$70B8,$D29A,$E2F9,0,0,$3FFC,0,$9ACF
+	dc.w	$476F,$5CCD,$1CB4,0,0,$3FFC,0,$A29E,$7630,$4954,$F23F,0,0,$3FFC,0,$AA68,$C5D0
+	dc.w	$8AB8,$5230,0,0,$3FFC,0,$B22D,$FFFD,$9D53,$9F83,0,0,$3FFC,0,$B9ED,$EF45,$3E90
+	dc.w	$0EA5,0,0,$3FFC,0,$C1A8,$5F1C,$C75E,$3EA5,0,0,$3FFC,0,$C95D,$1BE8,$2813,$8DE6
+	dcb.w	2,0
+	dc.w	$3FFC,0,$D10B,$F300,$840D,$2DE4,0,0,$3FFC,0,$D8B4,$B2BA,$6BC0,$5E7A,0,0,$3FFC
+	dc.w	0,$E057,$2A6B,$B423,$35F6,0,0,$3FFC,0,$E7F3,$2A70,$EA9C,$AA8F,0,0,$3FFC,0
+	dc.w	$EF88,$8432,$64EC,$EFAA,0,0,$3FFC,0,$F717,$0A28,$ECC0,$6666,0,0,$3FFD,0,$812F
+	dc.w	$D288,$332D,$AD32,0,0,$3FFD,0,$88A8,$D1B1,$218E,$4D64,0,0,$3FFD,0,$9012,$AB3F
+	dc.w	$23E4,$AEE8,0,0,$3FFD,0,$976C,$C3D4,$11E7,$F1B9,0,0,$3FFD,0,$9EB6,$8949,$3889
+	dc.w	$A227,0,0,$3FFD,0,$A5EF,$72C3,$4487,$361B,0,0,$3FFD,0,$AD17,$00BA,$F07A,$7227
+	dcb.w	2,0
+	dc.w	$3FFD,0,$B42C,$BCFA,$FD37,$EFB7,0,0,$3FFD,0,$BB30,$3A94,$0BA8,$0F89,0,0,$3FFD
+	dc.w	0,$C221,$15C6,$FCAE,$BBAF,0,0,$3FFD,0,$C8FE,$F3E6,$8633,$1221,0,0,$3FFD,0
+	dc.w	$CFC9,$8330,$B400,$0C70,0,0,$3FFD,0,$D680,$7AA1,$102C,$5BF9,0,0,$3FFD,0,$DD23
+	dc.w	$99BC,$3125,$2AA3,0,0,$3FFD,0,$E3B2,$A855,$6B8F,$C517,0,0,$3FFD,0,$EA2D,$764F
+	dc.w	$6431,$5989,0,0,$3FFD,0,$F3BF,$5BF8,$BAD1,$A21D,0,0,$3FFE,0,$801C,$E39E,$0D20
+	dc.w	$5C9A,0,0,$3FFE,0,$8630,$A2DA,$DA1E,$D066,0,0,$3FFE,0,$8C1A,$D445,$F3E0,$9B8C
+	dcb.w	2,0
+	dc.w	$3FFE,0,$91DB,$8F16,$64F3,$50E2,0,0,$3FFE,0,$9773,$1420,$365E,$538C,0,0,$3FFE
+	dc.w	0,$9CE1,$C8E6,$A0B8,$CDBA,0,0,$3FFE,0,$A228,$32DB,$CADA,$AE09,0,0,$3FFE,0
+	dc.w	$A746,$F2DD,$B760,$2294,0,0,$3FFE,0,$AC3E,$C0FB,$997D,$D6A2,0,0,$3FFE,0,$B110
+	dc.w	$688A,$EBDC,$6F6A,0,0,$3FFE,0,$B5BC,$C490,$59EC,$C4B0,0,0,$3FFE,0,$BA44,$BC7D
+	dc.w	$D470,$782F,0,0,$3FFE,0,$BEA9,$4144,$FD04,$9AAC,0,0,$3FFE,0,$C2EB,$4ABB,$6616
+	dc.w	$28B6,0,0,$3FFE,0,$C70B,$D54C,$E602,$EE14,0,0,$3FFE,0,$CD00,$0549,$ADEC,$7159
+	dcb.w	2,0
+	dc.w	$3FFE,0,$D484,$57D2,$D8EA,$4EA3,0,0,$3FFE,0,$DB94,$8DA7,$12DE,$CE3B,0,0,$3FFE
+	dc.w	0,$E238,$55F9,$69E8,$096A,0,0,$3FFE,0,$E877,$1129,$C435,$3259,0,0,$3FFE,0
+	dc.w	$EE57,$C16E,$0D37,$9C0D,0,0,$3FFE,0,$F3E1,$0211,$A87C,$3779,0,0,$3FFE,0,$F919
+	dc.w	$039D,$758B,$8D41,0,0,$3FFE,0,$FE05,$8B8F,$6493,$5FB3,0,0,$3FFF,0,$8155,$FB49
+	dc.w	$7B68,$5D04,0,0,$3FFF,0,$8388,$9E35,$49D1,$08E1,0,0,$3FFF,0,$859C,$FA76,$511D
+	dc.w	$724B,0,0,$3FFF,0,$8795,$2ECF,$FF81,$31E7,0,0,$3FFF,0,$8973,$2FD1,$9557,$641B
+	dcb.w	2,0
+	dc.w	$3FFF,0,$8B38,$CAD1,$0193,$2A35,0,0,$3FFF,0,$8CE7,$A8D8,$301E,$E6B5,0,0,$3FFF
+	dc.w	0,$8F46,$A39E,$2EAE,$5281,0,0,$3FFF,0,$922D,$A7D7,$9188,$8487,0,0,$3FFF,0
+	dc.w	$94D1,$9FCB,$DEDF,$5241,0,0,$3FFF,0,$973A,$B944,$19D2,$A08B,0,0,$3FFF,0,$996F
+	dc.w	$F00E,$08E1,$0B96,0,0,$3FFF,0,$9B77,$3F95,$1232,$1DA7,0,0,$3FFF,0,$9D55,$CC32
+	dc.w	$0F93,$5624,0,0,$3FFF,0,$9F10,$0575,$006C,$C571,0,0,$3FFF,0,$A0A9,$C290,$D97C
+	dc.w	$C06C,0,0,$3FFF,0,$A226,$59EB,$EBC0,$630A,0,0,$3FFF,0,$A388,$B4AF,$F6EF,$0EC9
+	dcb.w	2,0
+	dc.w	$3FFF,0,$A4D3,$5F10,$61D2,$92C4,0,0,$3FFF,0,$A608,$95DC,$FBE3,$187E,0,0,$3FFF
+	dc.w	0,$A72A,$51DC,$7367,$BEAC,0,0,$3FFF,0,$A83A,$5153,$0956,$168F,0,0,$3FFF,0
+	dc.w	$A93A,$2007,$7539,$546E,0,0,$3FFF,0,$AA9E,$7245,$023B,$2605,0,0,$3FFF,0,$AC4C
+	dc.w	$84BA,$6FE4,$D58F,0,0,$3FFF,0,$ADCE,$4A4A,$606B,$9712,0,0,$3FFF,0,$AF2A,$2DCD
+	dc.w	$8D26,$3C9C,0,0,$3FFF,0,$B065,$6F81,$F222,$65C7,0,0,$3FFF,0,$B184,$6515,$0F71
+	dc.w	$496A,0,0,$3FFF,0,$B28A,$AA15,$6F9A,$DA35,0,0,$3FFF,0,$B37B,$44FF,$3766,$B895
+	dcb.w	2,0
+	dc.w	$3FFF,0,$B458,$C3DC,$E963,$0433,0,0,$3FFF,0,$B525,$529D,$5622,$46BD,0,0,$3FFF
+	dc.w	0,$B5E2,$CCA9,$5F9D,$88CC,0,0,$3FFF,0,$B692,$CADA,$7ACA,$1ADA,0,0,$3FFF,0
+	dc.w	$B736,$AEA7,$A692,$5838,0,0,$3FFF,0,$B7CF,$AB28,$7E9F,$7B36,0,0,$3FFF,0,$B85E
+	dc.w	$CC66,$CB21,$9835,0,0,$3FFF,0,$B8E4,$FD5A,$20A5,$93DA,0,0,$3FFF,0,$B99F,$41F6
+	dc.w	$4AFF,$9BB5,0,0,$3FFF,0,$BA7F,$1E17,$842B,$BE7B,0,0,$3FFF,0,$BB47,$1285,$7637
+	dc.w	$E17D,0,0,$3FFF,0,$BBFA,$BE8A,$4788,$DF6F,0,0,$3FFF,0,$BC9D,$0FAD,$2B68,$9D79
+	dcb.w	2,0
+	dc.w	$3FFF,0,$BD30,$6A39,$471E,$CD86,0,0,$3FFF,0,$BDB6,$C731,$856A,$F18A,0,0,$3FFF
+	dc.w	0,$BE31,$CAC5,$02E8,$0D70,0,0,$3FFF,0,$BEA2,$D55C,$E331,$94E2,0,0,$3FFF,0
+	dc.w	$BF0B,$10B7,$C031,$28F0,0,0,$3FFF,0,$BF6B,$7A18,$DACB,$778D,0,0,$3FFF,0,$BFC4
+	dc.w	$EA46,$63FA,$18F6,0,0,$3FFF,0,$C018,$1BDE,$8B89,$A454,0,0,$3FFF,0,$C065,$B066
+	dc.w	$CFBF,$6439,0,0,$3FFF,0,$C0AE,$345F,$5634,$0AE6,0,0,$3FFF,0,$C0F2,$2291,$9CB9
+	dc.w	$E6A7,0,0
+
+lbC0048BC:	BRA.W	lbC0025FE
+
+lbC0048C0:	FMOVE.X	(A0),FP0
+	MOVE.L	(A0),D0
+	MOVE.W	(4,A0),D0
+	FMOVE.X	FP0,(-$0074,A6)
+	ANDI.L	#$7FFFFFFF,D0
+	CMPI.L	#$3FFB8000,D0
+	BGE.B	lbC0048E2
+	BRA.W	lbC0049AC
+
+lbC0048E2:	CMPI.L	#$4002FFFF,D0
+	BLE.B	lbC0048EE
+	BRA.W	lbC004A2E
+
+lbC0048EE:	MOVE.W	#0,(-$0072,A6)
+	ANDI.L	#$F8000000,(-$0070,A6)
+	ORI.L	#$04000000,(-$0070,A6)
+	MOVE.L	#0,(-$006C,A6)
+	FMOVE.X	FP0,FP1
+	FMUL.X	(-$0074,A6),FP1
+	FSUB.X	(-$0074,A6),FP0
+	FADD.S	#1.0,FP1
+	FDIV.X	FP1,FP0
+	MOVE.L	D2,-(SP)
+	MOVE.L	D0,D2
+	ANDI.L	#$00007800,D0
+	ANDI.L	#$7FFF0000,D2
+	SUBI.L	#$3FFB0000,D2
+	ASR.L	#1,D2
+	ADD.L	D2,D0
+	ASR.L	#7,D0
+	LEA	(lbW0040BC,PC),A1
+	ADDA.L	D0,A1
+	MOVE.L	(A1)+,(-$0064,A6)
+	MOVE.L	(A1)+,(-$0060,A6)
+	MOVE.L	(A1)+,(-$005C,A6)
+	MOVE.L	(-$0074,A6),D0
+	ANDI.L	#$80000000,D0
+	OR.L	D0,(-$0064,A6)
+	MOVE.L	(SP)+,D2
+	FMOVE.X	FP0,FP1
+	FMUL.X	FP1
+	FMOVE.D	(lbD00400C,PC),FP2
+	FADD.X	FP1,FP2
+	FMUL.X	FP1,FP2
+	FMUL.X	FP0,FP1
+	FADD.D	(lbD004014,PC),FP2
+	FMUL.D	(lbD00401C,PC),FP1
+	FMUL.X	FP2,FP1
+	FADD.X	FP1,FP0
+	FMOVE.L	D1,FPCR
+	FADD.X	(-$0064,A6),FP0
+	BRA.W	lbC00250C
+
+;fiX Label expected
+	CMPI.L	#$3FFF8000,D0
+	BGT.W	lbC004A2E
+lbC0049AC:	CMPI.L	#$3FD78000,D0
+	BLT.B	lbC004A1A
+	FMUL.X	FP0
+	MOVE.W	#0,(-$0072,A6)
+	FMOVE.X	FP0,FP1
+	FMUL.X	FP1
+	FMOVE.D	(lbD004024,PC),FP2
+	FMOVE.D	(lbD00402C,PC),FP3
+	FMUL.X	FP1,FP2
+	FMUL.X	FP1,FP3
+	FADD.D	(lbD004034,PC),FP2
+	FADD.D	(lbD00403C,PC),FP3
+	FMUL.X	FP1,FP2
+	FMUL.X	FP3,FP1
+	FADD.D	(lbD004044,PC),FP2
+	FADD.D	(lbD00404C,PC),FP1
+	FMUL.X	FP0,FP2
+	FMUL.X	(-$0074,A6),FP0
+	FADD.X	FP2,FP1
+	FMUL.X	FP1,FP0
+	FMOVE.L	D1,FPCR
+	FADD.X	(-$0074,A6),FP0
+	BRA.W	lbC00250C
+
+lbC004A1A:	MOVE.W	#0,(-$0072,A6)
+	FMOVE.L	D1,FPCR
+	FMOVE.X	(-$0074,A6),FP0
+	BRA.W	lbC00250C
+
+lbC004A2E:	CMPI.L	#$40638000,D0
+	BGT.W	lbC004ABA
+	FMOVE.S	#-1.0,FP1
+	FDIV.X	FP0,FP1
+	FMOVE.X	FP1,FP0
+	FMUL.X	FP0
+	FMOVE.X	FP1,(-$0074,A6)
+	FMOVE.X	FP0,FP1
+	FMUL.X	FP1
+	FMOVE.D	(lbD004054,PC),FP3
+	FMOVE.D	(lbD00405C,PC),FP2
+	FMUL.X	FP1,FP3
+	FMUL.X	FP1,FP2
+	FADD.D	(lbD004064,PC),FP3
+	FADD.D	(lbD00406C,PC),FP2
+	FMUL.X	FP3,FP1
+	FMUL.X	FP0,FP2
+	FADD.D	(lbD004074,PC),FP1
+	FMUL.X	(-$0074,A6),FP0
+	FADD.X	FP2,FP1
+	FMUL.X	FP1,FP0
+	FADD.X	(-$0074,A6),FP0
+	FMOVE.L	D1,FPCR
+	BTST	#7,(A0)
+	BEQ.B	lbC004AB0
+	FADD.X	(lbB00408C,PC),FP0
+	BRA.W	lbC00250C
+
+lbC004AB0:	FADD.X	(lbB00407C,PC),FP0
+	BRA.W	lbC00250C
+
+lbC004ABA:	BTST	#7,(A0)
+	BEQ.B	lbC004AD4
+	FMOVE.X	(lbB00408C,PC),FP0
+	FMOVE.L	D1,FPCR
+	FSUB.X	(lbB0040AC,PC),FP0
+	BRA.W	lbC00250C
+
+lbC004AD4:	FMOVE.X	(lbB00407C,PC),FP0
+	FMOVE.L	D1,FPCR
+	FSUB.X	(lbB00409C,PC),FP0
+	BRA.W	lbC00250C
+
+lbC004AE8:	BRA.W	lbC0025FE
+
+lbC004AEC:	MOVE.L	(A0),D0
+	MOVE.W	(4,A0),D0
+	ANDI.L	#$7FFFFFFF,D0
+	CMPI.L	#$3FFF8000,D0
+	BGE.B	lbC004B44
+	FABS.X	(A0),FP0
+	FMOVE.X	FP0,FP1
+	FNEG.X	FP1
+	FADD.X	FP0
+	FADD.S	#1.0,FP1
+	FDIV.X	FP1,FP0
+	MOVE.L	(A0),D0
+	ANDI.L	#$80000000,D0
+	ORI.L	#$3F000000,D0
+	MOVE.L	D0,-(SP)
+	FMOVEM.X	FP0,(A0)
+	MOVE.L	D1,-(SP)
+	MOVEQ	#0,D1
+	BSR.W	lbC007064
+	FMOVE.L	(SP)+,FPCR
+	FMUL.S	(SP)+,FP0
+	BRA.W	lbC00250C
+
+lbC004B44:	FABS.X	(A0),FP0
+	FCMP.S	#1.0,FP0
+	FBGT.W	lbC0023CE
+	BRA.W	lbC002378
+
+lbW004B58:	dc.w	$3FFF,$400C
+
+lbC004B5C:	FMOVE.L	#0,FPCR
+	MOVEQ	#0,D1
+	MOVE.W	(-$00D8,A6),D1
+	SMI	(-$0054,A6)
+	ANDI.L	#$00007FFF,D1
+	MOVE.W	(-$00CC,A6),D0
+	ANDI.W	#$7FFF,D0
+	CMP2.W	(lbW004B58).L,D0
+	BCC.B	lbC004BBC
+	CMPI.W	#$400C,D0
+	BGE.W	lbC004E5C
+	MOVE.B	(-$00E0,A6),D0
+	ANDI.B	#$E0,D0
+	TST.B	D0
+	BEQ.B	lbC004BAE
+	ST	(-$004C,A6)
+	ORI.L	#$00000800,(-$007C,A6)
+	LEA	(-$00D8,A6),A0
+	BRA.W	lbC002608
+
+lbC004BAE:	FMOVE.L	(-$0080,A6),FPCR
+	FMOVE.X	(-$00D8,A6),FP0
+	RTS
+
+lbC004BBC:	FMOVE.X	(-$00CC,A6),FP0
+	FMOVE.L	#$00000010,FPCR
+	FMOVE.L	FP0,D0
+	FMOVE.L	#0,FPSR
+	TST.W	(-$00CC,A6)
+	BLT.W	lbC004C6E
+	TST.W	D1
+	BEQ.W	lbC004DD0
+	ADD.L	D0,D1
+	BEQ.B	lbC004C2C
+	CMPI.L	#$00007FFF,D1
+	BGE.B	lbC004C0C
+	TST.B	(-$0054,A6)
+	BEQ.B	lbC004BFA
+	OR.W	#$8000,D1
+lbC004BFA:	MOVE.W	D1,(-$00D8,A6)
+	FMOVE.L	(-$0080,A6),FPCR
+	FMOVE.X	(-$00D8,A6),FP0
+	RTS
+
+lbC004C0C:	TST.B	(-$0054,A6)
+	BEQ.B	lbC004C16
+	OR.W	#$8000,D1
+lbC004C16:	MOVE.W	(-$00D8,A6),(-$00CC,A6)
+	MOVE.L	(-$00D4,A6),(-$00C8,A6)
+	MOVE.L	(-$00D0,A6),(-$00C4,A6)
+	BRA.W	lbC00245A
+
+lbC004C2C:	TST.B	(-$0054,A6)
+	BEQ.B	lbC004C36
+	OR.W	#$8000,D1
+lbC004C36:	TST.L	(-$00D4,A6)
+	BLT.B	lbC004C5C
+	MOVE.W	D1,(-$00CC,A6)
+	MOVE.L	(-$00D4,A6),(-$00C8,A6)
+	MOVE.L	(-$00D0,A6),(-$00C4,A6)
+	ORI.L	#3,(-$007C,A6)
+	LEA	(-$00CC,A6),A0
+	BRA.W	lbC002608
+
+lbC004C5C:	MOVE.W	D1,(-$00D8,A6)
+	FMOVE.L	(-$0080,A6),FPCR
+	FMOVE.X	(-$00D8,A6),FP0
+	RTS
+
+lbC004C6E:	ADD.L	D0,D1
+	BEQ.B	lbC004C2C
+	BLT.B	lbC004C90
+	TST.B	(-$0054,A6)
+	BEQ.B	lbC004C7E
+	OR.W	#$8000,D1
+lbC004C7E:	MOVE.W	D1,(-$00D8,A6)
+	FMOVE.L	(-$0080,A6),FPCR
+	FMOVE.X	(-$00D8,A6),FP0
+	RTS
+
+lbC004C90:	CMPI.W	#$FFC0,D1
+	BLT.W	lbC004D62
+	MOVE.W	D1,D0
+	MOVE.L	D2,-(SP)
+	MOVE.L	(-$00D4,A6),D1
+	MOVE.L	(-$00D0,A6),D2
+	CLR.L	(-$0050,A6)
+lbC004CA8:	ADDQ.W	#1,D0
+	LSR.L	#1,D1
+	ROXR.L	#1,D2
+	BCC.B	lbC004CB4
+	ST	(-$0050,A6)
+lbC004CB4:	TST.W	D0
+	BLT.B	lbC004CA8
+	TST.B	(-$0050,A6)
+	BEQ.B	lbC004CC6
+	ORI.L	#$00000828,(-$007C,A6)
+lbC004CC6:	CLR.W	(-$00D8,A6)
+	TST.B	(-$0054,A6)
+	BEQ.B	lbC004CD6
+	ORI.W	#$8000,(-$00D8,A6)
+lbC004CD6:	MOVE.L	D1,(-$00D4,A6)
+	MOVE.L	D2,(-$00D0,A6)
+	MOVE.L	(SP)+,D2
+	TST.L	D1
+	BNE.B	lbC004D4A
+	TST.L	(-$00D0,A6)
+	BNE.B	lbC004D4A
+	BTST	#5,(-$007D,A6)
+	BEQ.B	lbC004D22
+	BTST	#4,(-$007D,A6)
+	BEQ.B	lbC004D0A
+	TST.B	(-$0054,A6)
+	BNE.B	lbC004D22
+	MOVE.L	#1,(-$00D0,A6)
+	BRA.B	lbC004D30
+
+lbC004D0A:	TST.B	(-$0054,A6)
+	BEQ.B	lbC004D22
+	MOVE.L	#1,(-$00D0,A6)
+	ORI.L	#$08000000,(-$007C,A6)
+	BRA.B	lbC004D30
+
+lbC004D22:	FMOVE.L	(-$0080,A6),FPCR
+	FMOVE.X	(-$00D8,A6),FP0
+	RTS
+
+lbC004D30:	MOVE.L	(-$00D8,A6),(-$00CC,A6)
+	MOVE.L	(-$00D4,A6),(-$00C8,A6)
+	MOVE.L	(-$00D0,A6),(-$00C4,A6)
+	LEA	(-$00CC,A6),A0
+	BRA.W	lbC002608
+
+lbC004D4A:	ORI.L	#$00000800,(-$007C,A6)
+	TST.B	(-$0054,A6)
+	BEQ.B	lbC004D60
+	ORI.L	#$08000000,(-$007C,A6)
+lbC004D60:	BRA.B	lbC004D30
+
+lbC004D62:	ORI.L	#$00000828,(-$007C,A6)
+	BTST	#5,(-$007D,A6)
+	BEQ.B	lbC004DB6
+	BTST	#4,(-$007D,A6)
+	BEQ.B	lbC004D92
+	TST.B	(-$0054,A6)
+	BNE.B	lbC004DB6
+	CLR.L	(-$00D8,A6)
+	CLR.L	(-$00D4,A6)
+	MOVE.L	#1,(-$00D0,A6)
+	BRA.B	lbC004D30
+
+lbC004D92:	TST.B	(-$0054,A6)
+	BEQ.B	lbC004DB6
+	MOVE.W	#$8000,(-$00D8,A6)
+	CLR.L	(-$00D4,A6)
+	MOVE.L	#1,(-$00D0,A6)
+	ORI.L	#$08000000,(-$007C,A6)
+	BRA.W	lbC004D30
+
+lbC004DB6:	TST.B	(-$0054,A6)
+	BGE.B	lbC004DC6
+	FMOVE.S	#-0.0,FP0
+	RTS
+
+lbC004DC6:	FMOVE.S	#0.0,FP0
+	RTS
+
+lbC004DD0:	MOVEM.L	D2/D3,-(SP)
+	MOVE.W	(-$00D8,A6),D1
+	MOVE.L	(-$00D4,A6),D2
+	MOVE.L	(-$00D0,A6),D3
+lbC004DE0:	TST.L	D2
+	BLT.B	lbC004DF0
+	TST.L	D0
+	BEQ.B	lbC004E22
+	SUBQ.L	#1,D0
+	LSL.L	#1,D3
+	ADDX.L	D2,D2
+	BRA.B	lbC004DE0
+
+lbC004DF0:	ADD.W	D0,D1
+	TST.B	(-$0054,A6)
+	BEQ.B	lbC004DFE
+	OR.L	#$00008000,D1
+lbC004DFE:	MOVEM.W	D1,(-$00D8,A6)
+	MOVEM.L	D2,(-$00D4,A6)
+	MOVEM.L	D3,(-$00D0,A6)
+	FMOVE.L	(-$0080,A6),FPCR
+	FMOVE.X	(-$00D8,A6),FP0
+	MOVEM.L	(SP)+,D2/D3
+	RTS
+
+lbC004E22:	TST.B	(-$0054,A6)
+	BEQ.B	lbC004E36
+	ORI.L	#$08000000,(-$007C,A6)
+	OR.L	#$00008000,D1
+lbC004E36:	MOVEM.W	D1,(-$00CC,A6)
+	MOVEM.L	D2,(-$00C8,A6)
+	MOVEM.L	D3,(-$00C4,A6)
+	ORI.L	#$00000800,(-$007C,A6)
+	MOVEM.L	(SP)+,D2/D3
+	LEA	(-$00CC,A6),A0
+	BRA.W	lbC002608
+
+lbC004E5C:	TST.B	(-$0054,A6)
+	BEQ.B	lbC004E68
+	OR.L	#$00008000,D1
+lbC004E68:	MOVE.L	(-$00D4,A6),(-$00C8,A6)
+	MOVE.L	(-$00D0,A6),(-$00C4,A6)
+	TST.W	(-$00CC,A6)
+	BLT.B	lbC004E82
+	MOVE.W	D1,(-$00CC,A6)
+	BRA.W	lbC00245A
+
+lbC004E82:	MOVE.W	D1,(-$00CC,A6)
+	LEA	(-$00CC,A6),A0
+	BRA.W	lbC0023EE
+
+;fiX Label expected
+	dc.w	0
+
+; --------------------------------------------------------------
+_FPUExceptionHandler_UnorderedCond:
+	LINK.W	A6,#-$00C0
+	FSAVE	-(SP)
+	MOVEM.L	D0/D1/A0/A1,(-$00C0,A6)
+	FMOVEM.X	FP0/FP1/FP2/FP3,(-$00B0,A6)
+	FMOVEM.L	FPCR/FPSR/FPIAR,(-$0080,A6)
+	MOVE.L	(6,A6),(-$0078,A6)
+	MOVEM.L	(-$00C0,A6),D0/D1/A0/A1
+	FMOVEM.X	(-$00B0,A6),FP0/FP1/FP2/FP3
+	FMOVEM.L	(-$0080,A6),FPCR/FPSR/FPIAR
+	FRESTORE	(SP)+
+	UNLK	A6
+	BRA.W	lbC0009B2
+
+; --------------------------------------------------------------------
+_ExceptionHandler_11:
+	CMPI.W	#$202C,(6,SP)
+	BEQ.W	lbC005868
+	SUBQ.L	#4,SP
+	LINK.W	A6,#-$00C0
+	FSAVE	-(SP)
+	MOVEM.L	D0/D1/A0/A1,(-$00C0,A6)
+	MOVEA.L	(10,A6),A0
+	MOVE.L	(A0),D0
+	MOVE.L	D0,(-$0054,A6)
+	BFEXTU	D0{4:3},D1
+	CMPI.B	#1,D1
+	BNE.B	lbC004F70
+	BFEXTU	D0{$10:6},D1
+	CMPI.B	#$17,D1
+	BNE.B	lbC004F70
+	CMPI.B	#$40,(SP)
+	BNE.B	lbC004F1A
+	SUBA.L	#$00000028,SP
+	MOVE.B	#$40,(SP)
+	MOVE.B	#$28,(1,SP)
+	CLR.W	(2,SP)
+	BRA.B	lbC004F36
+
+lbC004F1A:	CMPI.B	#$41,(SP)
+	BNE.W	lbC0009EE
+	SUBA.L	#$00000030,SP
+	MOVE.B	#$41,(SP)
+	MOVE.B	#$30,(1,SP)
+	CLR.W	(2,SP)
+lbC004F36:	MOVE.W	(8,A6),(4,A6)
+	MOVE.L	(10,A6),(6,A6)
+	FMOVE.L	(6,A6),FPIAR
+	MOVEQ	#4,D1
+	ADD.L	D1,(6,A6)
+	MOVE.W	#$202C,(10,A6)
+	CLR.L	(12,A6)
+	MOVE.W	D0,(-$00E4,A6)
+	CLR.L	(-$00DC,A6)
+	BSET	#5,(-$00DB,A6)
+	MOVEM.L	(-$00C0,A6),D0/D1/A0/A1
+	BRA.W	lbC00586E
+
+lbC004F70:	MOVEM.L	(-$00C0,A6),D0/D1/A0/A1
+	FRESTORE	(SP)+
+	UNLK	A6
+	ADDQ.L	#4,SP
+	BRA.W	lbC0009D4
+
+; -------------------------------------------------------------
+_FPUExceptionHandler_OpError:
+	LINK.W	A6,#-$00C0
+	FSAVE	-(SP)
+	MOVEM.L	D0/D1/A0/A1,(-$00C0,A6)
+	FMOVEM.X	FP0/FP1/FP2/FP3,(-$00B0,A6)
+	FMOVEM.L	FPCR/FPSR/FPIAR,(-$0080,A6)
+	BTST	#4,(-$00DB,A6)
+	BEQ.B	lbC004FBE
+	MOVE.L	(-$00E4,A6),D0
+	BFEXTU	D0{3:3},D0
+	CMPI.B	#0,D0
+	BEQ.B	lbC004FE4
+	CMPI.B	#4,D0
+	BEQ.W	lbC005070
+	CMPI.B	#6,D0
+	BEQ.W	lbC0050BE
+lbC004FBE:	BSET	#5,(-$007A,A6)
+	BSET	#7,(-$0079,A6)
+	MOVEM.L	(-$00C0,A6),D0/D1/A0/A1
+	FMOVEM.X	(-$00B0,A6),FP0/FP1/FP2/FP3
+	FMOVEM.L	(-$0080,A6),FPCR/FPSR/FPIAR
+	FRESTORE	(SP)+
+	UNLK	A6
+	BRA.W	lbC0009A0
+
+lbC004FE4:	MOVEQ	#4,D1
+	MOVE.B	(-$00E8,A6),D0
+	ANDI.B	#$E0,D0
+	CMPI.B	#$60,D0
+	BEQ.W	lbC005108
+	CMPI.L	#$80000000,(-$00D0,A6)
+	BNE.B	lbC005016
+	BSR.W	lbC005198
+	TST.L	D0
+	BNE.B	lbC005016
+	MOVE.L	#$80000000,D0
+	BSR.W	lbC005150
+	BRA.W	lbC0051DC
+
+lbC005016:	MOVE.W	(-$00D8,A6),D0
+	AND.W	#$7FFF,D0
+	CMP.W	#$3FFE,D0
+	BNE.B	lbC005030
+lbC005024:	MOVE.L	(-$00D0,A6),D0
+	BSR.W	lbC005150
+	BRA.W	lbC0051DC
+
+lbC005030:	MOVE.W	(-$00D8,A6),D0
+	AND.W	#$7FFF,D0
+	CMP.W	#$4000,D0
+	BCC.W	lbC00511A
+	MOVE.L	(-$00D0,A6),D0
+	AND.L	#$7FFF0000,D0
+	CMP.L	#$7FFF0000,D0
+	BEQ.B	lbC005024
+	TST.L	(-$00D0,A6)
+	BPL.B	lbC005066
+	CMPI.L	#$FFFFFFFF,(-$00D4,A6)
+	BEQ.B	lbC005024
+	BRA.W	lbC00511A
+
+lbC005066:	TST.L	(-$00D4,A6)
+	BEQ.B	lbC005024
+	BRA.W	lbC00511A
+
+lbC005070:	MOVEQ	#2,D1
+	MOVE.B	(-$00E8,A6),D0
+	ANDI.B	#$E0,D0
+	CMPI.B	#$60,D0
+	BEQ.W	lbC005108
+	CMPI.L	#$FFFF8000,(-$00D0,A6)
+	BNE.B	lbC0050A2
+	BSR.W	lbC005198
+	TST.L	D0
+	BNE.B	lbC0050A2
+	MOVE.L	#$80000000,D0
+	BSR.W	lbC005150
+	BRA.W	lbC0051DC
+
+lbC0050A2:	MOVE.W	(-$00D8,A6),D0
+	AND.W	#$7FFF,D0
+	CMP.W	#$3FFE,D0
+	BNE.B	lbC00511A
+	MOVE.L	(-$00D0,A6),D0
+	SWAP	D0
+	BSR.W	lbC005150
+	BRA.W	lbC0051DC
+
+lbC0050BE:	MOVEQ	#1,D1
+	MOVE.B	(-$00E8,A6),D0
+	ANDI.B	#$E0,D0
+	CMPI.B	#$60,D0
+	BEQ.B	lbC005108
+	CMPI.L	#$FFFFFF80,(-$00D0,A6)
+	BNE.B	lbC0050EC
+	BSR.W	lbC005198
+	TST.L	D0
+	BNE.B	lbC0050EC
+	MOVE.L	#$80000000,D0
+	BSR.B	lbC005150
+	BRA.W	lbC0051DC
+
+lbC0050EC:	MOVE.W	(-$00D8,A6),D0
+	AND.W	#$7FFF,D0
+	CMP.W	#$3FFE,D0
+	BNE.B	lbC00511A
+	MOVE.L	(-$00D0,A6),D0
+	ASL.L	#8,D0
+	SWAP	D0
+	BSR.B	lbC005150
+	BRA.W	lbC0051DC
+
+lbC005108:	ORI.L	#$00002080,(-$007C,A6)
+	MOVE.L	(-$00C8,A6),D0
+	BSR.B	lbC005150
+	BRA.W	lbC0051BA
+
+lbC00511A:	ORI.L	#$00002080,(-$007C,A6)
+	BCLR	#1,(-$007A,A6)
+	BCLR	#3,(-$0079,A6)
+	FMOVE.L	#0,FPSR
+	TST.W	(-$00D8,A6)
+	BLT.B	lbC005146
+	MOVE.L	#$7FFFFFFF,D0
+	BSR.B	lbC005150
+	BRA.B	lbC0051BA
+
+lbC005146:	MOVE.L	#$80000000,D0
+	BSR.B	lbC005150
+	BRA.B	lbC0051BA
+
+lbC005150:	MOVE.L	D0,(-$0054,A6)
+	MOVEA.L	(-$0078,A6),A0
+	MOVE.W	(A0),D0
+	BFTST	D0{$1A:3}
+	BNE.B	lbC00518A
+	ANDI.L	#7,D0
+	CMPI.L	#4,D1
+	BEQ.B	lbC00517E
+	CMPI.L	#2,D1
+	BNE.B	lbC005184
+	OR.L	#8,D0
+	BRA.B	lbC005184
+
+lbC00517E:	OR.L	#$00000010,D0
+lbC005184:	MOVE.L	D0,D1
+	BRA.W	lbC009922
+
+lbC00518A:	LEA	(-$0054,A6),A0
+	MOVEA.L	(12,A6),A1
+	MOVE.L	D1,D0
+	BRA.W	lbC0009F8
+
+lbC005198:	CMPI.L	#$FFFFFFFF,(-$00D4,A6)
+	BNE.B	lbC0051B2
+	CMPI.W	#$C000,(-$00D8,A6)
+	BEQ.B	lbC0051B6
+	CMPI.W	#$BFFF,(-$00D8,A6)
+	BEQ.B	lbC0051B6
+lbC0051B2:	MOVEQ	#1,D0
+	RTS
+
+lbC0051B6:	MOVEQ	#0,D0
+	RTS
+
+lbC0051BA:	BTST	#5,(-$007E,A6)
+	BEQ.B	lbC0051DC
+	MOVEM.L	(-$00C0,A6),D0/D1/A0/A1
+	FMOVEM.X	(-$00B0,A6),FP0/FP1/FP2/FP3
+	FMOVEM.L	(-$0080,A6),FPCR/FPSR/FPIAR
+	FRESTORE	(SP)+
+	UNLK	A6
+	BRA.W	lbC0009A0
+
+lbC0051DC:	MOVE.B	(-$007E,A6),D0
+	AND.B	(-$007A,A6),D0
+	ANDI.B	#3,D0
+	BEQ.B	lbC005218
+	MOVE.B	#$C4,(11,A6)
+	MOVE.L	(-$007C,A6),(-$0100,A6)
+	ORI.L	#$01800000,(-$00DC,A6)
+	MOVEM.L	(-$00C0,A6),D0/D1/A0/A1
+	FMOVEM.X	(-$00B0,A6),FP0/FP1/FP2/FP3
+	FMOVEM.L	(-$0080,A6),FPCR/FPSR/FPIAR
+	FRESTORE	(SP)+
+	UNLK	A6
+	BRA.W	lbC000924
+
+lbC005218:	MOVEM.L	(-$00C0,A6),D0/D1/A0/A1
+	FMOVEM.X	(-$00B0,A6),FP0/FP1/FP2/FP3
+	FMOVEM.L	(-$0080,A6),FPCR/FPSR/FPIAR
+	UNLK	A6
+	BRA.W	lbC0009F4
+
+; --------------------------------------------------------------------------------------
+_FPUExceptionHandler_Overflow:
+	LINK.W	A6,#-$00C0
+	FSAVE	-(SP)
+	MOVEM.L	D0/D1/A0/A1,(-$00C0,A6)
+	FMOVEM.X	FP0/FP1/FP2/FP3,(-$00B0,A6)
+	FMOVEM.L	FPCR/FPSR/FPIAR,(-$0080,A6)
+	BSET	#3,(-$0079,A6)
+	BSR.W	lbC00533A
+	BTST	#4,(-$007E,A6)
+	BEQ.B	lbC005298
+	BTST	#1,(-$00DC,A6)
+	BEQ.B	lbC00527E
+	BFEXTU	(-$00F0,A6){6:3},D0
+	BCLR	D0,(-$011B,A6)
+	BSR.W	lbC000F90
+	MOVE.L	(-$007C,A6),(-$0100,A6)
+	ORI.L	#$01800000,(-$00DC,A6)
+lbC00527E:	MOVEM.L	(-$00C0,A6),D0/D1/A0/A1
+	FMOVEM.X	(-$00B0,A6),FP0/FP1/FP2/FP3
+	FMOVEM.L	(-$0080,A6),FPCR/FPSR/FPIAR
+	FRESTORE	(SP)+
+	UNLK	A6
+	BRA.W	lbC00095A
+
+lbC005298:	BTST	#1,(-$007E,A6)
+	BEQ.B	lbC0052E4
+	BTST	#1,(-$00DC,A6)
+	BEQ.B	lbC0052C4
+	BFEXTU	(-$00F0,A6){6:3},D0
+	BCLR	D0,(-$011B,A6)
+	BSR.W	lbC000F90
+	MOVE.L	(-$007C,A6),(-$0100,A6)
+	ORI.L	#$01800000,(-$00DC,A6)
+lbC0052C4:	MOVE.B	#$C4,(11,A6)
+	MOVEM.L	(-$00C0,A6),D0/D1/A0/A1
+	FMOVEM.X	(-$00B0,A6),FP0/FP1/FP2/FP3
+	FMOVEM.L	(-$0080,A6),FPCR/FPSR/FPIAR
+	FRESTORE	(SP)+
+	UNLK	A6
+	BRA.W	lbC000924
+
+lbC0052E4:	BCLR	#1,(-$00DC,A6)
+	BEQ.B	lbC005322
+	BFEXTU	(-$00F0,A6){6:3},D0
+	BCLR	D0,(-$011B,A6)
+	BSR.W	lbC000F90
+	MOVE.L	(-$007C,A6),(-$0100,A6)
+	ORI.L	#$01800000,(-$00DC,A6)
+	MOVEM.L	(-$00C0,A6),D0/D1/A0/A1
+	FMOVEM.X	(-$00B0,A6),FP0/FP1/FP2/FP3
+	FMOVEM.L	(-$0080,A6),FPCR/FPSR/FPIAR
+	FRESTORE	(SP)+
+	UNLK	A6
+	BRA.W	lbC0009F4
+
+lbC005322:	MOVEM.L	(-$00C0,A6),D0/D1/A0/A1
+	FMOVEM.X	(-$00B0,A6),FP0/FP1/FP2/FP3
+	FMOVEM.L	(-$0080,A6),FPCR/FPSR/FPIAR
+	UNLK	A6
+	BRA.W	lbC0009F4
+
+lbC00533A:	BTST	#1,(-$00DC,A6)
+	BEQ.B	lbC005348
+	LEA	(-$010C,A6),A0
+	BRA.B	lbC00534C
+
+lbC005348:	LEA	(-$00CC,A6),A0
+lbC00534C:	BCLR	#7,(A0)
+	SNE	(2,A0)
+	BSR.W	lbC0096AE
+	CMPI.W	#3,D0
+	BNE.B	lbC005372
+	MOVE.B	(-$007C,A6),(-$0054,A6)
+	BSR.W	lbC0094F2
+	MOVE.B	(-$0054,A6),(-$007C,A6)
+	BRA.W	lbC00554C
+
+lbC005372:	BSR.W	lbC00946C
+	BRA.W	lbC00554C
+
+;fiX Label expected
+	dc.w	0
+
+; --------------------------------------------------------------
+_FPUExceptionHandler_SNAN:
+	LINK.W	A6,#-$00C0
+	FSAVE	-(SP)
+	MOVEM.L	D0/D1/A0/A1,(-$00C0,A6)
+	FMOVEM.X	FP0/FP1/FP2/FP3,(-$00B0,A6)
+	FMOVEM.L	FPCR/FPSR/FPIAR,(-$0080,A6)
+	BTST	#6,(-$007E,A6)
+	BNE.B	lbC0053CE
+	BSR.W	lbC005476
+	MOVE.B	(-$007E,A6),D0
+	AND.B	(-$007A,A6),D0
+	ANDI.B	#3,D0
+	BEQ.B	lbC005426
+	MOVE.B	#$C4,(11,A6)
+	MOVEM.L	(-$00C0,A6),D0/D1/A0/A1
+	FMOVEM.X	(-$00B0,A6),FP0/FP1/FP2/FP3
+	FMOVEM.L	(-$0080,A6),FPCR/FPSR/FPIAR
+	FRESTORE	(SP)+
+	UNLK	A6
+	BRA.W	lbC000924
+
+lbC0053CE:	BTST	#5,(-$00E4,A6)
+	BEQ.W	lbC005508
+	BSR.W	lbC005476
+lbC0053DC:	MOVE.B	(SP),(-$0045,A6)
+	CMPI.B	#$40,(SP)
+	BNE.B	lbC0053EA
+	MOVEQ	#13,D0
+	BRA.B	lbC0053EC
+
+lbC0053EA:	MOVEQ	#11,D0
+lbC0053EC:	CLR.L	(SP)
+lbC0053EE:	CLR.L	-(SP)
+	DBRA	D0,lbC0053EE
+	MOVE.B	(-$0045,A6),(SP)
+	MOVE.B	#$60,(1,SP)
+	MOVE.L	(-$007C,A6),(-$0100,A6)
+	ORI.L	#$01800000,(-$00DC,A6)
+	MOVEM.L	(-$00C0,A6),D0/D1/A0/A1
+	FMOVEM.X	(-$00B0,A6),FP0/FP1/FP2/FP3
+	FMOVEM.L	(-$0080,A6),FPCR/FPSR/FPIAR
+	FRESTORE	(SP)+
+	UNLK	A6
+	BRA.W	lbC00098E
+
+lbC005426:	BCLR	#2,(-$00DC,A6)
+	MOVE.B	(SP),(-$0045,A6)
+	CMPI.B	#$40,(SP)
+	BNE.B	lbC00543A
+	MOVEQ	#13,D0
+	BRA.B	lbC00543C
+
+lbC00543A:	MOVEQ	#11,D0
+lbC00543C:	CLR.L	(SP)
+lbC00543E:	CLR.L	-(SP)
+	DBRA	D0,lbC00543E
+	MOVE.B	(-$0045,A6),(SP)
+	MOVE.B	#$60,(1,SP)
+	MOVE.L	(-$007C,A6),(-$0100,A6)
+	ORI.L	#$01800000,(-$00DC,A6)
+	MOVEM.L	(-$00C0,A6),D0/D1/A0/A1
+	FMOVEM.X	(-$00B0,A6),FP0/FP1/FP2/FP3
+	FMOVEM.L	(-$0080,A6),FPCR/FPSR/FPIAR
+	FRESTORE	(SP)+
+	UNLK	A6
+	BRA.W	lbC0009F4
+
+lbC005476:	MOVEA.L	(12,A6),A0
+	BFEXTU	(-$00E4,A6){3:3},D0
+	CMPI.L	#0,D0
+	BEQ.B	lbC00549A
+	CMPI.L	#4,D0
+	BEQ.B	lbC0054AC
+	CMPI.L	#6,D0
+	BEQ.B	lbC0054BE
+	RTS
+
+lbC00549A:	MOVE.L	(-$00C8,A6),D1
+	MOVEQ	#4,D0
+	BSET	#$1E,D1
+	TST.L	A0
+	BEQ.B	lbC0054D0
+	MOVE.L	D1,(A0)
+	RTS
+
+lbC0054AC:	MOVE.L	(-$00C8,A6),D1
+	MOVEQ	#2,D0
+	BSET	#$1E,D1
+	TST.L	A0
+	BEQ.B	lbC0054D0
+	MOVE.L	D1,(A0)
+	RTS
+
+lbC0054BE:	MOVE.L	(-$00C8,A6),D1
+	MOVEQ	#1,D0
+	BSET	#$1E,D1
+	TST.L	A0
+	BEQ.B	lbC0054D0
+	MOVE.L	D1,(A0)
+	RTS
+
+lbC0054D0:	MOVE.L	D1,(-$0054,A6)
+	MOVEA.L	(-$0078,A6),A0
+	MOVE.W	(A0),D1
+	ANDI.L	#7,D1
+	CMPI.L	#4,D0
+	BEQ.B	lbC0054FA
+	CMPI.L	#2,D0
+	BNE.B	lbC005504
+	OR.L	#8,D1
+	BRA.W	lbC009922
+
+lbC0054FA:	OR.L	#$00000010,D1
+	BRA.W	lbC009922
+
+lbC005504:	BRA.W	lbC009922
+
+lbC005508:	MOVE.L	(-$00E0,A6),D0
+	BFEXTU	D0{0:3},D0
+	CMPI.B	#3,D0
+	BNE.B	lbC005524
+	BTST	#6,(-$00D4,A6)
+	BNE.B	lbC005524
+	MOVE.W	(-$00D8,A6),D0
+	BRA.B	lbC005528
+
+lbC005524:	MOVE.W	(-$00CC,A6),D0
+lbC005528:	BTST	#15,D0
+	BEQ.B	lbC005538
+	BSET	#3,(-$007C,A6)
+	BRA.W	lbC0053DC
+
+lbC005538:	BCLR	#3,(-$007C,A6)
+	BRA.W	lbC0053DC
+
+;fiX Label expected
+	dc.w	0
+lbL005544:	dc.l	$80402010,$08040201
+
+lbC00554C:	BTST	#1,(-$00DC,A6)
+	BEQ.B	lbC0055AC
+	MOVE.L	(-$00F0,A6),D0
+	BFEXTU	D0{6:3},D0
+lbC00555C:	LEA	(lbL005544,PC),A1
+	MOVE.B	(A1,D0.W),D0
+	TST.B	(2,A0)
+	BEQ.B	lbC00556E
+	BSET	#7,(A0)
+lbC00556E:	FMOVEM.X	(A0),D0
+	CMP.B	#$80,D0
+	BNE.B	lbC005580
+	FMOVEM.X	D0,(-$00B0,A6)
+	RTS
+
+lbC005580:	CMP.B	#$40,D0
+	BNE.B	lbC00558E
+	FMOVEM.X	D0,(-$00A4,A6)
+	RTS
+
+lbC00558E:	CMP.B	#$20,D0
+	BNE.B	lbC00559C
+	FMOVEM.X	D0,(-$0098,A6)
+	RTS
+
+lbC00559C:	CMP.B	#$10,D0
+	BNE.B	lbC0055AA
+	FMOVEM.X	D0,(-$008C,A6)
+	RTS
+
+lbC0055AA:	RTS
+
+lbC0055AC:	BSR.W	lbC0096AE
+	CMPI.B	#3,D0
+	BEQ.B	lbC0055C0
+	MOVE.L	(-$00E4,A6),D0
+	BFEXTU	D0{6:3},D0
+	BRA.B	lbC00555C
+
+lbC0055C0:	BSR.W	lbC0096C4
+	MOVEA.L	A0,A1
+	MOVEA.L	(12,A6),A0
+	CMPI.L	#0,D0
+	BEQ.W	lbC0056A4
+	CMPI.L	#1,D0
+	BEQ.B	lbC005644
+lbC0055DC:	MOVEQ	#0,D0
+	MOVE.W	(A1),D0
+	SUB.W	#$3FFF,D0
+	CMP.W	#$4000,D0
+	BEQ.B	lbC0055FE
+	ADD.W	#$03FF,D0
+	SWAP	D0
+	LSL.L	#4,D0
+	TST.B	(2,A1)
+	BEQ.B	lbC005616
+	BSET	#$1F,D0
+	BRA.B	lbC005616
+
+lbC0055FE:	MOVE.L	#$7FF00000,D0
+	CLR.L	(4,A1)
+	TST.B	(2,A1)
+	BEQ.B	lbC005612
+	BSET	#$1F,D0
+lbC005612:	MOVE.L	D0,(A1)
+	BRA.B	lbC00563A
+
+lbC005616:	MOVE.L	(4,A1),D1
+	BFEXTU	D1{1:$14},D1
+	OR.L	D1,D0
+	MOVE.L	D0,(A1)
+	MOVE.L	(4,A1),D1
+	MOVEQ	#$15,D0
+	LSL.L	D0,D1
+	MOVE.L	D1,(4,A1)
+	MOVE.L	(8,A1),D1
+	BFEXTU	D1{0:$15},D0
+	OR.L	D0,(4,A1)
+lbC00563A:	MOVEQ	#8,D0
+	EXG	A0,A1
+	BSR.W	lbC0009F8
+	RTS
+
+lbC005644:	MOVEQ	#0,D0
+	MOVE.W	(A1),D0
+	SUB.W	#$3FFF,D0
+	CMP.W	#$4000,D0
+	BEQ.B	lbC005666
+	ADD.W	#$007F,D0
+	SWAP	D0
+	LSL.L	#7,D0
+	TST.B	(2,A1)
+	BEQ.B	lbC005678
+	BSET	#$1F,D0
+	BRA.B	lbC005678
+
+lbC005666:	MOVE.L	#$7F800000,D0
+	TST.B	(2,A1)
+	BEQ.B	lbC005682
+	BSET	#$1F,D0
+	BRA.B	lbC005682
+
+lbC005678:	MOVE.L	(4,A1),D1
+	BFEXTU	D1{1:$17},D1
+	OR.L	D1,D0
+lbC005682:	MOVE.L	D0,(-$0054,A6)
+	TST.L	A0
+	BEQ.B	lbC00568E
+	MOVE.L	D0,(A0)
+	RTS
+
+lbC00568E:	MOVEA.L	(-$0078,A6),A0
+	MOVE.W	(A0),D0
+	AND.W	#7,D0
+	MOVE.L	D0,D1
+	OR.L	#$00000010,D1
+	BRA.W	lbC009922
+
+lbC0056A4:	TST.B	(2,A1)
+	BEQ.B	lbC0056AE
+	BSET	#7,(A1)
+lbC0056AE:	CLR.B	(2,A1)
+	MOVEQ	#12,D0
+	EXG	A0,A1
+	BSR.W	lbC0009F8
+	RTS
+
+; ----------------------------------------------------------------
+_FPUExceptionHandler_Underflow:
+	LINK.W	A6,#-$00C0
+	FSAVE	-(SP)
+	MOVEM.L	D0/D1/A0/A1,(-$00C0,A6)
+	FMOVEM.X	FP0/FP1/FP2/FP3,(-$00B0,A6)
+	FMOVEM.L	FPCR/FPSR/FPIAR,(-$0080,A6)
+	BSR.W	lbC0057C6
+	BTST	#3,(-$007E,A6)
+	BEQ.B	lbC00571E
+	BTST	#1,(-$00DC,A6)
+	BEQ.B	lbC005704
+	BFEXTU	(-$00F0,A6){6:3},D0
+	BCLR	D0,(-$011B,A6)
+	BSR.W	lbC000F90
+	MOVE.L	(-$007C,A6),(-$0100,A6)
+	ORI.L	#$01800000,(-$00DC,A6)
+lbC005704:	MOVEM.L	(-$00C0,A6),D0/D1/A0/A1
+	FMOVEM.X	(-$00B0,A6),FP0/FP1/FP2/FP3
+	FMOVEM.L	(-$0080,A6),FPCR/FPSR/FPIAR
+	FRESTORE	(SP)+
+	UNLK	A6
+	BRA.W	lbC000974
+
+lbC00571E:	MOVE.B	(-$007E,A6),D0
+	AND.B	(-$007A,A6),D0
+	ANDI.B	#3,D0
+	BEQ.B	lbC005770
+	BTST	#1,(-$00DC,A6)
+	BEQ.B	lbC005750
+	BFEXTU	(-$00F0,A6){6:3},D0
+	BCLR	D0,(-$011B,A6)
+	BSR.W	lbC000F90
+	MOVE.L	(-$007C,A6),(-$0100,A6)
+	ORI.L	#$01800000,(-$00DC,A6)
+lbC005750:	MOVE.B	#$C4,(11,A6)
+	MOVEM.L	(-$00C0,A6),D0/D1/A0/A1
+	FMOVEM.X	(-$00B0,A6),FP0/FP1/FP2/FP3
+	FMOVEM.L	(-$0080,A6),FPCR/FPSR/FPIAR
+	FRESTORE	(SP)+
+	UNLK	A6
+	BRA.W	lbC000924
+
+lbC005770:	BCLR	#1,(-$00DC,A6)
+	BEQ.B	lbC0057AE
+	BFEXTU	(-$00F0,A6){6:3},D0
+	BCLR	D0,(-$011B,A6)
+	BSR.W	lbC000F90
+	MOVE.L	(-$007C,A6),(-$0100,A6)
+	ORI.L	#$01800000,(-$00DC,A6)
+	MOVEM.L	(-$00C0,A6),D0/D1/A0/A1
+	FMOVEM.X	(-$00B0,A6),FP0/FP1/FP2/FP3
+	FMOVEM.L	(-$0080,A6),FPCR/FPSR/FPIAR
+	FRESTORE	(SP)+
+	UNLK	A6
+	BRA.W	lbC0009F4
+
+lbC0057AE:	MOVEM.L	(-$00C0,A6),D0/D1/A0/A1
+	FMOVEM.X	(-$00B0,A6),FP0/FP1/FP2/FP3
+	FMOVEM.L	(-$0080,A6),FPCR/FPSR/FPIAR
+	UNLK	A6
+	BRA.W	lbC0009F4
+
+lbC0057C6:	BSR.W	lbC009616
+	MOVE.W	#0,-(SP)
+	MOVE.W	D0,-(SP)
+	BTST	#1,(-$00DC,A6)
+	BEQ.B	lbC0057F8
+	LEA	(-$010C,A6),A0
+	MOVE.W	(-$00F0,A6),D1
+	ANDI.W	#$007F,D1
+	CMPI.W	#$0030,D1
+	BEQ.B	lbC0057F0
+	CMPI.W	#$0033,D1
+	BNE.B	lbC0057FC
+lbC0057F0:	MOVEQ	#0,D0
+	MOVE.W	#1,(SP)
+	BRA.B	lbC0057FC
+
+lbC0057F8:	LEA	(-$00D8,A6),A0
+lbC0057FC:	BCLR	#7,(A0)
+	SNE	(2,A0)
+	BSR.W	lbC003CC0
+	BFEXTU	(-$007D,A6){2:2},D1
+	ADD.L	(SP)+,D1
+	BSR.W	lbC003A70
+	BSR.W	lbC0096AE
+	CMPI.B	#3,D0
+	BNE.B	lbC005834
+	BSR.W	lbC0096C4
+	TST.B	D0
+	BEQ.B	lbC00582E
+	TST.B	(4,A0)
+	BMI.B	lbC00582E
+	SUBQ.W	#1,(A0)
+lbC00582E:	BSR.W	lbC00554C
+	BRA.B	lbC005856
+
+lbC005834:	BSR.W	lbC00554C
+	TST.L	(4,A0)
+	BNE.B	lbC00584A
+	TST.L	(8,A0)
+	BNE.B	lbC00584A
+	BSET	#2,(-$007C,A6)
+lbC00584A:	BTST	#7,(A0)
+	BEQ.B	lbC005856
+	BSET	#3,(-$007C,A6)
+lbC005856:	BTST	#1,(-$007A,A6)
+	BEQ.B	lbC005864
+	BSET	#5,(-$0079,A6)
+lbC005864:	RTS
+
+;fiX Label expected
+	dc.w	0
+
+lbC005868:	LINK.W	A6,#-$00C0
+	FSAVE	-(SP)
+lbC00586E:	MOVEM.L	D0/D1/A0/A1,(-$00C0,A6)
+	FMOVEM.X	FP0/FP1/FP2/FP3,(-$00B0,A6)
+	FMOVEM.L	FPCR/FPSR/FPIAR,(-$0080,A6)
+	MOVE.B	(SP),D0
+	ANDI.B	#$F0,D0
+	CMPI.B	#$40,D0
+	BNE.W	lbC0009EE
+	MOVE.L	(-$007C,A6),D0
+	AND.L	#$000000FF,D0
+	MOVE.L	D0,(-$007C,A6)
+	FMOVE.L	#0,FPSR
+	FMOVE.L	#0,FPCR
+	CLR.B	(-$0047,A6)
+	BSR.W	lbC001F2C
+	CLR.B	(-$004C,A6)
+	BSR.W	lbC0014C4
+	FSAVE	-(SP)
+	TST.B	(-$004C,A6)
+	BNE.B	lbC0058C8
+	BSR.W	lbC0085A4
+lbC0058C8:	BRA.W	lbC001954
+
+; -------------------------------------------------------------
+_FPUExceptionHandler_UnimplDType:
+	LINK.W	A6,#-$00C0
+	FSAVE	-(SP)
+	MOVEM.L	D0/D1/A0/A1,(-$00C0,A6)
+	FMOVEM.X	FP0/FP1/FP2/FP3,(-$00B0,A6)
+	FMOVEM.L	FPCR/FPSR/FPIAR,(-$0080,A6)
+	MOVE.B	(SP),(-$0045,A6)
+	MOVE.B	(SP),D0
+	ANDI.B	#$F0,D0
+	CMPI.B	#$40,D0
+	BNE.W	lbC0009EE
+	FMOVE.L	#0,FPSR
+	FMOVE.L	#0,FPCR
+	MOVE.L	(-$007C,A6),D1
+	BTST	#5,(-$00E4,A6)
+	BNE.B	lbC00591A
+	AND.L	#$00FF00FF,D1
+	BRA.B	lbC005920
+
+lbC00591A:	AND.L	#$0FFF40FF,D1
+lbC005920:	MOVE.L	D1,(-$007C,A6)
+	ST	(-$0047,A6)
+	BSR.W	lbC001F2C
+	BSR.W	lbC002738
+	CLR.L	-(SP)
+	MOVE.B	(-$0045,A6),(SP)
+	BRA.W	lbC001954
+
+;fiX Label expected
+	dc.w	0
+lbD00593C:	dc.d	11354.443964752463
+lbD005944:	dc.d	8.9713596574902281E-13
+lbB00594C:	dc.b	$7F,$FB,0,0,$80,0,0,0,0,0,0,0,0,0,0,0
+
+lbC00595C:	FMOVE.S	#1.0,FP0
+	FMOVE.L	D1,FPCR
+	FADD.S	#1.17549435E-38,FP0
+	BRA.W	lbC00250C
+
+lbC005974:	FMOVE.X	(A0),FP0
+	MOVE.L	(A0),D0
+	MOVE.W	(4,A0),D0
+	ANDI.L	#$7FFFFFFF,D0
+	CMPI.L	#$400CB167,D0
+	BGT.B	lbC0059BE
+	FABS.X	FP0
+	MOVE.L	D1,-(SP)
+	MOVEQ	#0,D1
+	FMOVEM.X	FP0,(A0)
+	BSR.W	lbC005ED8
+	FMUL.S	#0.5,FP0
+	MOVE.L	(SP)+,D1
+	FMOVE.S	#0.25,FP1
+	FDIV.X	FP0,FP1
+	FMOVE.L	D1,FPCR
+	FADD.X	FP1,FP0
+	BRA.W	lbC00250C
+
+lbC0059BE:	CMPI.L	#$400CB2B3,D0
+	BGT.B	lbC0059F0
+	FABS.X	FP0
+	FSUB.D	(lbD00593C,PC),FP0
+	FSUB.D	(lbD005944,PC),FP0
+	MOVE.L	D1,-(SP)
+	MOVEQ	#0,D1
+	FMOVEM.X	FP0,(A0)
+	BSR.W	lbC005ED8
+	FMOVE.L	(SP)+,FPCR
+	FMUL.X	(lbB00594C,PC),FP0
+	BRA.W	lbC00250C
+
+lbC0059F0:	FMOVE.L	#0,FPSR
+	BCLR	#7,(A0)
+	FMOVEM.X	(A0),FP0
+	BRA.W	lbC0024AE
+
+lbW005A04:	dc.w	$3FDC,0,$82E3,$0865,$4361,$C4C6,0,0
+lbD005A14:	dc.d	0.041666666666636216
+lbD005A1C:	dc.d	0.16666666666651575,NaN,NaN,1.3906923815249055E-309,NaN
+lbD005A44:	dc.d	8.3333333340378599E-3
+lbD005A4C:	dc.d	0.04166666666665604
+lbD005A54:	dc.d	0.16666666666666665,0.0
+lbD005A64:	dc.d	2.75573192330057E-6
+lbD005A6C:	dc.d	2.4801587292298988E-5
+lbD005A74:	dc.d	1.9841269841268347E-4
+lbD005A7C:	dc.d	1.388888888889155E-3
+lbD005A84:	dc.d	8.3333333333333332E-3
+lbD005A8C:	dc.d	0.041666666666666664
+lbB005A94:	dc.b	$3F,$FC,0,0,$AA,$AA,$AA,$AA,$AA,$AA,$AA,$AB,0,0,0,0
+lbD005AA4:	dc.d	1.3937965749081639E42
+lbD005AAC:	dc.d	7.1746481373430634E-43
+lbW005AB4:	dc.w	$3FFF,0,$8000,0,0,0,0,0,$3FFF,0,$8164,$D1F3,$BC03,$0774,$9F84,$1A9B,$3FFF,0
+	dc.w	$82CD,$8698,$AC2B,$A1D8,$9FC1,$D5B9,$3FFF,0,$843A,$28C3,$ACDE,$4048,$A072
+	dc.w	$8369,$3FFF,0,$85AA,$C367,$CC48,$7B14,$1FC5,$C95C,$3FFF,0,$871F,$6196,$9E8D
+	dc.w	$1010,$1EE8,$5C9F,$3FFF,0,$8898,$0E80,$92DA,$8528,$9FA2,$0729,$3FFF,0,$8A14
+	dc.w	$D575,$496E,$FD9C,$A07B,$F9AF,$3FFF,0,$8B95,$C1E3,$EA8B,$D6E8,$A002,$0DCF
+	dc.w	$3FFF,0,$8D1A,$DF5B,$7E5B,$A9E4,$205A,$63DA,$3FFF,0,$8EA4,$398B,$45CD,$53C0
+	dc.w	$1EB7,$0051,$3FFF,0,$9031,$DC43,$1466,$B1DC,$1F6E,$B029,$3FFF,0,$91C3,$D373
+	dc.w	$AB11,$C338,$A078,$1494,$3FFF,0,$935A,$2B2F,$13E6,$E92C,$9EB3,$19B0,$3FFF,0
+	dc.w	$94F4,$EFA8,$FEF7,$0960,$2017,$457D,$3FFF,0,$9694,$2D37,$2018,$5A00,$1F11
+	dc.w	$D537,$3FFF,0,$9837,$F051,$8DB8,$A970,$9FB9,$52DD,$3FFF,0,$99E0,$4593,$20B7
+	dc.w	$FA64,$1FE4,$3087,$3FFF,0,$9B8D,$39B9,$D54E,$5538,$1FA2,$A818,$3FFF,0,$9D3E
+	dc.w	$D9A7,$2CFF,$B750,$1FDE,$494D,$3FFF,0,$9EF5,$3260,$91A1,$11AC,$2050,$4890
+	dc.w	$3FFF,0,$A0B0,$510F,$B971,$4FC4,$A073,$691C,$3FFF,0,$A270,$4303,$0C49,$6818
+	dc.w	$1F9B,$7A05,$3FFF,0,$A435,$15AE,$09E6,$80A0,$A079,$7126,$3FFF,0,$A5FE,$D6A9
+	dc.w	$B151,$38EC,$A071,$A140,$3FFF,0,$A7CD,$93B4,$E965,$3568,$204F,$62DA,$3FFF,0
+	dc.w	$A9A1,$5AB4,$EA7C,$0EF8,$1F28,$3C4A,$3FFF,0,$AB7A,$39B5,$A93E,$D338,$9F9A
+	dc.w	$7FDC,$3FFF,0,$AD58,$3EEA,$42A1,$4AC8,$A05B,$3FAC,$3FFF,0,$AF3B,$78AD,$690A
+	dc.w	$4374,$1FDF,$2610,$3FFF,0,$B123,$F581,$D2AC,$2590,$9F70,$5F90,$3FFF,0,$B311
+	dc.w	$C412,$A911,$2488,$201F,$678A,$3FFF,0,$B504,$F333,$F9DE,$6484,$1F32,$FB13
+	dc.w	$3FFF,0,$B6FD,$91E3,$28D1,$7790,$2003,$8B30,$3FFF,0,$B8FB,$AF47,$62FB,$9EE8
+	dc.w	$200D,$C3CC,$3FFF,0,$BAFF,$5AB2,$133E,$45FC,$9F8B,$2AE6,$3FFF,0,$BD08,$A39F
+	dc.w	$580C,$36C0,$A02B,$BF70,$3FFF,0,$BF17,$99B6,$7A73,$1084,$A00B,$F518,$3FFF,0
+	dc.w	$C12C,$4CCA,$6670,$9458,$A041,$DD41,$3FFF,0,$C346,$CCDA,$2497,$6408,$9FDF
+	dc.w	$137B,$3FFF,0,$C567,$2A11,$5506,$DADC,$201F,$1568,$3FFF,0,$C78D,$74C8,$ABB9
+	dc.w	$B15C,$1FC1,$3A2E,$3FFF,0,$C9B9,$BD86,$6E2F,$27A4,$A03F,$8F03,$3FFF,0,$CBEC
+	dc.w	$14FE,$F272,$7C5C,$1FF4,$907D,$3FFF,0,$CE24,$8C15,$1F84,$80E4,$9E6E,$53E4
+	dc.w	$3FFF,0,$D063,$33DA,$EF2B,$2594,$1FD6,$D45C,$3FFF,0,$D2A8,$1D91,$F12A,$E45C
+	dc.w	$A076,$EDB9,$3FFF,0,$D4F3,$5AAB,$CFED,$FA20,$9FA6,$DE21,$3FFF,0,$D744,$FCCA
+	dc.w	$D69D,$6AF4,$1EE6,$9A2F,$3FFF,0,$D99D,$15C2,$78AF,$D7B4,$207F,$439F,$3FFF,0
+	dc.w	$DBFB,$B797,$DAF2,$3754,$201E,$C207,$3FFF,0,$DE60,$F482,$5E0E,$9124,$9E8B
+	dc.w	$E175,$3FFF,0,$E0CC,$DEEC,$2A94,$E110,$2003,$2C4B,$3FFF,0,$E33F,$8972,$BE8A
+	dc.w	$5A50,$2004,$DFF5,$3FFF,0,$E5B9,$06E7,$7C83,$48A8,$1E72,$F47A,$3FFF,0,$E839
+	dc.w	$6A50,$3C4B,$DC68,$1F72,$2F22,$3FFF,0,$EAC0,$C6E7,$DD24,$3930,$A017,$E945
+	dc.w	$3FFF,0,$ED4F,$301E,$D994,$2B84,$1F40,$1A5B,$3FFF,0,$EFE4,$B99B,$DCDA,$F5CC
+	dc.w	$9FB9,$A9E3,$3FFF,0,$F281,$773C,$59FF,$B138,$2074,$4C05,$3FFF,0,$F525,$7D15
+	dc.w	$2486,$CC2C,$1F77,$3A19,$3FFF,0,$F7D0,$DF73,$0AD1,$3BB8,$1FFE,$90D5,$3FFF,0
+	dc.w	$FA83,$B2DB,$722A,$033C,$A041,$ED22,$3FFF,0,$FD3E,$0C0C,$F486,$C174,$1F85
+	dc.w	$3F3A
+lbL005EB4:	dc.l	$20100280,$80000000,$00800080,$00002F00,$F23C4400,$3F800000,$F2019000
+
+	FADD.S	(SP)+,FP0
+	BRA.W	lbC00250C
+
+lbC005ED8:	MOVE.L	(A0),D0
+	ANDI.L	#$7FFF0000,D0
+	CMPI.L	#$3FBE0000,D0
+	BGE.B	lbC005EEC
+	BRA.W	lbC005FEC
+
+lbC005EEC:	MOVE.W	(4,A0),D0
+	CMPI.L	#$400CB167,D0
+	BLT.B	lbC005EFC
+	BRA.W	lbC006000
+
+lbC005EFC:	FMOVE.X	(A0),FP0
+	FMOVE.X	FP0,FP1
+	FMUL.S	#92.3324813,FP0
+	FMOVEM.X	FP2/FP3,-(SP)
+	MOVE.L	#0,(-$0050,A6)
+	FMOVE.L	FP0,D0
+	LEA	(lbW005AB4,PC),A1
+	FMOVE.L	D0,FP0
+	MOVE.L	D0,(-$0054,A6)
+	ANDI.L	#$0000003F,D0
+	LSL.L	#4,D0
+	ADDA.L	D0,A1
+	MOVE.L	(-$0054,A6),D0
+	ASR.L	#6,D0
+	ADDI.W	#$3FFF,D0
+	MOVE.W	(lbW005A04,PC),(-$0054,A6)
+lbC005F42:	FMOVE.X	FP0,FP2
+	FMUL.S	#-0.0108304247,FP0
+	FMUL.X	(lbW005A04,PC),FP2
+	FADD.X	FP1,FP0
+	FADD.X	FP2,FP0
+	FMOVE.X	FP0,FP1
+	FMUL.X	FP1
+	FMOVE.S	#1.38889066E-3,FP2
+	FMUL.X	FP1,FP2
+	FMOVE.X	FP1,FP3
+	FMUL.S	#8.33334494E-3,FP3
+	FADD.D	(lbD005A14,PC),FP2
+	FADD.D	(lbD005A1C,PC),FP3
+	FMUL.X	FP1,FP2
+	MOVE.W	D0,(-$0074,A6)
+	CLR.W	(-$0072,A6)
+	MOVE.L	#$80000000,(-$0070,A6)
+	CLR.L	(-$006C,A6)
+	FMUL.X	FP1,FP3
+	FADD.S	#0.5,FP2
+	FMUL.X	FP0,FP3
+	FMUL.X	FP1,FP2
+	FADD.X	FP3,FP0
+	FMOVE.X	(A1)+,FP1
+	FADD.X	FP2,FP0
+	FMUL.X	FP1,FP0
+	FMOVEM.X	(SP)+,FP2/FP3
+	FADD.S	(A1),FP0
+	FADD.X	FP1,FP0
+	MOVE.L	(-$0050,A6),D0
+	TST.L	D0
+	BEQ.B	lbC005FDE
+	FMUL.X	(-$0064,A6),FP0
+lbC005FDE:	FMOVE.L	D1,FPCR
+	FMUL.X	(-$0074,A6),FP0
+	BRA.W	lbC00250C
+
+lbC005FEC:	FMOVEM.X	(A0),FP0
+	FMOVE.L	D1,FPCR
+	FADD.S	#1.0,FP0
+	BRA.W	lbC00250C
+
+lbC006000:	CMPI.L	#$400CB27C,D0
+	BGT.B	lbC006072
+	FMOVE.X	(A0),FP0
+	FMOVE.X	FP0,FP1
+	FMUL.S	#92.3324813,FP0
+	FMOVEM.X	FP2/FP3,-(SP)
+	MOVE.L	#1,(-$0050,A6)
+	FMOVE.L	FP0,D0
+	LEA	(lbW005AB4,PC),A1
+	FMOVE.L	D0,FP0
+	MOVE.L	D0,(-$0054,A6)
+	ANDI.L	#$0000003F,D0
+	LSL.L	#4,D0
+	ADDA.L	D0,A1
+	MOVE.L	(-$0054,A6),D0
+	ASR.L	#6,D0
+	MOVE.L	D0,(-$0054,A6)
+	ASR.L	#1,D0
+	SUB.L	D0,(-$0054,A6)
+	ADDI.W	#$3FFF,D0
+	MOVE.W	D0,(-$0064,A6)
+	CLR.W	(-$0062,A6)
+	MOVE.L	#$80000000,(-$0060,A6)
+	CLR.L	(-$005C,A6)
+	MOVE.L	(-$0054,A6),D0
+	ADDI.W	#$3FFF,D0
+	BRA.W	lbC005F42
+
+lbC006072:	FMOVE.L	D1,FPCR
+	MOVE.L	(A0),D0
+	BCLR	#7,(A0)
+	CMPI.L	#0,D0
+	BLT.W	lbC0023EE
+	BRA.W	lbC0024AE
+
+lbC00608A:	BRA.W	lbC0025FE
+
+lbC00608E:	MOVE.L	(A0),D0
+	ANDI.L	#$7FFF0000,D0
+	CMPI.L	#$3FFD0000,D0
+	BGE.B	lbC0060A2
+	BRA.W	lbC0061F8
+
+lbC0060A2:	MOVE.W	(4,A0),D0
+	CMPI.L	#$4004C215,D0
+	BLE.B	lbC0060B2
+	BRA.W	lbC00630A
+
+lbC0060B2:	FMOVE.X	(A0),FP0
+	FMOVE.X	FP0,FP1
+	FMUL.S	#92.3324813,FP0
+	FMOVEM.X	FP2/FP3,-(SP)
+	FMOVE.L	FP0,D0
+	LEA	(lbW005AB4,PC),A1
+	FMOVE.L	D0,FP0
+	MOVE.L	D0,(-$0054,A6)
+	ANDI.L	#$0000003F,D0
+	LSL.L	#4,D0
+	ADDA.L	D0,A1
+	MOVE.L	(-$0054,A6),D0
+	ASR.L	#6,D0
+	MOVE.L	D0,(-$0054,A6)
+	FMOVE.X	FP0,FP2
+	FMUL.S	#-0.0108304247,FP0
+	FMUL.X	(lbW005A04,PC),FP2
+	FADD.X	FP1,FP0
+	FADD.X	FP2,FP0
+	ADDI.W	#$3FFF,D0
+	FMOVE.X	FP0,FP1
+	FMUL.X	FP1
+	FMOVE.S	#1.98399575E-4,FP2
+	FMUL.X	FP1,FP2
+	FMOVE.X	FP1,FP3
+	FMUL.S	#1.38888997E-3,FP3
+	FADD.D	(lbD005A44,PC),FP2
+	FADD.D	(lbD005A4C,PC),FP3
+	MOVE.W	D0,(-$0040,A6)
+	CLR.W	(-$003E,A6)
+	MOVE.L	#$80000000,(-$003C,A6)
+	CLR.L	(-$0038,A6)
+	FMUL.X	FP1,FP2
+	MOVE.L	(-$0054,A6),D0
+	NEG.W	D0
+	FMUL.X	FP1,FP3
+	ADDI.W	#$3FFF,D0
+	FADD.D	(lbD005A54,PC),FP2
+	FADD.S	#0.5,FP3
+	FMUL.X	FP1,FP2
+	ORI.W	#$8000,D0
+	MOVE.W	D0,(-$0030,A6)
+	CLR.W	(-$002E,A6)
+	MOVE.L	#$80000000,(-$002C,A6)
+	CLR.L	(-$0028,A6)
+	FMUL.X	FP3,FP1
+	FMUL.X	FP0,FP2
+	FADD.X	FP1,FP0
+	FADD.X	FP2,FP0
+	FMOVEM.X	(SP)+,FP2/FP3
+	FMUL.X	(A1),FP0
+	MOVE.L	(-$0054,A6),D0
+	CMPI.L	#$0000003F,D0
+	BLE.B	lbC0061BE
+	FMOVE.S	(12,A1),FP1
+	FADD.X	(-$0030,A6),FP1
+	FADD.X	FP1,FP0
+	FADD.X	(A1),FP0
+	BRA.B	lbC0061EA
+
+lbC0061BE:	CMPI.L	#$FFFFFFFD,D0
+	BGE.B	lbC0061D8
+	FADD.S	(12,A1),FP0
+	FADD.X	(A1),FP0
+	FADD.X	(-$0030,A6),FP0
+	BRA.B	lbC0061EA
+
+lbC0061D8:	FMOVE.X	(A1)+,FP1
+	FADD.S	(A1),FP0
+	FADD.X	(-$0030,A6),FP1
+	FADD.X	FP1,FP0
+lbC0061EA:	FMOVE.L	D1,FPCR
+	FMUL.X	(-$0040,A6),FP0
+	BRA.W	lbC00250C
+
+lbC0061F8:	CMPI.L	#$3FBE0000,D0
+	BGE.B	lbC006260
+	CMPI.L	#$00330000,D0
+	BLT.B	lbC00622E
+	MOVE.L	#$80010000,(-$0040,A6)
+	MOVE.L	#$80000000,(-$003C,A6)
+	CLR.L	(-$0038,A6)
+	FMOVE.X	(A0),FP0
+	FMOVE.L	D1,FPCR
+	FADD.X	(-$0040,A6),FP0
+	BRA.W	lbC00250C
+
+lbC00622E:	FMOVE.X	(A0),FP0
+	FMUL.D	(lbD005AA4,PC),FP0
+	MOVE.L	#$80010000,(-$0040,A6)
+	MOVE.L	#$80000000,(-$003C,A6)
+	CLR.L	(-$0038,A6)
+	FADD.X	(-$0040,A6),FP0
+	FMOVE.L	D1,FPCR
+	FMUL.D	(lbD005AAC,PC),FP0
+	BRA.W	lbC00250C
+
+lbC006260:	FMOVE.X	(A0),FP0
+	FMUL.X	FP0
+	FMOVEM.X	FP2/FP3,-(SP)
+	FMOVE.S	#1.60791047E-10,FP1
+	FMUL.X	FP0,FP1
+	FMOVE.S	#2.08834549E-9,FP2
+	FADD.S	#2.50520884E-8,FP1
+	FMUL.X	FP0,FP2
+	FMUL.X	FP0,FP1
+	FADD.S	#2.75573285E-7,FP2
+	FADD.D	(lbD005A64,PC),FP1
+	FMUL.X	FP0,FP2
+	FMUL.X	FP0,FP1
+	FADD.D	(lbD005A6C,PC),FP2
+	FADD.D	(lbD005A74,PC),FP1
+	FMUL.X	FP0,FP2
+	FMUL.X	FP0,FP1
+	FADD.D	(lbD005A7C,PC),FP2
+	FADD.D	(lbD005A84,PC),FP1
+	FMUL.X	FP0,FP2
+	FMUL.X	FP0,FP1
+	FADD.D	(lbD005A8C,PC),FP2
+	FADD.X	(lbB005A94,PC),FP1
+	FMUL.X	FP0,FP2
+	FMUL.X	FP0,FP1
+	FMUL.X	FP0,FP2
+	FMUL.X	(A0),FP1
+	FMUL.S	#0.5,FP0
+	FADD.X	FP2,FP1
+	FMOVEM.X	(SP)+,FP2/FP3
+	FADD.X	FP1,FP0
+	FMOVE.L	D1,FPCR
+	FADD.X	(A0),FP0
+	BRA.W	lbC00250C
+
+lbC00630A:	MOVE.L	(A0),D0
+	CMPI.L	#0,D0
+	BGT.W	lbC005EEC
+	FMOVE.S	#-1.0,FP0
+	FMOVE.L	D1,FPCR
+	FADD.S	#1.17549435E-38,FP0
+	BRA.W	lbC00250C
+
+;fiX Label expected
+	dc.w	0
+
+lbC006330:	MOVE.W	(A0),D0
+	BCLR	#15,D0
+	SUB.W	#$3FFF,D0
+	FMOVE.W	D0,FP0
+	RTS
+
+lbC006340:	BCLR	#7,(A0)
+	BSR.W	lbC003C6E
+	MOVE.W	(A0),D0
+	SUB.W	#$3FFF,D0
+	FMOVE.W	D0,FP0
+	RTS
+
+lbC006354:	MOVE.L	(-$0080,A6),D0
+	ANDI.L	#$FFFFFF00,D0
+	FMOVE.L	D0,FPCR
+	MOVE.W	(A0),D0
+	OR.W	#$7FFF,D0
+	BCLR	#14,D0
+	MOVE.W	D0,(A0)
+	FMOVE.X	(A0),FP0
+	RTS
+
+lbC006374:	MOVE.L	(4,A0),D0
+	MOVE.L	(8,A0),D1
+	BSR.B	lbC006388
+	MOVE.L	D0,(4,A0)
+	MOVE.L	D1,(8,A0)
+	BRA.B	lbC006354
+
+lbC006388:	TST.L	D0
+	BNE.B	lbC0063A0
+	TST.L	D1
+	BNE.B	lbC006392
+	BRA.B	lbC0063BA
+
+lbC006392:	MOVE.L	D3,-(SP)
+	EXG	D0,D1
+	BFFFO	D0{0:$20},D3
+	LSL.L	D3,D0
+	MOVE.L	(SP)+,D3
+	BRA.B	lbC0063BA
+
+lbC0063A0:	MOVEM.L	D3/D5/D6,-(SP)
+	BFFFO	D0{0:$20},D3
+	LSL.L	D3,D0
+	MOVE.L	D1,D6
+	LSL.L	D3,D1
+	MOVEQ	#$20,D5
+	SUB.L	D3,D5
+	LSR.L	D5,D6
+	OR.L	D6,D0
+	MOVEM.L	(SP)+,D3/D5/D6
+lbC0063BA:	RTS
+
+lbC0063BC:	BFEXTU	(-$007D,A6){2:2},D1
+	MOVE.L	D1,(-$0054,A6)
+	BRA.B	lbC00641A
+
+lbC0063C8:	BTST	#5,(-$007D,A6)
+	BEQ.W	lbC001520
+	BTST	#4,(-$007D,A6)
+	BEQ.B	lbC0063E8
+	BTST	#7,(A0)
+	BNE.B	lbC0063FE
+	BSR.W	lbC0018F6
+	BRA.W	lbC002502
+
+lbC0063E8:	BTST	#7,(A0)
+	BEQ.B	lbC0063F6
+	BSR.W	lbC0018FE
+	BRA.W	lbC002502
+
+lbC0063F6:	BSR.W	lbC00190E
+	BRA.W	lbC002502
+
+lbC0063FE:	BSR.W	lbC00191E
+	BRA.W	lbC002502
+
+lbC006406:	MOVE.L	#1,(-$0054,A6)
+	BRA.B	lbC00641A
+
+lbC006410:	BFEXTU	(-$007D,A6){2:2},D1
+	MOVE.L	D1,(-$0054,A6)
+lbC00641A:	BCLR	#7,(A0)
+	SNE	(2,A0)
+	CMPI.W	#$403E,(A0)
+	BGT.B	lbC006482
+	CMPI.W	#$3FFD,(A0)
+	BGT.B	lbC0064A4
+	BTST	#1,(-$0051,A6)
+	BEQ.B	lbC00646C
+	TST.B	(2,A0)
+	BNE.B	lbC006454
+	CMPI.B	#3,(-$0051,A6)
+	BEQ.B	lbC00644C
+	BSR.W	lbC00190E
+	BRA.W	lbC002502
+
+lbC00644C:	BSR.W	lbC0018F6
+	BRA.W	lbC002502
+
+lbC006454:	CMPI.B	#2,(-$0051,A6)
+	BEQ.B	lbC006464
+	BSR.W	lbC00191E
+	BRA.W	lbC002502
+
+lbC006464:	BSR.W	lbC0018FE
+	BRA.W	lbC002502
+
+lbC00646C:	TST.B	(2,A0)
+	BNE.B	lbC00647A
+	BSR.W	lbC00190E
+	BRA.W	lbC002502
+
+lbC00647A:	BSR.W	lbC00191E
+	BRA.W	lbC002502
+
+lbC006482:	BFCLR	(2,A0){0:8}
+	BEQ.B	lbC00648E
+	BSET	#7,(A0)
+lbC00648E:	FMOVE.L	FPCR,-(SP)
+	FMOVE.L	#0,FPCR
+	FMOVE.X	(A0),FP0
+	FMOVE.L	(SP)+,FPCR
+	RTS
+
+lbC0064A4:	MOVEQ	#0,D0
+	MOVE.L	#$0000403E,D1
+	BSR.W	lbC003D4E
+	MOVE.L	(-$0054,A6),D1
+	BSR.W	lbC003A70
+	BSR.W	lbC003C6E
+	BFCLR	(2,A0){0:8}
+	BEQ.B	lbC0064C8
+	BSET	#7,(A0)
+lbC0064C8:	FMOVE.L	FPCR,-(SP)
+	FMOVE.L	#0,FPCR
+	FMOVE.X	(A0),FP0
+	FMOVE.L	(SP)+,FPCR
+	RTS
+
+;fiX Label expected
+	dc.w	0
+lbB0064E0:	dc.b	$3F,$FD,0,0,$DE,$5B,$D8,$A9,$37,$28,$71,$95,0,0,0,0
+lbB0064F0:	dc.b	$3F,$FF,0,0,$B8,$AA,$3B,$29,$5C,$17,$F0,$BC,0,0,0,0
+
+lbC006500:	MOVE.L	(A0),D0
+	BLT.W	lbC006598
+	MOVE.L	D1,-(SP)
+	MOVEQ	#0,D1
+	BSR.W	lbC006E3C
+	FMOVE.L	(SP)+,FPCR
+	FMUL.X	(lbB0064E0,PC),FP0
+	BRA.W	lbC00250C
+
+lbC00651C:	MOVE.L	(A0),D0
+	BLT.B	lbC006598
+	MOVE.L	D1,-(SP)
+	MOVEQ	#0,D1
+	BSR.W	lbC006EC6
+	FMOVE.L	(SP)+,FPCR
+	FMUL.X	(lbB0064E0,PC),FP0
+	BRA.W	lbC00250C
+
+lbC006536:	MOVE.L	(A0),D0
+	BLT.B	lbC006598
+	MOVE.L	D1,-(SP)
+	MOVEQ	#0,D1
+	BSR.W	lbC006E3C
+	FMOVE.L	(SP)+,FPCR
+	FMUL.X	(lbB0064F0,PC),FP0
+	BRA.W	lbC00250C
+
+lbC006550:	MOVE.L	(A0),D0
+	BLT.B	lbC006598
+	MOVE.L	(8,A0),D0
+	BNE.B	lbC006582
+	MOVE.L	(4,A0),D0
+	AND.L	#$7FFFFFFF,D0
+	TST.L	D0
+	BNE.B	lbC006582
+	MOVE.W	(A0),D0
+	AND.L	#$00007FFF,D0
+	SUB.L	#$00003FFF,D0
+	FMOVE.L	D1,FPCR
+	FMOVE.L	D0,FP0
+	BRA.W	lbC00250C
+
+lbC006582:	MOVE.L	D1,-(SP)
+	MOVEQ	#0,D1
+	BSR.W	lbC006EC6
+	FMOVE.L	(SP)+,FPCR
+	FMUL.X	(lbB0064F0,PC),FP0
+	BRA.W	lbC00250C
+
+lbC006598:	BRA.W	lbC0023CE
+
+lbW00659C:	dc.w	$3FFE,$F07D,$3FFF,$8841
+lbW0065A4:	dc.w	$3FFE,$8000,$3FFF,$C000
+lbB0065AC:	dc.b	$3F,$FE,0,0,$B1,$72,$17,$F7,$D1,$CF,$79,$AC,0,0,0,0
+lbS0065BC:	dc.s	1.0
+lbS0065C0:	dc.s	0.0,Inf
+lbS0065C8:	dc.s	-1.0
+lbD0065CC:	dc.d	0.14287122613316713
+lbD0065D4:	dc.d	-0.1666781327452885
+lbD0065DC:	dc.d	0.19999999948327618
+lbD0065E4:	dc.d	-0.24999999973714601
+lbD0065EC:	dc.d	0.3333333333333377
+lbD0065F4:	dc.d	-0.50000000000000088
+lbD0065FC:	dc.d	8.8998505326158674E-5
+lbD006604:	dc.d	4.3402681922366341E-4
+lbD00660C:	dc.d	2.2321428590373888E-3
+lbD006614:	dc.d	0.012499999999998366
+lbD00661C:	dc.d	0.083333333333333328
+lbS006624:	dc.s	2.0,0.0
+lbB00662C:	dc.b	$3F,$99,0,0,$80,0,0,0,0,0,0,0,0,0,0,0
+lbW00663C:	dc.w	$3FFE,0,$FE03,$F80F,$E03F,$80FE,0,0,$3FF7,0,$FF01,$5358,$833C,$47E2,0,0,$3FFE
+	dc.w	0,$FA23,$2CF2,$5213,$8AC0,0,0,$3FF9,0,$BDC8,$D83E,$AD88,$D549,0,0,$3FFE,0
+	dc.w	$F660,$3D98,$0F66,$03DA,0,0,$3FFA,0,$9CF4,$3DCF,$F5EA,$FD48,0,0,$3FFE,0,$F2B9
+	dc.w	$D648,$0F2B,$9D65,0,0,$3FFA,0,$DA16,$EB88,$CB8D,$F614,0,0,$3FFE,0,$EF2E,$B71F
+	dc.w	$C434,$5238,0,0,$3FFB,0,$8B29,$B775,$1BD7,$0743,0,0,$3FFE,0,$EBBD,$B2A5,$C161
+	dc.w	$9C8C,0,0,$3FFB,0,$A8D8,$39F8,$30C1,$FB49,0,0,$3FFE,0,$E865,$AC7B,$7603,$A197
+	dcb.w	2,0
+	dc.w	$3FFB,0,$C61A,$2EB1,$8CD9,$07AD,0,0,$3FFE,0,$E525,$982A,$F70C,$880E,0,0,$3FFB
+	dc.w	0,$E2F2,$A47A,$DE3A,$18AF,0,0,$3FFE,0,$E1FC,$780E,$1FC7,$80E2,0,0,$3FFB,0
+	dc.w	$FF64,$898E,$DF55,$D551,0,0,$3FFE,0,$DEE9,$5C4C,$A037,$BA57,0,0,$3FFC,0,$8DB9
+	dc.w	$56A9,$7B3D,$0148,0,0,$3FFE,0,$DBEB,$61EE,$D19C,$5958,0,0,$3FFC,0,$9B8F,$E100
+	dc.w	$F47B,$A1DE,0,0,$3FFE,0,$D901,$B203,$6406,$C80E,0,0,$3FFC,0,$A937,$2F1D,$0DA1
+	dc.w	$BD17,0,0,$3FFE,0,$D62B,$80D6,$2B80,$D62C,0,0,$3FFC,0,$B6B0,$7F38,$CE90,$E46B
+	dcb.w	2,0
+	dc.w	$3FFE,0,$D368,$0D36,$80D3,$680D,0,0,$3FFC,0,$C3FD,$0329,$0648,$8481,0,0,$3FFE
+	dc.w	0,$D0B6,$9FCB,$D258,$0D0B,0,0,$3FFC,0,$D11D,$E0FF,$15AB,$18CA,0,0,$3FFE,0
+	dc.w	$CE16,$8A77,$2508,$0CE1,0,0,$3FFC,0,$DE14,$33A1,$6C66,$B150,0,0,$3FFE,0,$CB87
+	dc.w	$27C0,$65C3,$93E0,0,0,$3FFC,0,$EAE1,$0B5A,$7DDC,$8ADD,0,0,$3FFE,0,$C907,$DA4E
+	dc.w	$8711,$46AD,0,0,$3FFC,0,$F785,$6E5E,$E2C9,$B291,0,0,$3FFE,0,$C698,$0C69,$80C6
+	dc.w	$980C,0,0,$3FFD,0,$8201,$2CA5,$A682,$06D7,0,0,$3FFE,0,$C437,$2F85,$5D82,$4CA6
+	dcb.w	2,0
+	dc.w	$3FFD,0,$882C,$5FCD,$7256,$A8C5,0,0,$3FFE,0,$C1E4,$BBD5,$95F6,$E947,0,0,$3FFD
+	dc.w	0,$8E44,$C60B,$4CCF,$D7DE,0,0,$3FFE,0,$BFA0,$2FE8,$0BFA,$02FF,0,0,$3FFD,0
+	dc.w	$944A,$D09E,$F435,$1AF6,0,0,$3FFE,0,$BD69,$1047,$0766,$1AA3,0,0,$3FFD,0,$9A3E
+	dc.w	$ECD4,$C3EA,$A6B2,0,0,$3FFE,0,$BB3E,$E721,$A54D,$880C,0,0,$3FFD,0,$A021,$8434
+	dc.w	$353F,$1DE8,0,0,$3FFE,0,$B921,$43FA,$36F5,$E02E,0,0,$3FFD,0,$A5F2,$FCAB,$BBC5
+	dc.w	$06DA,0,0,$3FFE,0,$B70F,$BB5A,$19BE,$3659,0,0,$3FFD,0,$ABB3,$B8BA,$2AD3,$62A5
+	dcb.w	2,0
+	dc.w	$3FFE,0,$B509,$E68A,$9B94,$821F,0,0,$3FFD,0,$B164,$1795,$CE3C,$A97B,0,0,$3FFE
+	dc.w	0,$B30F,$6352,$8917,$C80B,0,0,$3FFD,0,$B704,$7551,$5D0F,$1C61,0,0,$3FFE,0
+	dc.w	$B11F,$D3B8,$0B11,$FD3C,0,0,$3FFD,0,$BC95,$2AFE,$EA3D,$13E1,0,0,$3FFE,0,$AF3A
+	dc.w	$DDC6,$80AF,$3ADE,0,0,$3FFD,0,$C216,$8ED0,$F458,$BA4A,0,0,$3FFE,0,$AD60,$2B58
+	dc.w	$0AD6,$02B6,0,0,$3FFD,0,$C788,$F439,$B316,$3BF1,0,0,$3FFE,0,$AB8F,$69E2,$8359
+	dc.w	$CD11,0,0,$3FFD,0,$CCEC,$AC08,$BF04,$565D,0,0,$3FFE,0,$A9C8,$4A47,$A07F,$5638
+	dcb.w	2,0
+	dc.w	$3FFD,0,$D242,$0487,$2DD8,$5160,0,0,$3FFE,0,$A80A,$80A8,$0A80,$A80B,0,0,$3FFD
+	dc.w	0,$D789,$4992,$3BC3,$588A,0,0,$3FFE,0,$A655,$C439,$2D7B,$73A8,0,0,$3FFD,0
+	dc.w	$DCC2,$C4B4,$9887,$DACC,0,0,$3FFE,0,$A4A9,$CF1D,$9683,$3751,0,0,$3FFD,0,$E1EE
+	dc.w	$BD3E,$6D6A,$6B9E,0,0,$3FFE,0,$A306,$5E3F,$AE7C,$D0E0,0,0,$3FFD,0,$E70D,$785C
+	dc.w	$2F9F,$5BDC,0,0,$3FFE,0,$A16B,$312E,$A8FC,$377D,0,0,$3FFD,0,$EC1F,$392C,$5179
+	dc.w	$F283,0,0,$3FFE,0,$9FD8,$09FD,$809F,$D80A,0,0,$3FFD,0,$F124,$40D3,$E361,$30E6
+	dcb.w	2,0
+	dc.w	$3FFE,0,$9E4C,$AD23,$DD5F,$3A20,0,0,$3FFD,0,$F61C,$CE92,$3466,$00BB,0,0,$3FFE
+	dc.w	0,$9CC8,$E160,$C3FB,$19B9,0,0,$3FFD,0,$FB09,$1FD3,$8145,$630A,0,0,$3FFE,0
+	dc.w	$9B4C,$6F9E,$F03A,$3CAA,0,0,$3FFD,0,$FFE9,$7042,$BFA4,$C2AD,0,0,$3FFE,0,$99D7
+	dc.w	$22DA,$BDE5,$8F06,0,0,$3FFE,0,$825E,$FCED,$4936,$9330,0,0,$3FFE,0,$9868,$C809
+	dc.w	$868C,$8098,0,0,$3FFE,0,$84C3,$7A7A,$B9A9,$05C9,0,0,$3FFE,0,$9701,$2E02,$5C04
+	dc.w	$B809,0,0,$3FFE,0,$8722,$4C2E,$8E64,$5FB7,0,0,$3FFE,0,$95A0,$2568,$095A,$0257
+	dcb.w	2,0
+	dc.w	$3FFE,0,$897B,$8CAC,$9F7D,$E298,0,0,$3FFE,0,$9445,$8094,$4580,$9446,0,0,$3FFE
+	dc.w	0,$8BCF,$55DE,$C4CD,$05FE,0,0,$3FFE,0,$92F1,$1384,$0497,$889C,0,0,$3FFE,0
+	dc.w	$8E1D,$C0FB,$89E1,$25E5,0,0,$3FFE,0,$91A2,$B3C4,$D5E6,$F809,0,0,$3FFE,0,$9066
+	dc.w	$E68C,$955B,$6C9B,0,0,$3FFE,0,$905A,$3863,$3E06,$C43B,0,0,$3FFE,0,$92AA,$DE74
+	dc.w	$C7BE,$59E0,0,0,$3FFE,0,$8F17,$79D9,$FDC3,$A219,0,0,$3FFE,0,$94E9,$BFF6,$1584
+	dc.w	$5643,0,0,$3FFE,0,$8DDA,$5202,$3769,$4809,0,0,$3FFE,0,$9723,$A1B7,$2013,$4203
+	dcb.w	2,0
+	dc.w	$3FFE,0,$8CA2,$9C04,$6514,$E023,0,0,$3FFE,0,$9958,$99C8,$90EB,$8990,0,0,$3FFE
+	dc.w	0,$8B70,$344A,$139B,$C75A,0,0,$3FFE,0,$9B88,$BDAA,$3A3D,$AE2F,0,0,$3FFE,0
+	dc.w	$8A42,$F870,$5669,$DB46,0,0,$3FFE,0,$9DB4,$224F,$FFE1,$157C,0,0,$3FFE,0,$891A
+	dc.w	$C73A,$E981,$9B50,0,0,$3FFE,0,$9FDA,$DC26,$8B7A,$12DA,0,0,$3FFE,0,$87F7,$8087
+	dc.w	$F780,$87F8,0,0,$3FFE,0,$A1FC,$FF17,$CE73,$3BD4,0,0,$3FFE,0,$86D9,$0544,$7A34
+	dc.w	$ACC6,0,0,$3FFE,0,$A41A,$9E8F,$5446,$FB9F,0,0,$3FFE,0,$85BF,$3761,$2CEE,$3C9B
+	dcb.w	2,0
+	dc.w	$3FFE,0,$A633,$CD7E,$6771,$CD8B,0,0,$3FFE,0,$84A9,$F9C8,$084A,$9F9D,0,0,$3FFE
+	dc.w	0,$A848,$9E60,$0B43,$5A5E,0,0,$3FFE,0,$8399,$3052,$3FBE,$3368,0,0,$3FFE,0
+	dc.w	$AA59,$233C,$CCA4,$BD49,0,0,$3FFE,0,$828C,$BFBE,$B9A0,$20A3,0,0,$3FFE,0,$AC65
+	dc.w	$6DAE,$6BCC,$4985,0,0,$3FFE,0,$8184,$8DA8,$FAF0,$D277,0,0,$3FFE,0,$AE6D,$8EE3
+	dc.w	$60BB,$2468,0,0,$3FFE,0,$8080,$8080,$8080,$8081,0,0,$3FFE,0,$B071,$97A2,$3C46
+	dc.w	$C654,0,0
+
+lbC006E3C:	MOVE.L	#$FFFFFF9C,(-$0054,A6)
+	MOVEM.L	D2-D7,-(SP)
+	MOVEQ	#0,D3
+	MOVE.L	(4,A0),D4
+	MOVE.L	(8,A0),D5
+	MOVEQ	#0,D2
+	TST.L	D4
+	BNE.B	lbC006E8A
+	MOVE.L	D5,D4
+	MOVEQ	#0,D5
+	MOVEQ	#$20,D2
+	MOVEQ	#0,D6
+	BFFFO	D4{0:$20},D6
+	LSL.L	D6,D4
+	ADD.L	D6,D2
+	MOVE.L	D3,(-$0074,A6)
+	MOVE.L	D4,(-$0070,A6)
+	MOVE.L	D5,(-$006C,A6)
+	NEG.L	D2
+	MOVE.L	D2,(-$0054,A6)
+	FMOVE.X	(-$0074,A6),FP0
+	MOVEM.L	(SP)+,D2-D7
+	LEA	(-$0074,A6),A0
+	BRA.B	lbC006ED2
+
+lbC006E8A:	MOVEQ	#0,D6
+	BFFFO	D4{0:$20},D6
+	MOVE.L	D6,D2
+	LSL.L	D6,D4
+	MOVE.L	D5,D7
+	LSL.L	D6,D5
+	NEG.L	D6
+	ADDI.L	#$00000020,D6
+	LSR.L	D6,D7
+	OR.L	D7,D4
+	MOVE.L	D3,(-$0074,A6)
+	MOVE.L	D4,(-$0070,A6)
+	MOVE.L	D5,(-$006C,A6)
+	NEG.L	D2
+	MOVE.L	D2,(-$0054,A6)
+	FMOVE.X	(-$0074,A6),FP0
+	MOVEM.L	(SP)+,D2-D7
+	LEA	(-$0074,A6),A0
+	BRA.B	lbC006ED2
+
+lbC006EC6:	FMOVE.X	(A0),FP0
+	MOVE.L	#0,(-$0054,A6)
+lbC006ED2:	MOVE.L	(A0),D0
+	MOVE.W	(4,A0),D0
+	MOVE.L	(A0),(-$0074,A6)
+	MOVE.L	(4,A0),(-$0070,A6)
+	MOVE.L	(8,A0),(-$006C,A6)
+	CMPI.L	#0,D0
+	BLT.W	lbC00705C
+	CMP2.L	(lbW00659C).L,D0
+	BCC.W	lbC006FDA
+lbC006EFE:	ASR.L	#8,D0
+	ASR.L	#8,D0
+	SUBI.L	#$00003FFF,D0
+	ADD.L	(-$0054,A6),D0
+	LEA	(lbW00663C,PC),A0
+	FMOVE.L	D0,FP1
+	MOVE.L	#$3FFF0000,(-$0074,A6)
+	MOVE.L	(-$0070,A6),(-$0060,A6)
+	ANDI.L	#$FE000000,(-$0060,A6)
+	ORI.L	#$01000000,(-$0060,A6)
+	MOVE.L	(-$0060,A6),D0
+	ANDI.L	#$7E000000,D0
+	ASR.L	#8,D0
+	ASR.L	#8,D0
+	ASR.L	#4,D0
+	ADDA.L	D0,A0
+	FMOVE.X	(-$0074,A6),FP0
+	MOVE.L	#$3FFF0000,(-$0064,A6)
+	CLR.L	(-$005C,A6)
+	FSUB.X	(-$0064,A6),FP0
+	FMOVEM.X	FP2/FP3,-(SP)
+lbC006F60:	FMUL.X	(A0),FP0
+	FMUL.X	(lbB0065AC,PC),FP1
+	FMOVE.X	FP0,FP2
+	FMUL.X	FP2
+	FMOVE.X	FP1,(-$0040,A6)
+	FMOVE.X	FP2,FP3
+	FMOVE.X	FP2,FP1
+	FMUL.D	(lbD0065CC,PC),FP1
+	FMUL.D	(lbD0065D4,PC),FP2
+	FADD.D	(lbD0065DC,PC),FP1
+	FADD.D	(lbD0065E4,PC),FP2
+	FMUL.X	FP3,FP1
+	FMUL.X	FP3,FP2
+	FADD.D	(lbD0065EC,PC),FP1
+	FADD.D	(lbD0065F4,PC),FP2
+	FMUL.X	FP3,FP1
+	LEA	($0010,A0),A0
+	FMUL.X	FP3,FP2
+	FMUL.X	FP0,FP1
+	FADD.X	FP2,FP0
+	FADD.X	(A0),FP1
+	FMOVEM.X	(SP)+,FP2/FP3
+	FADD.X	FP1,FP0
+	FMOVE.L	D1,FPCR
+	FADD.X	(-$0040,A6),FP0
+	BRA.W	lbC00250C
+
+lbC006FDA:	FMOVE.X	FP0,FP1
+	FSUB.S	(lbS0065BC,PC),FP1
+	FADD.S	(lbS0065BC,PC),FP0
+	FADD.X	FP1
+lbC006FEE:	FDIV.X	FP0,FP1
+	FMOVEM.X	FP2/FP3,-(SP)
+	FMOVE.X	FP1,FP0
+	FMUL.X	FP0
+	FMOVE.X	FP1,(-$0030,A6)
+	FMOVE.X	FP0,FP1
+	FMUL.X	FP1
+	FMOVE.D	(lbD0065FC,PC),FP3
+	FMOVE.D	(lbD006604,PC),FP2
+	FMUL.X	FP1,FP3
+	FMUL.X	FP1,FP2
+	FADD.D	(lbD00660C,PC),FP3
+	FADD.D	(lbD006614,PC),FP2
+	FMUL.X	FP3,FP1
+	FMUL.X	FP0,FP2
+	FADD.D	(lbD00661C,PC),FP1
+	FMUL.X	(-$0030,A6),FP0
+	FADD.X	FP2,FP1
+	FMOVEM.X	(SP)+,FP2/FP3
+	FMUL.X	FP1,FP0
+	FMOVE.L	D1,FPCR
+	FADD.X	(-$0030,A6),FP0
+	BRA.W	lbC00250C
+
+;fiX Label expected
+	RTS
+
+lbC00705C:	BRA.W	lbC0023CE
+
+lbC007060:	BRA.W	lbC0025FE
+
+lbC007064:	FMOVE.X	(A0),FP0
+	FABS.X	FP0
+	FCMP.X	(lbB00662C,PC),FP0
+	FBGT.W	lbC00708A
+	FMOVE.L	#0,FPSR
+	FMOVE.L	D1,FPCR
+	FMOVE.X	(A0),FP0
+	BRA.W	lbC00250C
+
+lbC00708A:	FMOVE.X	(A0),FP0
+	MOVE.L	#0,(-$0054,A6)
+	FMOVE.X	FP0,FP1
+	FADD.S	(lbS0065BC,PC),FP0
+	FMOVE.X	FP0,(-$0074,A6)
+	MOVE.W	(-$0070,A6),(-$0072,A6)
+	MOVE.L	(-$0074,A6),D0
+	CMPI.L	#0,D0
+	BLE.W	lbC007180
+	CMP2.L	(lbW0065A4).L,D0
+	BCS.W	lbC006EFE
+	CMP2.L	(lbW00659C).L,D0
+	BCS.B	lbC0070DE
+	FADD.X	FP1
+	FADD.S	(lbS0065BC,PC),FP0
+	BRA.W	lbC006FEE
+
+lbC0070DE:	MOVE.L	(-$0070,A6),(-$0060,A6)
+	ANDI.L	#$FE000000,(-$0060,A6)
+	ORI.L	#$01000000,(-$0060,A6)
+	CMPI.L	#$3FFF8000,D0
+	BGE.B	lbC007140
+	FMOVE.S	(lbS006624,PC),FP0
+	MOVE.L	#$3FFF0000,(-$0064,A6)
+	CLR.L	(-$005C,A6)
+	FSUB.X	(-$0064,A6),FP0
+	MOVE.L	(-$0060,A6),D0
+	ANDI.L	#$7E000000,D0
+	ASR.L	#8,D0
+	ASR.L	#8,D0
+	ASR.L	#4,D0
+	FADD.X	FP1
+	FMOVEM.X	FP2/FP3,-(SP)
+	FADD.X	FP1,FP0
+	LEA	(lbW00663C,PC),A0
+	ADDA.L	D0,A0
+	FMOVE.S	(lbS0065C8,PC),FP1
+	BRA.W	lbC006F60
+
+lbC007140:	FMOVE.S	(lbS0065BC,PC),FP0
+	MOVE.L	#$3FFF0000,(-$0064,A6)
+	CLR.L	(-$005C,A6)
+	FSUB.X	(-$0064,A6),FP0
+	MOVE.L	(-$0060,A6),D0
+	ANDI.L	#$7E000000,D0
+	ASR.L	#8,D0
+	ASR.L	#8,D0
+	ASR.L	#4,D0
+	FADD.X	FP1,FP0
+	FMOVEM.X	FP2/FP3,-(SP)
+	LEA	(lbW00663C,PC),A0
+	ADDA.L	D0,A0
+	FMOVE.S	(lbS0065C0,PC),FP1
+	BRA.W	lbC006F60
+
+lbC007180:	CMPI.L	#0,D0
+	BLT.B	lbC007196
+	FMOVE.S	(lbS0065C8,PC),FP0
+	FMOVE.L	D1,FPCR
+	BRA.W	lbC002378
+
+lbC007196:	FMOVE.S	(lbS0065C0,PC),FP0
+	FMOVE.L	D1,FPCR
+	BRA.W	lbC0023CE
+
+lbS0071A4:	dc.s	0.0
+
+lbC0071A8:	BFEXTU	(-$00E4,A6){9:7},D0
+	BFEXTU	(-$0080,A6){$1A:2},D1
+	TST.B	D0
+	BEQ.B	lbC0071D8
+	CMPI.B	#10,D0
+	BLE.B	lbC0071D0
+	CMPI.B	#14,D0
+	BLE.B	lbC007200
+	CMPI.B	#$2F,D0
+	BLE.B	lbC0071D0
+	CMPI.B	#$3F,D0
+	BLE.B	lbC007238
+lbC0071D0:	FMOVE.S	(lbS0071A4,PC),FP0
+	RTS
+
+lbC0071D8:	TST.B	D1
+	BEQ.B	lbC0071EC
+	CMPI.B	#3,D1
+	BEQ.B	lbC0071F6
+	LEA	(lbW001C20).L,A0
+	BRA.W	lbC007282
+
+lbC0071EC:	LEA	(lbW001C14).L,A0
+	BRA.W	lbC007282
+
+lbC0071F6:	LEA	(lbW001C2C).L,A0
+	BRA.W	lbC007282
+
+lbC007200:	SUBQ.L	#8,D0
+	SUBQ.L	#3,D0
+	TST.B	D1
+	BEQ.B	lbC00721C
+	CMPI.B	#3,D1
+	BEQ.B	lbC00722A
+	LEA	(lbL001C74).L,A0
+	CMPI.B	#2,D0
+	BLE.B	lbC007282
+	BRA.B	lbC00728A
+
+lbC00721C:	LEA	(lbL001C38).L,A0
+	CMPI.B	#2,D0
+	BLE.B	lbC007282
+	BRA.B	lbC00728A
+
+lbC00722A:	LEA	(lbL001CB0).L,A0
+	CMPI.B	#2,D0
+	BLE.B	lbC007282
+	BRA.B	lbC00728A
+
+lbC007238:	SUBI.L	#$00000030,D0
+	TST.B	D1
+	BEQ.B	lbC00725C
+	CMPI.B	#3,D1
+	BEQ.B	lbC007270
+	LEA	(lbL001DAC).L,A0
+	CMPI.B	#1,D0
+	BLE.B	lbC007282
+	CMPI.B	#7,D0
+	BLE.B	lbC00728A
+	BRA.B	lbC007282
+
+lbC00725C:	LEA	(lbL001CEC).L,A0
+	CMPI.B	#1,D0
+	BLE.B	lbC007282
+	CMPI.B	#7,D0
+	BLE.B	lbC00728A
+	BRA.B	lbC007282
+
+lbC007270:	LEA	(lbL001E6C).L,A0
+	CMPI.B	#1,D0
+	BLE.B	lbC007282
+	CMPI.B	#7,D0
+	BLE.B	lbC00728A
+lbC007282:	ORI.L	#$00000208,(-$007C,A6)
+lbC00728A:	MULU.L	#12,D0
+	MOVE.L	D1,(-$0054,A6)
+	BFEXTU	(-$0080,A6){$18:2},D1
+	TST.L	D1
+	BNE.B	lbC0072A8
+	FMOVEM.X	(A0,D0.W),FP0
+	RTS
+
+lbC0072A8:	SWAP	D1
+	ADD.L	(-$0054,A6),D1
+	MOVE.L	(A0,D0.W),(-$0074,A6)
+	MOVE.L	(4,A0,D0.W),(-$0070,A6)
+	MOVE.L	(8,A0,D0.W),(-$006C,A6)
+	MOVEQ	#0,D0
+	LEA	(-$0074,A6),A0
+	BTST	#7,(A0)
+	SNE	(2,A0)
+	BSR.W	lbC003A70
+	BFCLR	(2,A0){0:8}
+	BEQ.B	lbC0072DE
+	BSET	#7,(A0)
+lbC0072DE:	FMOVEM.X	(A0),FP0
+	RTS
+
+lbB0072E4:	dc.b	0,1,0,0,$80,0,0,0,0,0,0,0,0,0,0,0
+
+lbC0072F4:	MOVE.L	#0,(-$0044,A6)
+	BRA.B	lbC007306
+
+lbC0072FE:	MOVE.L	#1,(-$0044,A6)
+lbC007306:	MOVEM.L	D2-D7,-(SP)
+	MOVE.W	(A0),D3
+	MOVE.W	D3,(-$003C,A6)
+	ANDI.L	#$00007FFF,D3
+	MOVE.L	(4,A0),D4
+	MOVE.L	(8,A0),D5
+	TST.L	D3
+	BNE.B	lbC00735E
+	MOVE.L	#$00003FFE,D3
+	TST.L	D4
+	BNE.B	lbC007342
+	MOVE.L	D5,D4
+	MOVEQ	#0,D5
+	SUBI.L	#$00000020,D3
+	MOVEQ	#0,D6
+	BFFFO	D4{0:$20},D6
+	LSL.L	D6,D4
+	SUB.L	D6,D3
+	BRA.B	lbC007364
+
+lbC007342:	MOVEQ	#0,D6
+	BFFFO	D4{0:$20},D6
+	SUB.L	D6,D3
+	LSL.L	D6,D4
+	MOVE.L	D5,D7
+	LSL.L	D6,D5
+	NEG.L	D6
+	ADDI.L	#$00000020,D6
+	LSR.L	D6,D7
+	OR.L	D7,D4
+	BRA.B	lbC007364
+
+lbC00735E:	ADDI.L	#$00003FFE,D3
+lbC007364:	MOVE.W	(-12,A0),D0
+	MOVE.W	D0,(-$0038,A6)
+	MOVE.W	(-$003C,A6),D1
+	EOR.L	D0,D1
+	ANDI.L	#$00008000,D1
+	MOVE.W	D1,(-$0034,A6)
+	ANDI.L	#$00007FFF,D0
+	MOVE.L	(-8,A0),D1
+	MOVE.L	(-4,A0),D2
+	TST.L	D0
+	BNE.B	lbC0073CA
+	MOVE.L	#$00003FFE,D0
+	TST.L	D1
+	BNE.B	lbC0073AE
+	MOVE.L	D2,D1
+	MOVEQ	#0,D2
+	SUBI.L	#$00000020,D0
+	MOVEQ	#0,D6
+	BFFFO	D1{0:$20},D6
+	LSL.L	D6,D1
+	SUB.L	D6,D0
+	BRA.B	lbC0073D0
+
+lbC0073AE:	MOVEQ	#0,D6
+	BFFFO	D1{0:$20},D6
+	SUB.L	D6,D0
+	LSL.L	D6,D1
+	MOVE.L	D2,D7
+	LSL.L	D6,D2
+	NEG.L	D6
+	ADDI.L	#$00000020,D6
+	LSR.L	D6,D7
+	OR.L	D7,D1
+	BRA.B	lbC0073D0
+
+lbC0073CA:	ADDI.L	#$00003FFE,D0
+lbC0073D0:	MOVE.L	D3,(-$0054,A6)
+	MOVE.L	D0,(-$0050,A6)
+	SUB.L	D3,D0
+	MOVEQ	#0,D6
+	MOVEQ	#0,D3
+	SUBA.L	A1,A1
+	TST.L	D0
+	BGE.B	lbC0073EA
+	MOVE.L	(-$0050,A6),D0
+	BRA.B	lbC007450
+
+lbC0073EA:	TST.L	D6
+	BGT.B	lbC0073FC
+	CMP.L	D4,D1
+	BNE.B	lbC0073FA
+	CMP.L	D5,D2
+	BNE.B	lbC0073FA
+	BRA.W	lbC00753E
+
+lbC0073FA:	BCS.B	lbC007404
+lbC0073FC:	SUB.L	D5,D2
+	SUBX.L	D4,D1
+	MOVEQ	#0,D6
+	ADDQ.L	#1,D3
+lbC007404:	TST.L	D0
+	BEQ.B	lbC007416
+	ADD.L	D3,D3
+	ADD.L	D2,D2
+	ADDX.L	D1,D1
+	SCS	D6
+	ADDQ.L	#1,A1
+	SUBQ.L	#1,D0
+	BRA.B	lbC0073EA
+
+lbC007416:	MOVE.L	(-$0054,A6),D0
+	TST.L	D1
+	BNE.B	lbC007434
+	MOVE.L	D2,D1
+	MOVEQ	#0,D2
+	SUBI.L	#$00000020,D0
+	MOVEQ	#0,D6
+	BFFFO	D1{0:$20},D6
+	LSL.L	D6,D1
+	SUB.L	D6,D0
+	BRA.B	lbC007450
+
+lbC007434:	MOVEQ	#0,D6
+	BFFFO	D1{0:$20},D6
+	BMI.B	lbC007450
+	SUB.L	D6,D0
+	LSL.L	D6,D1
+	MOVE.L	D2,D7
+	LSL.L	D6,D2
+	NEG.L	D6
+	ADDI.L	#$00000020,D6
+	LSR.L	D6,D7
+	OR.L	D7,D1
+lbC007450:	CMPI.L	#$000041FE,D0
+	BGE.B	lbC00748C
+	MOVE.W	D0,(-$0064,A6)
+	CLR.W	(-$0062,A6)
+	MOVE.L	D1,(-$0060,A6)
+	MOVE.L	D2,(-$005C,A6)
+	MOVE.L	(-$0054,A6),D6
+	MOVE.W	D6,(-$0074,A6)
+	CLR.W	(-$0072,A6)
+	MOVE.L	D4,(-$0070,A6)
+	MOVE.L	D5,(-$006C,A6)
+	FMOVE.X	(-$0064,A6),FP0
+	MOVE.L	#1,(-$0030,A6)
+	BRA.B	lbC0074CA
+
+lbC00748C:	MOVE.L	D1,(-$0060,A6)
+	MOVE.L	D2,(-$005C,A6)
+	SUBI.L	#$00003FFE,D0
+	MOVE.W	D0,(-$0064,A6)
+	CLR.W	(-$0062,A6)
+	MOVE.L	(-$0054,A6),D6
+	SUBI.L	#$00003FFE,D6
+	MOVE.L	D6,(-$0054,A6)
+	FMOVE.X	(-$0064,A6),FP0
+	MOVE.W	D6,(-$0074,A6)
+	MOVE.L	D4,(-$0070,A6)
+	MOVE.L	D5,(-$006C,A6)
+	MOVE.L	#0,(-$0030,A6)
+lbC0074CA:	MOVE.L	(-$0044,A6),D6
+	BEQ.B	lbC0074F0
+	MOVE.L	(-$0054,A6),D6
+	SUBQ.L	#1,D6
+	CMP.L	D6,D0
+	BLT.B	lbC0074F0
+	BGT.B	lbC0074E8
+	CMP.L	D4,D1
+	BNE.B	lbC0074E6
+	CMP.L	D5,D2
+	BNE.B	lbC0074E6
+	BRA.B	lbC007560
+
+lbC0074E6:	BCS.B	lbC0074F0
+lbC0074E8:	FSUB.X	(-$0074,A6),FP0
+	ADDQ.L	#1,D3
+lbC0074F0:	MOVE.W	(-$0038,A6),D6
+	BGE.B	lbC0074FA
+	FNEG.X	FP0
+lbC0074FA:	MOVEQ	#0,D6
+	MOVE.W	(-$0034,A6),D6
+	MOVEQ	#8,D7
+	LSR.L	D7,D6
+	ANDI.L	#$0000007F,D3
+	OR.L	D6,D3
+	SWAP	D3
+	FMOVE.L	FPSR,D6
+	ANDI.L	#$FF00FFFF,D6
+	OR.L	D3,D6
+	FMOVE.L	D6,FPSR
+	MOVEM.L	(SP)+,D2-D7
+	FMOVE.L	(-$0080,A6),FPCR
+	MOVE.L	(-$0030,A6),D0
+	BEQ.B	lbC007538
+	FMUL.X	(lbB0072E4,PC),FP0
+	BRA.W	lbC00269C
+
+lbC007538:	FMOVE.X	FP0
+	RTS
+
+lbC00753E:	ADDQ.L	#1,D3
+	CMPI.L	#8,D0
+	BGE.B	lbC00754C
+	LSL.L	D0,D3
+	BRA.B	lbC00754E
+
+lbC00754C:	MOVEQ	#0,D3
+lbC00754E:	FMOVE.S	#0.0,FP0
+	MOVE.L	#0,(-$0030,A6)
+	BRA.B	lbC0074F0
+
+lbC007560:	MOVE.L	D3,D6
+	ANDI.L	#1,D6
+	TST.L	D6
+	BEQ.B	lbC0074F0
+	ADDQ.L	#1,D3
+	MOVE.W	(-$0038,A6),D6
+	EORI.L	#$00008000,D6
+	MOVE.W	D6,(-$0038,A6)
+	BRA.W	lbC0074F0
+
+;fiX Label expected
+	dc.w	$3FD7,$8000,$4004,$BC7E
+lbD007588:	dc.d	0.63661977236758138
+lbD007590:	dc.d	-7.5789019155594151E-13
+lbD007598:	dc.d	1.605837106872755E-10
+lbD0075A0:	dc.d	-2.5052104949881168E-8
+lbD0075A8:	dc.d	2.7557319214355996E-6
+lbD0075B0:	dc.d	-1.984126984125544E-4,0.0
+lbB0075C0:	dc.b	$3F,$F8,0,0,$88,$88,$88,$88,$88,$88,$59,$AF,0,0,0,0
+lbB0075D0:	dc.b	$BF,$FC,0,0,$AA,$AA,$AA,$AA,$AA,$AA,$AA,$99,0,0,0,0
+lbD0075E0:	dc.d	4.7550961539464083E-14
+lbD0075E8:	dc.d	-1.1470710646311223E-11
+lbD0075F0:	dc.d	2.0876758521456034E-9
+lbD0075F8:	dc.d	-2.755731923682345E-7
+lbD007600:	dc.d	2.4801587301632434E-5,0.0
+lbB007610:	dc.b	$BF,$F5,0,0,$B6,11,$60,$B6,11,$61,$D4,$38,0,0,0,0
+lbB007620:	dc.b	$3F,$FA,0,0,$AA,$AA,$AA,$AA,$AA,$AA,$AB,$5E
+lbS00762C:	dc.s	-0.5,1.96875,-6.76307418E-18,8.22430336E8,2.015625,-589226.125,0.0,0.0
+	dc.s	1.7421875,-1.53316892E-35,0.0,0.0
+
+lbC00765C:	BRA.W	lbC0025FE
+
+lbC007660:	FMOVE.S	#1.0,FP0
+	FMOVE.L	#0,FPSR
+	BRA.W	lbC00250C
+
+lbC007674:	MOVE.L	#0,(-$0044,A6)
+	BRA.B	lbC007686
+
+lbC00767E:	MOVE.L	#1,(-$0044,A6)
+lbC007686:	FMOVE.X	(A0),FP0
+	MOVE.L	(A0),D0
+	MOVE.W	(4,A0),D0
+	FMOVE.X	FP0,(-$0020,A6)
+	ANDI.L	#$7FFFFFFF,D0
+	CMPI.L	#$3FD78000,D0
+	BGE.B	lbC0076A8
+	BRA.W	lbC007802
+
+lbC0076A8:	CMPI.L	#$4004BC7E,D0
+	BLT.B	lbC0076B4
+	BRA.W	lbC00783A
+
+lbC0076B4:	FMOVE.X	FP0,FP1
+	FMUL.D	(lbD007588,PC),FP1
+	LEA	(lbL007F80).L,A1
+	FMOVE.L	FP1,(-$0050,A6)
+	MOVE.L	(-$0050,A6),D0
+	ASL.L	#4,D0
+	ADDA.L	D0,A1
+	FSUB.X	(A1)+,FP0
+	FSUB.S	(A1),FP0
+lbC0076DA:	MOVE.L	(-$0050,A6),D0
+	ADD.L	(-$0044,A6),D0
+	ROR.L	#1,D0
+	CMPI.L	#0,D0
+	BLT.B	lbC007768
+	FMOVE.X	FP0,(-$0020,A6)
+	FMUL.X	FP0
+	FMOVE.D	(lbD007590,PC),FP3
+	FMOVE.D	(lbD007598,PC),FP2
+	FMOVE.X	FP0,FP1
+	FMUL.X	FP1
+	ROR.L	#1,D0
+	ANDI.L	#$80000000,D0
+	EOR.L	D0,(-$0020,A6)
+	FMUL.X	FP1,FP3
+	FMUL.X	FP1,FP2
+	FADD.D	(lbD0075A0,PC),FP3
+	FADD.D	(lbD0075A8,PC),FP2
+	FMUL.X	FP1,FP3
+	FMUL.X	FP1,FP2
+	FADD.D	(lbD0075B0,PC),FP3
+	FADD.X	(lbB0075C0,PC),FP2
+	FMUL.X	FP3,FP1
+	FMUL.X	FP0,FP2
+	FADD.X	(lbB0075D0,PC),FP1
+	FMUL.X	(-$0020,A6),FP0
+	FADD.X	FP2,FP1
+	FMUL.X	FP1,FP0
+	FMOVE.L	D1,FPCR
+	FADD.X	(-$0020,A6),FP0
+	BRA.W	lbC00250C
+
+lbC007768:	FMUL.X	FP0
+	FMOVE.D	(lbD0075E0,PC),FP2
+	FMOVE.D	(lbD0075E8,PC),FP3
+	FMOVE.X	FP0,FP1
+	FMUL.X	FP1
+	FMOVE.X	FP0,(-$0020,A6)
+	ROR.L	#1,D0
+	ANDI.L	#$80000000,D0
+	FMUL.X	FP1,FP2
+	EOR.L	D0,(-$0020,A6)
+	ANDI.L	#$80000000,D0
+	FMUL.X	FP1,FP3
+	ORI.L	#$3F800000,D0
+	MOVE.L	D0,(-$0054,A6)
+	FADD.D	(lbD0075F0,PC),FP2
+	FADD.D	(lbD0075F8,PC),FP3
+	FMUL.X	FP1,FP2
+	FMUL.X	FP1,FP3
+	FADD.D	(lbD007600,PC),FP2
+	FADD.X	(lbB007610,PC),FP3
+	FMUL.X	FP1,FP2
+	FMUL.X	FP3,FP1
+	FADD.X	(lbB007620,PC),FP2
+	FADD.S	(lbS00762C,PC),FP1
+	FMUL.X	FP2,FP0
+	FADD.X	FP1,FP0
+	FMUL.X	(-$0020,A6),FP0
+	FMOVE.L	D1,FPCR
+	FADD.S	(-$0054,A6),FP0
+	BRA.W	lbC00250C
+
+;fiX Label expected
+	CMPI.L	#$3FFF8000,D0
+	BGT.B	lbC00783A
+lbC007802:	MOVE.L	(-$0044,A6),D0
+	CMPI.L	#0,D0
+	BGT.B	lbC007822
+	MOVE.W	#0,(-$001E,A6)
+	FMOVE.L	D1,FPCR
+	FMOVE.X	(-$0020,A6),FP0
+	BRA.W	lbC00250C
+
+lbC007822:	FMOVE.S	#1.0,FP0
+	FMOVE.L	D1,FPCR
+	FSUB.S	#1.17549435E-38,FP0
+	BRA.W	lbC00250C
+
+lbC00783A:	FMOVEM.X	FP2/FP3/FP4/FP5,-(SP)
+	MOVE.L	D2,-(SP)
+	FMOVE.S	#0.0,FP1
+lbC007848:	FMOVE.X	FP0,(-$0030,A6)
+	MOVE.W	(-$0030,A6),D0
+	MOVEA.L	D0,A1
+	ANDI.L	#$00007FFF,D0
+	SUBI.L	#$00003FFF,D0
+	CMPI.L	#$0000001C,D0
+	BLE.B	lbC007878
+	SUBI.L	#$0000001B,D0
+	MOVE.L	#0,(-$0050,A6)
+	BRA.B	lbC007882
+
+lbC007878:	MOVEQ	#0,D0
+	MOVE.L	#1,(-$0050,A6)
+lbC007882:	MOVE.L	#$00003FFE,D2
+	SUB.L	D0,D2
+	MOVE.L	#$A2F9836E,(-$0070,A6)
+	MOVE.L	#$4E44152A,(-$006C,A6)
+	MOVE.W	D2,(-$0074,A6)
+	FMOVE.X	FP0,FP2
+	FMUL.X	(-$0074,A6),FP2
+	MOVE.L	A1,D2
+	SWAP	D2
+	ANDI.L	#$80000000,D2
+	ORI.L	#$5F000000,D2
+	MOVE.L	D2,(-$0054,A6)
+	MOVE.L	D0,D2
+	ADDI.L	#$00003FFF,D2
+	FADD.S	(-$0054,A6),FP2
+	MOVE.W	D2,(-$0064,A6)
+	CLR.W	(-$0062,A6)
+	MOVE.L	#$C90FDAA2,(-$0060,A6)
+	CLR.L	(-$005C,A6)
+	FSUB.S	(-$0054,A6),FP2
+	ADDI.L	#$00003FDD,D0
+	MOVE.W	D0,(-$0040,A6)
+	CLR.W	(-$003E,A6)
+	MOVE.L	#$85A308D3,(-$003C,A6)
+	CLR.L	(-$0038,A6)
+	MOVE.L	(-$0050,A6),D0
+	FMOVE.X	FP2,FP4
+	FMUL.X	(-$0064,A6),FP4
+	FMOVE.X	FP2,FP5
+	FMUL.X	(-$0040,A6),FP5
+	FMOVE.X	FP4,FP3
+	FADD.X	FP5,FP3
+	FSUB.X	FP3,FP4
+	FSUB.X	FP3,FP0
+	FADD.X	FP5,FP4
+	FMOVE.X	FP0,FP3
+	FSUB.X	FP4,FP1
+	FADD.X	FP1,FP0
+	CMPI.L	#0,D0
+	BGT.B	lbC00794A
+	FSUB.X	FP0,FP3
+	FADD.X	FP3,FP1
+	BRA.W	lbC007848
+
+lbC00794A:	FMOVE.L	FP2,(-$0050,A6)
+	MOVE.L	(SP)+,D2
+	FMOVEM.X	(SP)+,FP2/FP3/FP4/FP5
+	MOVE.L	(-$0044,A6),D0
+	CMPI.L	#4,D0
+	BLT.W	lbC0076DA
+	BRA.B	lbC0079D2
+
+lbC007966:	FMOVE.S	#1.0,FP1
+	BSR.W	lbC008554
+	BRA.W	lbC0025FE
+
+lbC007976:	MOVE.L	#4,(-$0044,A6)
+	FMOVE.X	(A0),FP0
+	MOVE.L	(A0),D0
+	MOVE.W	(4,A0),D0
+	FMOVE.X	FP0,(-$0020,A6)
+	ANDI.L	#$7FFFFFFF,D0
+	CMPI.L	#$3FD78000,D0
+	BGE.B	lbC0079A0
+	BRA.W	lbC007BDC
+
+lbC0079A0:	CMPI.L	#$4004BC7E,D0
+	BLT.B	lbC0079AC
+	BRA.W	lbC00783A
+
+lbC0079AC:	FMOVE.X	FP0,FP1
+	FMUL.D	(lbD007588,PC),FP1
+	LEA	(lbL007F80).L,A1
+	FMOVE.L	FP1,(-$0050,A6)
+	MOVE.L	(-$0050,A6),D0
+	ASL.L	#4,D0
+	ADDA.L	D0,A1
+	FSUB.X	(A1)+,FP0
+	FSUB.S	(A1),FP0
+lbC0079D2:	MOVE.L	(-$0050,A6),D0
+	ROR.L	#1,D0
+	CMPI.L	#0,D0
+	BGE.W	lbC007AE6
+	FMOVE.X	FP0,(-$0074,A6)
+	FMUL.X	FP0
+	FMOVE.D	(lbD007590,PC),FP1
+	FMOVE.D	(lbD0075E0,PC),FP2
+	FMUL.X	FP0,FP1
+	MOVE.L	D2,-(SP)
+	MOVE.L	D0,D2
+	FMUL.X	FP0,FP2
+	ROR.L	#1,D2
+	ANDI.L	#$80000000,D2
+	FADD.D	(lbD007598,PC),FP1
+	EOR.L	D0,D2
+	ANDI.L	#$80000000,D2
+	FADD.D	(lbD0075E8,PC),FP2
+	FMUL.X	FP0,FP1
+	EOR.L	D2,(-$0074,A6)
+	MOVE.L	(SP)+,D2
+	FMUL.X	FP0,FP2
+	ROR.L	#1,D0
+	ANDI.L	#$80000000,D0
+	FADD.D	(lbD0075A0,PC),FP1
+	MOVE.L	#$3F800000,(-$0054,A6)
+	EOR.L	D0,(-$0054,A6)
+	FADD.D	(lbD0075F0,PC),FP2
+	FMUL.X	FP0,FP1
+	FMUL.X	FP0,FP2
+	FMOVE.X	FP0,(-$0064,A6)
+	FADD.D	(lbD0075A8,PC),FP1
+	EOR.L	D0,(-$0064,A6)
+	FADD.D	(lbD0075F8,PC),FP2
+	FMUL.X	FP0,FP1
+	FMUL.X	FP0,FP2
+	FADD.D	(lbD0075B0,PC),FP1
+	FADD.D	(lbD007600,PC),FP2
+	FMUL.X	FP0,FP1
+	FMUL.X	FP0,FP2
+	FADD.X	(lbB0075C0,PC),FP1
+	FADD.X	(lbB007610,PC),FP2
+	FMUL.X	FP0,FP1
+	FMUL.X	FP0,FP2
+	FADD.X	(lbB0075D0,PC),FP1
+	FADD.X	(lbB007620,PC),FP2
+	FMUL.X	FP0,FP1
+	FMUL.X	FP2,FP0
+	FMUL.X	(-$0074,A6),FP1
+	FADD.S	(lbS00762C,PC),FP0
+	FMUL.X	(-$0064,A6),FP0
+	MOVE.L	D1,-(SP)
+	ANDI.L	#$000000FF,D1
+	FMOVE.L	D1,FPCR
+	FADD.X	(-$0074,A6),FP1
+	BSR.W	lbC008554
+	FMOVE.L	(SP)+,FPCR
+	FADD.S	(-$0054,A6),FP0
+	BRA.W	lbC00250C
+
+lbC007AE6:	FMOVE.X	FP0,(-$0074,A6)
+	FMUL.X	FP0
+	FMOVE.D	(lbD0075E0,PC),FP1
+	FMOVE.D	(lbD007590,PC),FP2
+	FMUL.X	FP0,FP1
+	FMOVE.X	FP0,(-$0064,A6)
+	FMUL.X	FP0,FP2
+	ROR.L	#1,D0
+	ANDI.L	#$80000000,D0
+	FADD.D	(lbD0075E8,PC),FP1
+	FADD.D	(lbD007598,PC),FP2
+	EOR.L	D0,(-$0074,A6)
+	EOR.L	D0,(-$0064,A6)
+	FMUL.X	FP0,FP1
+	ORI.L	#$3F800000,D0
+	MOVE.L	D0,(-$0054,A6)
+	FMUL.X	FP0,FP2
+	FADD.D	(lbD0075F0,PC),FP1
+	FADD.D	(lbD0075A0,PC),FP2
+	FMUL.X	FP0,FP1
+	FMUL.X	FP0,FP2
+	FADD.D	(lbD0075F8,PC),FP1
+	FADD.D	(lbD0075A8,PC),FP2
+	FMUL.X	FP0,FP1
+	FMUL.X	FP0,FP2
+	FADD.D	(lbD007600,PC),FP1
+	FADD.D	(lbD0075B0,PC),FP2
+	FMUL.X	FP0,FP1
+	FMUL.X	FP0,FP2
+	FADD.X	(lbB007610,PC),FP1
+	FADD.X	(lbB0075C0,PC),FP2
+	FMUL.X	FP0,FP1
+	FMUL.X	FP0,FP2
+	FADD.X	(lbB007620,PC),FP1
+	FADD.X	(lbB0075D0,PC),FP2
+	FMUL.X	FP0,FP1
+	FMUL.X	FP2,FP0
+	FADD.S	(lbS00762C,PC),FP1
+	FMUL.X	(-$0074,A6),FP0
+	FMUL.X	(-$0064,A6),FP1
+	MOVE.L	D1,-(SP)
+	ANDI.L	#$000000FF,D1
+	FMOVE.L	D1,FPCR
+	FADD.S	(-$0054,A6),FP1
+	BSR.W	lbC008554
+	FMOVE.L	(SP)+,FPCR
+	FADD.X	(-$0074,A6),FP0
+	BRA.W	lbC00250C
+
+;fiX Label expected
+	CMPI.L	#$3FFF8000,D0
+	BGT.W	lbC00783A
+lbC007BDC:	MOVE.W	#0,(-$001E,A6)
+	FMOVE.S	#1.0,FP1
+	MOVE.L	D1,-(SP)
+	ANDI.L	#$000000FF,D1
+	FMOVE.L	D1,FPCR
+	FSUB.S	#1.17549435E-38,FP1
+	BSR.W	lbC008554
+	FMOVE.L	(SP)+,FPCR
+	FMOVE.X	(-$0020,A6),FP0
+	BRA.W	lbC00250C
+
+lbD007C10:	dc.d	11354.443964752463
+lbD007C18:	dc.d	8.9713596574902281E-13
+
+lbC007C20:	BRA.W	lbC0025FE
+
+lbC007C24:	FMOVE.X	(A0),FP0
+	MOVE.L	(A0),D0
+	MOVE.W	(4,A0),D0
+	MOVEA.L	D0,A1
+	AND.L	#$7FFFFFFF,D0
+	CMP.L	#$400CB167,D0
+	BGT.B	lbC007C90
+	FABS.X	FP0
+	MOVEM.L	D1/A1,-(SP)
+	FMOVEM.X	FP0,(A0)
+	MOVEQ	#0,D1
+	BSR.W	lbC00608E
+	FMOVE.L	#0,FPCR
+	MOVEM.L	(SP)+,D1/A1
+	FMOVE.X	FP0,FP1
+	FADD.S	#1.0,FP1
+	FMOVE.X	FP0,-(SP)
+	FDIV.X	FP1,FP0
+	MOVE.L	A1,D0
+	AND.L	#$80000000,D0
+	OR.L	#$3F000000,D0
+	FADD.X	(SP)+,FP0
+	MOVE.L	D0,-(SP)
+	FMOVE.L	D1,FPCR
+	FMUL.S	(SP)+,FP0
+	BRA.W	lbC00250C
+
+lbC007C90:	CMP.L	#$400CB2B3,D0
+	BGT.W	lbC0024AE
+	FABS.X	FP0
+	FSUB.D	(lbD007C10,PC),FP0
+	MOVE.L	#0,-(SP)
+	MOVE.L	#$80000000,-(SP)
+	MOVE.L	A1,D0
+	AND.L	#$80000000,D0
+	OR.L	#$7FFB0000,D0
+	MOVE.L	D0,-(SP)
+	FSUB.D	(lbD007C18,PC),FP0
+	MOVE.L	D1,-(SP)
+	MOVEQ	#0,D1
+	FMOVEM.X	FP0,(A0)
+	BSR.W	lbC005ED8
+	FMOVE.L	(SP)+,FPCR
+	FMUL.X	(SP)+,FP0
+	BRA.W	lbC00250C
+
+;fiX Label expected
+	dc.w	0,$3FD7,$8000,$4004,$BC7E
+lbD007CE8:	dc.d	0.63661977236758138
+lbD007CF0:	dc.d	4.981820699268385E-7
+lbD007CF8:	dc.d	-1.7861452339020512E-5
+lbD007D00:	dc.d	-3.1181278209988465E-4,0.0
+lbB007D10:	dc.b	$3F,$F6,0,0,$E0,$73,$D3,$FC,$19,$9C,$4A,0,0,0,0,0
+lbB007D20:	dc.b	$3F,$F9,0,0,$D2,$3C,$D6,$84,$15,$D9,$5F,$A1,0,0,0,0
+lbB007D30:	dc.b	$BF,$FC,0,0,$88,$95,$A6,$C5,$FB,$42,$3B,$CA,0,0,0,0
+lbB007D40:	dc.b	$BF,$FD,0,0,$EE,$F5,$7E,13,$A8,$4B,$C8,$CE,0,0,0,0,$3F,$FC,0,0,$A2,$F9,$83
+	dc.b	$6E,$4E,$44,$15,$2A,0,0,0,0,$40,1,0,0,$C9,15,$DA,$A2,0,0,0,0,0,0,0,0,$3F,$DF
+	dcb.b	2,0
+	dc.b	$85,$A3,8,$D4,0,0,0,0,0,0,0,0,$C0,4,0,0,$C9,15,$DA,$A2,$21,$68,$C2,$35,$21
+	dc.b	$80,0,0,$C0,4,0,0,$C2,$C7,$5B,$CD,$10,$5D,$7C,$23,$A0,$D0,0,0,$C0,4,0,0,$BC
+	dc.b	$7E,$DC,$F7,$FF,$52,$36,$11,$A1,$E8,0,0,$C0,4,0,0,$B6,$36,$5E,$22,$EE,$46,$F0
+	dc.b	0,$21,$48,0,0,$C0,4,0,0,$AF,$ED,$DF,$4D,$DD,$3B,$A9,$EE,$A1,$20,0,0,$C0,4,0,0
+	dc.b	$A9,$A5,$60,$78,$CC,$30,$63,$DD,$21,$FC,0,0,$C0,4,0,0,$A3,$5C,$E1,$A3,$BB,$25
+	dc.b	$1D,$CB,$21,$10,0,0,$C0,4,0,0,$9D,$14,$62,$CE,$AA,$19,$D7,$B9,$A1,$58,0,0,$C0
+	dc.b	4,0,0,$96,$CB,$E3,$F9,$99,14,$91,$A8,$21,$E0,0,0,$C0,4,0,0,$90,$83,$65,$24
+	dc.b	$88,3,$4B,$96,$20,$B0,0,0,$C0,4,0,0,$8A,$3A,$E6,$4F,$76,$F8,5,$84,$A1,$88,0,0
+	dc.b	$C0,4,0,0,$83,$F2,$67,$7A,$65,$EC,$BF,$73,$21,$C4,0,0,$C0,3,0,0,$FB,$53,$D1
+	dc.b	$4A,$A9,$C2,$F2,$C2,$20,0,0,0,$C0,3,0,0,$EE,$C2,$D3,$A0,$87,$AC,$66,$9F,$21
+	dc.b	$38,0,0,$C0,3,0,0,$E2,$31,$D5,$F6,$65,$95,$DA,$7B,$A1,$30,0,0,$C0,3,0,0,$D5
+	dc.b	$A0,$D8,$4C,$43,$7F,$4E,$58,$9F,$C0,0,0,$C0,3,0,0,$C9,15,$DA,$A2,$21,$68,$C2
+	dc.b	$35,$21,0,0,0,$C0,3,0,0,$BC,$7E,$DC,$F7,$FF,$52,$36,$11,$A1,$68,0,0,$C0,3,0,0
+	dc.b	$AF,$ED,$DF,$4D,$DD,$3B,$A9,$EE,$A0,$A0,0,0,$C0,3,0,0,$A3,$5C,$E1,$A3,$BB,$25
+	dc.b	$1D,$CB,$20,$90,0,0,$C0,3,0,0,$96,$CB,$E3,$F9,$99,14,$91,$A8,$21,$60,0,0,$C0
+	dc.b	3,0,0,$8A,$3A,$E6,$4F,$76,$F8,5,$84,$A1,8,0,0,$C0,2,0,0,$FB,$53,$D1,$4A,$A9
+	dc.b	$C2,$F2,$C2,$1F,$80,0,0,$C0,2,0,0,$E2,$31,$D5,$F6,$65,$95,$DA,$7B,$A0,$B0,0,0
+	dc.b	$C0,2,0,0,$C9,15,$DA,$A2,$21,$68,$C2,$35,$20,$80,0,0,$C0,2,0,0,$AF,$ED,$DF
+	dc.b	$4D,$DD,$3B,$A9,$EE,$A0,$20,0,0,$C0,2,0,0,$96,$CB,$E3,$F9,$99,14,$91,$A8,$20
+	dc.b	$E0,0,0,$C0,1,0,0,$FB,$53,$D1,$4A,$A9,$C2,$F2,$C2,$1F,0,0,0,$C0,1,0,0,$C9,15
+	dc.b	$DA,$A2,$21,$68,$C2,$35,$20,0,0,0,$C0,1,0,0,$96,$CB,$E3,$F9,$99,14,$91,$A8
+	dc.b	$20,$60,0,0,$C0,0,0,0,$C9,15,$DA,$A2,$21,$68,$C2,$35,$1F,$80,0,0,$BF,$FF,0,0
+	dc.b	$C9,15,$DA,$A2,$21,$68,$C2,$35,$1F,0,0,0
+lbL007F80:	dcb.l	4,0
+	dc.l	$3FFF0000,$C90FDAA2,$2168C235,$9F000000,$40000000,$C90FDAA2,$2168C235
+	dc.l	$9F800000,$40010000,$96CBE3F9,$990E91A8,$A0600000,$40010000,$C90FDAA2
+	dc.l	$2168C235,$A0000000,$40010000,$FB53D14A,$A9C2F2C2,$9F000000,$40020000
+	dc.l	$96CBE3F9,$990E91A8,$A0E00000,$40020000,$AFEDDF4D,$DD3BA9EE,$20200000
+	dc.l	$40020000,$C90FDAA2,$2168C235,$A0800000,$40020000,$E231D5F6,$6595DA7B
+	dc.l	$20B00000,$40020000,$FB53D14A,$A9C2F2C2,$9F800000,$40030000,$8A3AE64F
+	dc.l	$76F80584,$21080000,$40030000,$96CBE3F9,$990E91A8,$A1600000,$40030000
+	dc.l	$A35CE1A3,$BB251DCB,$A0900000,$40030000,$AFEDDF4D,$DD3BA9EE,$20A00000
+	dc.l	$40030000,$BC7EDCF7,$FF523611,$21680000,$40030000,$C90FDAA2,$2168C235
+	dc.l	$A1000000,$40030000,$D5A0D84C,$437F4E58,$1FC00000,$40030000,$E231D5F6
+	dc.l	$6595DA7B,$21300000,$40030000,$EEC2D3A0,$87AC669F,$A1380000,$40030000
+	dc.l	$FB53D14A,$A9C2F2C2,$A0000000,$40040000,$83F2677A,$65ECBF73,$A1C40000
+	dc.l	$40040000,$8A3AE64F,$76F80584,$21880000,$40040000,$90836524,$88034B96
+	dc.l	$A0B00000,$40040000,$96CBE3F9,$990E91A8,$A1E00000,$40040000,$9D1462CE
+	dc.l	$AA19D7B9,$21580000,$40040000,$A35CE1A3,$BB251DCB,$A1100000,$40040000
+	dc.l	$A9A56078,$CC3063DD,$A1FC0000,$40040000,$AFEDDF4D,$DD3BA9EE,$21200000
+	dc.l	$40040000,$B6365E22,$EE46F000,$A1480000,$40040000,$BC7EDCF7,$FF523611
+	dc.l	$21E80000,$40040000,$C2C75BCD,$105D7C23,$20D00000,$40040000,$C90FDAA2
+	dc.l	$2168C235,$A1800000
+
+lbC008190:	BRA.W	lbC0025FE
+
+lbC008194:	FMOVE.X	(A0),FP0
+	MOVE.L	(A0),D0
+	MOVE.W	(4,A0),D0
+	ANDI.L	#$7FFFFFFF,D0
+	CMPI.L	#$3FD78000,D0
+	BGE.B	lbC0081B0
+	BRA.W	lbC0082D0
+
+lbC0081B0:	CMPI.L	#$4004BC7E,D0
+	BLT.B	lbC0081BC
+	BRA.W	lbC0082E0
+
+lbC0081BC:	FMOVE.X	FP0,FP1
+	FMUL.D	(lbD007CE8,PC),FP1
+	LEA	(lbL007F80,PC),A1
+	FMOVE.L	FP1,D0
+	ASL.L	#4,D0
+	ADDA.L	D0,A1
+	FSUB.X	(A1)+,FP0
+	FSUB.S	(A1),FP0
+	ROR.L	#5,D0
+	ANDI.L	#$80000000,D0
+lbC0081E2:	CMPI.L	#0,D0
+	BLT.B	lbC008254
+	FMOVE.X	FP0,FP1
+	FMUL.X	FP1
+	FMOVE.D	(lbD007CF0,PC),FP3
+	FMOVE.D	(lbD007CF8,PC),FP2
+	FMUL.X	FP1,FP3
+	FMUL.X	FP1,FP2
+	FADD.D	(lbD007D00,PC),FP3
+	FADD.X	(lbB007D10,PC),FP2
+	FMUL.X	FP1,FP3
+	FMUL.X	FP1,FP2
+	FADD.X	(lbB007D20,PC),FP3
+	FADD.X	(lbB007D30,PC),FP2
+	FMUL.X	FP1,FP3
+	FMUL.X	FP1,FP2
+	FADD.X	(lbB007D40,PC),FP3
+	FMUL.X	FP0,FP2
+	FMUL.X	FP3,FP1
+	FADD.X	FP2,FP0
+	FADD.S	#1.0,FP1
+	FMOVE.L	D1,FPCR
+	FDIV.X	FP1,FP0
+	BRA.W	lbC00250C
+
+lbC008254:	FMOVE.X	FP0,FP1
+	FMUL.X	FP0
+	FMOVE.D	(lbD007CF0,PC),FP3
+	FMOVE.D	(lbD007CF8,PC),FP2
+	FMUL.X	FP0,FP3
+	FMUL.X	FP0,FP2
+	FADD.D	(lbD007D00,PC),FP3
+	FADD.X	(lbB007D10,PC),FP2
+	FMUL.X	FP0,FP3
+	FMUL.X	FP0,FP2
+	FADD.X	(lbB007D20,PC),FP3
+	FADD.X	(lbB007D30,PC),FP2
+	FMUL.X	FP0,FP3
+	FMUL.X	FP0,FP2
+	FADD.X	(lbB007D40,PC),FP3
+	FMUL.X	FP1,FP2
+	FMUL.X	FP3,FP0
+	FADD.X	FP2,FP1
+	FADD.S	#1.0,FP0
+	FMOVE.X	FP1,-(SP)
+	EORI.L	#$80000000,(SP)
+	FMOVE.L	D1,FPCR
+	FDIV.X	(SP)+,FP0
+	BRA.W	lbC00250C
+
+;fiX Label expected
+	CMPI.L	#$3FFF8000,D0
+	BGT.B	lbC0082E0
+lbC0082D0:	FMOVE.X	FP0,-(SP)
+	FMOVE.L	D1,FPCR
+	FMOVE.X	(SP)+,FP0
+	BRA.W	lbC00250C
+
+lbC0082E0:	FMOVEM.X	FP2/FP3/FP4/FP5,-(SP)
+	MOVE.L	D2,-(SP)
+	FMOVE.S	#0.0,FP1
+lbC0082EE:	FMOVE.X	FP0,(-$0030,A6)
+	MOVE.W	(-$0030,A6),D0
+	MOVEA.L	D0,A1
+	ANDI.L	#$00007FFF,D0
+	SUBI.L	#$00003FFF,D0
+	CMPI.L	#$0000001C,D0
+	BLE.B	lbC00831E
+	SUBI.L	#$0000001B,D0
+	MOVE.L	#0,(-$0050,A6)
+	BRA.B	lbC008328
+
+lbC00831E:	MOVEQ	#0,D0
+	MOVE.L	#1,(-$0050,A6)
+lbC008328:	MOVE.L	#$00003FFE,D2
+	SUB.L	D0,D2
+	MOVE.L	#$A2F9836E,(-$0070,A6)
+	MOVE.L	#$4E44152A,(-$006C,A6)
+	MOVE.W	D2,(-$0074,A6)
+	FMOVE.X	FP0,FP2
+	FMUL.X	(-$0074,A6),FP2
+	MOVE.L	A1,D2
+	SWAP	D2
+	ANDI.L	#$80000000,D2
+	ORI.L	#$5F000000,D2
+	MOVE.L	D2,(-$0054,A6)
+	MOVE.L	D0,D2
+	ADDI.L	#$00003FFF,D2
+	FADD.S	(-$0054,A6),FP2
+	MOVE.W	D2,(-$0064,A6)
+	CLR.W	(-$0062,A6)
+	MOVE.L	#$C90FDAA2,(-$0060,A6)
+	CLR.L	(-$005C,A6)
+	FSUB.S	(-$0054,A6),FP2
+	ADDI.L	#$00003FDD,D0
+	MOVE.W	D0,(-$0040,A6)
+	CLR.W	(-$003E,A6)
+	MOVE.L	#$85A308D3,(-$003C,A6)
+	CLR.L	(-$0038,A6)
+	MOVE.L	(-$0050,A6),D0
+	FMOVE.X	FP2,FP4
+	FMUL.X	(-$0064,A6),FP4
+	FMOVE.X	FP2,FP5
+	FMUL.X	(-$0040,A6),FP5
+	FMOVE.X	FP4,FP3
+	FADD.X	FP5,FP3
+	FSUB.X	FP3,FP4
+	FSUB.X	FP3,FP0
+	FADD.X	FP5,FP4
+	FMOVE.X	FP0,FP3
+	FSUB.X	FP4,FP1
+	FADD.X	FP1,FP0
+	CMPI.L	#0,D0
+	BGT.B	lbC0083F0
+	FSUB.X	FP0,FP3
+	FADD.X	FP3,FP1
+	BRA.W	lbC0082EE
+
+lbC0083F0:	FMOVE.L	FP2,(-$0044,A6)
+	MOVE.L	(SP)+,D2
+	FMOVEM.X	(SP)+,FP2/FP3/FP4/FP5
+	MOVE.L	(-$0044,A6),D0
+	ROR.L	#1,D0
+	BRA.W	lbC0081E2
+
+;fiX Label expected
+	dc.w	0
+lbW008408:	dc.w	$3FD7,$8000,$3FFF,$DDCE
+
+lbC008410:	BRA.W	lbC0025FE
+
+lbC008414:	FMOVE.X	(A0),FP0
+	FMOVE.X	FP0,(-$0020,A6)
+	MOVE.L	(A0),D0
+	MOVE.W	(4,A0),D0
+	MOVE.L	D0,(-$0020,A6)
+	AND.L	#$7FFFFFFF,D0
+	CMP2.L	(lbW008408).L,D0
+	BCS.B	lbC008494
+	MOVE.L	(-$0020,A6),D0
+	MOVE.L	D0,(-$0044,A6)
+	AND.L	#$7FFF0000,D0
+	ADD.L	#$00010000,D0
+	MOVE.L	D0,(-$0020,A6)
+	ANDI.L	#$80000000,(-$0044,A6)
+	FMOVE.X	(-$0020,A6),FP0
+	MOVE.L	D1,-(SP)
+	MOVEQ	#0,D1
+	FMOVEM.X	FP0,(A0)
+	BSR.W	lbC00608E
+	MOVE.L	(SP)+,D1
+	FMOVE.X	FP0,FP1
+	FADD.S	#2.0,FP1
+	MOVE.L	(-$0044,A6),D0
+	FMOVE.X	FP1,(-$0010,A6)
+	EOR.L	D0,(-$0010,A6)
+	FMOVE.L	D1,FPCR
+	FDIV.X	(-$0010,A6),FP0
+	BRA.W	lbC00250C
+
+lbC008494:	CMP.L	#$3FFF8000,D0
+	BLT.B	lbC008512
+	CMP.L	#$40048AA1,D0
+	BGT.W	lbC008526
+	MOVE.L	(-$0020,A6),D0
+	MOVE.L	D0,(-$0044,A6)
+	AND.L	#$7FFF0000,D0
+	ADD.L	#$00010000,D0
+	MOVE.L	D0,(-$0020,A6)
+	ANDI.L	#$80000000,(-$0044,A6)
+	MOVE.L	(-$0044,A6),D0
+	FMOVE.X	(-$0020,A6),FP0
+	MOVE.L	D1,-(SP)
+	MOVEQ	#0,D1
+	FMOVEM.X	FP0,(A0)
+	BSR.W	lbC005ED8
+	MOVE.L	(SP)+,D1
+	MOVE.L	(-$0044,A6),D0
+	FADD.S	#1.0,FP0
+	EORI.L	#$C0000000,D0
+	FMOVE.S	D0,FP1
+	FDIV.X	FP0,FP1
+	MOVE.L	(-$0044,A6),D0
+	OR.L	#$3F800000,D0
+	FMOVE.S	D0,FP0
+	FMOVE.L	D1,FPCR
+	FADD.X	FP1,FP0
+	BRA.W	lbC00250C
+
+lbC008512:	MOVE.W	#0,(-$001E,A6)
+	FMOVE.L	D1,FPCR
+	FMOVE.X	(-$0020,A6),FP0
+	BRA.W	lbC00250C
+
+lbC008526:	MOVE.L	(-$0020,A6),D0
+	AND.L	#$80000000,D0
+	OR.L	#$3F800000,D0
+	FMOVE.S	D0,FP0
+	AND.L	#$80000000,D0
+	EORI.L	#$80800000,D0
+	FMOVE.L	D1,FPCR
+	FADD.S	D0,FP0
+	BRA.W	lbC00250C
+
+;fiX Label expected
+	dc.w	0
+
+lbC008554:	BFEXTU	(-$00E4,A6){13:3},D0
+	CMPI.B	#3,D0
+	BLE.B	lbC008572
+	FMOVEM.X	FP1,-(SP)
+	MOVEQ	#7,D1
+	SUB.L	D0,D1
+	MOVEQ	#0,D0
+	BSET	D1,D0
+	FMOVEM.X	(SP)+,D0
+	RTS
+
+lbC008572:	CMPI.B	#0,D0
+	BEQ.B	lbC00859C
+	CMPI.B	#1,D0
+	BEQ.B	lbC008594
+	CMPI.B	#2,D0
+	BEQ.B	lbC00858C
+	FMOVEM.X	FP1,(-$008C,A6)
+	RTS
+
+lbC00858C:	FMOVEM.X	FP1,(-$0098,A6)
+	RTS
+
+lbC008594:	FMOVEM.X	FP1,(-$00A4,A6)
+	RTS
+
+lbC00859C:	FMOVEM.X	FP1,(-$00B0,A6)
+	RTS
+
+lbC0085A4:	BFEXTU	(-$00E4,A6){6:3},D0
+	CMPI.B	#3,D0
+	BLE.B	lbC0085C2
+	FMOVEM.X	FP0,-(SP)
+	MOVEQ	#7,D1
+	SUB.L	D0,D1
+	MOVEQ	#0,D0
+	BSET	D1,D0
+	FMOVEM.X	(SP)+,D0
+	RTS
+
+lbC0085C2:	CMPI.B	#0,D0
+	BEQ.B	lbC0085EC
+	CMPI.B	#1,D0
+	BEQ.B	lbC0085E4
+	CMPI.B	#2,D0
+	BEQ.B	lbC0085DC
+	FMOVEM.X	FP0,(-$008C,A6)
+	RTS
+
+lbC0085DC:	FMOVEM.X	FP0,(-$0098,A6)
+	RTS
+
+lbC0085E4:	FMOVEM.X	FP0,(-$00A4,A6)
+	RTS
+
+lbC0085EC:	FMOVEM.X	FP0,(-$00B0,A6)
+	RTS
+
+;fiX Label expected
+	dc.w	$3FB9,$8000,$400D,$80C0,$3FB9,$8000,$400B,$9B07
+lbD008604:	dc.d	212.60339807279117
+lbD00860C:	dc.d	4.7035936822510393E-3
+lbB008614:	dc.b	$BF,$CD,0,0,$C0,$21,$9D,$C1,$DA,$99,$4F,$D2,0,0,0,0
+lbB008624:	dc.b	$40,0,0,0,$93,$5D,$8D,$DD,$AA,$A8,$AC,$17,0,0,0,0
+lbB008634:	dc.b	$3F,$FE,0,0,$B1,$72,$17,$F7,$D1,$CF,$79,$AC,0,0,0,0
+lbD008644:	dc.d	1.3888901430024022E-3
+lbD00864C:	dc.d	8.3333416892448983E-3
+lbD008654:	dc.d	0.041666666666651426
+lbD00865C:	dc.d	0.16666666666658846
+lbD008664:	dc.d	0.5,0.0,NaN,NaN,1.3906923815249055E-309,NaN
+lbW008694:	dc.w	$3FFF,0,$8000,0,0,0,$3F73,$8000,$3FFF,0,$8164,$D1F3,$BC03,$0773,$3FBE,$F7CA
+	dc.w	$3FFF,0,$82CD,$8698,$AC2B,$A1D7,$3FBD,$F8A9,$3FFF,0,$843A,$28C3,$ACDE,$4046
+	dc.w	$3FBC,$D7C9,$3FFF,0,$85AA,$C367,$CC48,$7B15,$BFBD,$E8DA,$3FFF,0,$871F,$6196
+	dc.w	$9E8D,$1010,$3FBD,$E85C,$3FFF,0,$8898,$0E80,$92DA,$8527,$3FBE,$BBF1,$3FFF,0
+	dc.w	$8A14,$D575,$496E,$FD9A,$3FBB,$80CA,$3FFF,0,$8B95,$C1E3,$EA8B,$D6E7,$BFBA
+	dc.w	$8373,$3FFF,0,$8D1A,$DF5B,$7E5B,$A9E6,$BFBE,$9670,$3FFF,0,$8EA4,$398B,$45CD
+	dc.w	$53C0,$3FBD,$B700,$3FFF,0,$9031,$DC43,$1466,$B1DC,$3FBE,$EEB0,$3FFF,0,$91C3
+	dc.w	$D373,$AB11,$C336,$3FBB,$FD6D,$3FFF,0,$935A,$2B2F,$13E6,$E92C,$BFBD,$B319
+	dc.w	$3FFF,0,$94F4,$EFA8,$FEF7,$0961,$3FBD,$BA2B,$3FFF,0,$9694,$2D37,$2018,$5A00
+	dc.w	$3FBE,$91D5,$3FFF,0,$9837,$F051,$8DB8,$A96F,$3FBE,$8D5A,$3FFF,0,$99E0,$4593
+	dc.w	$20B7,$FA65,$BFBC,$DE7B,$3FFF,0,$9B8D,$39B9,$D54E,$5539,$BFBE,$BAAF,$3FFF,0
+	dc.w	$9D3E,$D9A7,$2CFF,$B751,$BFBD,$86DA,$3FFF,0,$9EF5,$3260,$91A1,$11AE,$BFBE
+	dc.w	$BEDD,$3FFF,0,$A0B0,$510F,$B971,$4FC2,$3FBC,$C96E,$3FFF,0,$A270,$4303,$0C49
+	dc.w	$6819,$BFBE,$C90B,$3FFF,0,$A435,$15AE,$09E6,$809E,$3FBB,$D1DB,$3FFF,0,$A5FE
+	dc.w	$D6A9,$B151,$38EA,$3FBC,$E5EB,$3FFF,0,$A7CD,$93B4,$E965,$356A,$BFBE,$C274
+	dc.w	$3FFF,0,$A9A1,$5AB4,$EA7C,$0EF8,$3FBE,$A83C,$3FFF,0,$AB7A,$39B5,$A93E,$D337
+	dc.w	$3FBE,$CB00,$3FFF,0,$AD58,$3EEA,$42A1,$4AC6,$3FBE,$9301,$3FFF,0,$AF3B,$78AD
+	dc.w	$690A,$4375,$BFBD,$8367,$3FFF,0,$B123,$F581,$D2AC,$2590,$BFBE,$F05F,$3FFF,0
+	dc.w	$B311,$C412,$A911,$2489,$3FBD,$FB3C,$3FFF,0,$B504,$F333,$F9DE,$6484,$3FBE
+	dc.w	$B2FB,$3FFF,0,$B6FD,$91E3,$28D1,$7791,$3FBA,$E2CB,$3FFF,0,$B8FB,$AF47,$62FB
+	dc.w	$9EE9,$3FBC,$DC3C,$3FFF,0,$BAFF,$5AB2,$133E,$45FB,$3FBE,$E9AA,$3FFF,0,$BD08
+	dc.w	$A39F,$580C,$36BF,$BFBE,$AEFD,$3FFF,0,$BF17,$99B6,$7A73,$1083,$BFBC,$BF51
+	dc.w	$3FFF,0,$C12C,$4CCA,$6670,$9456,$3FBE,$F88A,$3FFF,0,$C346,$CCDA,$2497,$6407
+	dc.w	$3FBD,$83B2,$3FFF,0,$C567,$2A11,$5506,$DADD,$3FBD,$F8AB,$3FFF,0,$C78D,$74C8
+	dc.w	$ABB9,$B15D,$BFBD,$FB17,$3FFF,0,$C9B9,$BD86,$6E2F,$27A3,$BFBE,$FE3C,$3FFF,0
+	dc.w	$CBEC,$14FE,$F272,$7C5D,$BFBB,$B6F8,$3FFF,0,$CE24,$8C15,$1F84,$80E4,$BFBC
+	dc.w	$EE53,$3FFF,0,$D063,$33DA,$EF2B,$2595,$BFBD,$A4AE,$3FFF,0,$D2A8,$1D91,$F12A
+	dc.w	$E45A,$3FBC,$9124,$3FFF,0,$D4F3,$5AAB,$CFED,$FA1F,$3FBE,$B243,$3FFF,0,$D744
+	dc.w	$FCCA,$D69D,$6AF4,$3FBD,$E69A,$3FFF,0,$D99D,$15C2,$78AF,$D7B6,$BFB8,$BC61
+	dc.w	$3FFF,0,$DBFB,$B797,$DAF2,$3755,$3FBD,$F610,$3FFF,0,$DE60,$F482,$5E0E,$9124
+	dc.w	$BFBD,$8BE1,$3FFF,0,$E0CC,$DEEC,$2A94,$E111,$3FBA,$CB12,$3FFF,0,$E33F,$8972
+	dc.w	$BE8A,$5A51,$3FBB,$9BFE,$3FFF,0,$E5B9,$06E7,$7C83,$48A8,$3FBC,$F2F4,$3FFF,0
+	dc.w	$E839,$6A50,$3C4B,$DC68,$3FBE,$F22F,$3FFF,0,$EAC0,$C6E7,$DD24,$392F,$BFBD
+	dc.w	$BF4A,$3FFF,0,$ED4F,$301E,$D994,$2B84,$3FBE,$C01A,$3FFF,0,$EFE4,$B99B,$DCDA
+	dc.w	$F5CB,$3FBE,$8CAC,$3FFF,0,$F281,$773C,$59FF,$B13A,$BFBC,$BB3F,$3FFF,0,$F525
+	dc.w	$7D15,$2486,$CC2C,$3FBE,$F73A,$3FFF,0,$F7D0,$DF73,$0AD1,$3BB9,$BFB8,$B795
+	dc.w	$3FFF,0,$FA83,$B2DB,$722A,$033A,$3FBE,$F84B,$3FFF,0,$FD3E,$0C0C,$F486,$C175
+	dc.w	$BFBE,$F581
+
+lbC008A94:	FMOVE.L	D1,FPCR
+	FMOVE.S	#1.0,FP0
+	MOVE.L	(A0),D0
+	OR.L	#$00800001,D0
+	FADD.S	D0,FP0
+	BRA.W	lbC00250C
+
+lbC008AB0:	FMOVEM.X	(A0),FP0
+	MOVE.L	(A0),D0
+	MOVE.W	(4,A0),D0
+	FMOVE.X	FP0,(-$0074,A6)
+	ANDI.L	#$7FFFFFFF,D0
+	CMPI.L	#$3FB98000,D0
+	BGE.B	lbC008AD2
+	BRA.W	lbC008B5E
+
+lbC008AD2:	CMPI.L	#$400D80C0,D0
+	BLE.B	lbC008ADE
+	BRA.W	lbC008B5E
+
+lbC008ADE:	FMOVE.X	FP0,FP1
+	FMUL.S	#64.0,FP1
+	FMOVE.L	FP1,(-$0054,A6)
+	MOVE.L	D2,-(SP)
+	LEA	(lbW008694,PC),A1
+	FMOVE.L	(-$0054,A6),FP1
+	MOVE.L	(-$0054,A6),D0
+	MOVE.L	D0,D2
+	ANDI.L	#$0000003F,D0
+	ASL.L	#4,D0
+	ADDA.L	D0,A1
+	ASR.L	#6,D2
+	MOVE.L	D2,D0
+	ASR.L	#1,D0
+	SUB.L	D0,D2
+	ADDI.L	#$00003FFF,D2
+	MOVE.W	D2,(-$0064,A6)
+	MOVE.L	(SP)+,D2
+	FMUL.S	#0.015625,FP1
+	MOVE.L	(A1)+,(-$0040,A6)
+	MOVE.L	(A1)+,(-$003C,A6)
+	MOVE.L	(A1)+,(-$0038,A6)
+	MOVE.W	(A1)+,(-$0030,A6)
+	CLR.W	(-$002E,A6)
+	FSUB.X	FP1,FP0
+	MOVE.W	(A1)+,(-$002C,A6)
+	CLR.W	(-$002A,A6)
+	CLR.L	(-$0028,A6)
+	ADD.W	D0,(-$0040,A6)
+	FMUL.X	(lbB008634,PC),FP0
+	ADD.W	D0,(-$0030,A6)
+	BRA.W	lbC008C5E
+
+lbC008B5E:	CMPI.L	#$3FFF8000,D0
+	BGT.B	lbC008B76
+	FMOVE.L	D1,FPCR
+	FADD.S	#1.0,FP0
+	BRA.W	lbC00250C
+
+lbC008B76:	MOVE.L	(-$0074,A6),D0
+	CMPI.L	#0,D0
+	BLT.B	lbC008B8A
+	BCLR	#7,(A0)
+	BRA.W	lbC0024AE
+
+lbC008B8A:	BCLR	#7,(A0)
+	BRA.W	lbC0023EE
+
+lbC008B92:	FMOVE.L	D1,FPCR
+	FMOVE.S	#1.0,FP0
+	MOVE.L	(A0),D0
+	OR.L	#$00800001,D0
+	FADD.S	D0,FP0
+	BRA.W	lbC00250C
+
+lbC008BAE:	FMOVEM.X	(A0),FP0
+	MOVE.L	(A0),D0
+	MOVE.W	(4,A0),D0
+	FMOVE.X	FP0,(-$0074,A6)
+	ANDI.L	#$7FFFFFFF,D0
+	CMPI.L	#$3FB98000,D0
+	BGE.B	lbC008BCE
+	BRA.B	lbC008B5E
+
+lbC008BCE:	CMPI.L	#$400B9B07,D0
+	BLE.B	lbC008BD8
+	BRA.B	lbC008B5E
+
+lbC008BD8:	FMOVE.X	FP0,FP1
+	FMUL.D	(lbD008604,PC),FP1
+	FMOVE.L	FP1,(-$0054,A6)
+	MOVE.L	D2,-(SP)
+	LEA	(lbW008694,PC),A1
+	FMOVE.L	(-$0054,A6),FP1
+	MOVE.L	(-$0054,A6),D0
+	MOVE.L	D0,D2
+	ANDI.L	#$0000003F,D0
+	ASL.L	#4,D0
+	ADDA.L	D0,A1
+	ASR.L	#6,D2
+	MOVE.L	D2,D0
+	ASR.L	#1,D0
+	SUB.L	D0,D2
+	ADDI.L	#$00003FFF,D2
+	MOVE.W	D2,(-$0064,A6)
+	MOVE.L	(SP)+,D2
+	FMOVE.X	FP1,FP2
+	FMUL.D	(lbD00860C,PC),FP1
+	MOVE.L	(A1)+,(-$0040,A6)
+	FMUL.X	(lbB008614,PC),FP2
+	MOVE.L	(A1)+,(-$003C,A6)
+	MOVE.L	(A1)+,(-$0038,A6)
+	FSUB.X	FP1,FP0
+	MOVE.W	(A1)+,(-$0030,A6)
+	FSUB.X	FP2,FP0
+	CLR.W	(-$002E,A6)
+	MOVE.W	(A1)+,(-$002C,A6)
+	CLR.W	(-$002A,A6)
+	CLR.L	(-$0028,A6)
+	FMUL.X	(lbB008624,PC),FP0
+	ADD.W	D0,(-$0040,A6)
+	ADD.W	D0,(-$0030,A6)
+lbC008C5E:	FMOVE.X	FP0,FP1
+	FMUL.X	FP1
+	FMOVE.D	(lbD008644,PC),FP2
+	FMOVE.D	(lbD00864C,PC),FP3
+	FMUL.X	FP1,FP2
+	FMUL.X	FP1,FP3
+	FADD.D	(lbD008654,PC),FP2
+	FADD.D	(lbD00865C,PC),FP3
+	FMUL.X	FP1,FP2
+	FMUL.X	FP1,FP3
+	FADD.D	(lbD008664,PC),FP2
+	FMUL.X	FP0,FP3
+	FMUL.X	FP1,FP2
+	FADD.X	FP3,FP0
+	FADD.X	FP2,FP0
+	FMUL.X	(-$0040,A6),FP0
+	FADD.X	(-$0030,A6),FP0
+	FADD.X	(-$0040,A6),FP0
+	FMOVE.L	D1,FPCR
+	CLR.W	(-$0062,A6)
+	MOVE.L	#$80000000,(-$0060,A6)
+	CLR.L	(-$005C,A6)
+	FMUL.X	(-$0064,A6),FP0
+	BRA.W	lbC00250C
+
+lbL008CD4:	dc.l	lbC0071A8
+	dc.l	lbC0071A8
+	dc.l	lbC0071A8
+	dc.l	lbC0071A8
+	dc.l	lbC0071A8
+	dc.l	lbC0071A8
+	dc.l	lbC0071A8
+	dc.l	lbC0071A8
+	dc.l	lbC0063BC
+	dc.l	lbC001536
+	dc.l	lbC001542
+	dc.l	lbL00259A
+	dc.l	lbC0063C8
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC007C24
+	dc.l	lbC001536
+	dc.l	lbC001542
+	dc.l	lbL00259A
+	dc.l	lbC007C20
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC006406
+	dc.l	lbC001536
+	dc.l	lbC001542
+	dc.l	lbL00259A
+	dc.l	lbC001520
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00157E
+	dc.l	lbC001536
+	dc.l	lbC001572
+	dc.l	lbL00259A
+	dc.l	lbC007060
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00608E
+	dc.l	lbC001536
+	dc.l	lbC00159C
+	dc.l	lbL00259A
+	dc.l	lbC00608A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC008414
+	dc.l	lbC001536
+	dc.l	lbC00154E
+	dc.l	lbL00259A
+	dc.l	lbC008410
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC0048C0
+	dc.l	lbC001536
+	dc.l	lbC00155A
+	dc.l	lbL00259A
+	dc.l	lbC0048BC
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC003F78
+	dc.l	lbC001536
+	dc.l	lbC0023CE
+	dc.l	lbL00259A
+	dc.l	lbC003F74
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC004AEC
+	dc.l	lbC001536
+	dc.l	lbC0023CE
+	dc.l	lbL00259A
+	dc.l	lbC004AE8
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC007674
+	dc.l	lbC001536
+	dc.l	lbC0023CE
+	dc.l	lbL00259A
+	dc.l	lbC00765C
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC008194
+	dc.l	lbC001536
+	dc.l	lbC0023CE
+	dc.l	lbL00259A
+	dc.l	lbC008190
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC005ED8
+	dc.l	lbC0018F6
+	dc.l	lbC001566
+	dc.l	lbL00259A
+	dc.l	lbL005EB4
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC008AB0
+	dc.l	lbC0018F6
+	dc.l	lbC001566
+	dc.l	lbL00259A
+	dc.l	lbC008A94
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC008BAE
+	dc.l	lbC0018F6
+	dc.l	lbC001566
+	dc.l	lbL00259A
+	dc.l	lbC008B92
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC0015A8
+	dc.l	lbC002360
+	dc.l	lbC001572
+	dc.l	lbL00259A
+	dc.l	lbC0015D4
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC0015E0
+	dc.l	lbC002360
+	dc.l	lbC001572
+	dc.l	lbL00259A
+	dc.l	lbC00160C
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC001618
+	dc.l	lbC002360
+	dc.l	lbC001572
+	dc.l	lbL00259A
+	dc.l	lbC001644
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC005974
+	dc.l	lbC0018F6
+	dc.l	lbC0018D6
+	dc.l	lbL00259A
+	dc.l	lbC00595C
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC003ED2
+	dc.l	lbC0018BA
+	dc.l	lbC0023CE
+	dc.l	lbL00259A
+	dc.l	lbC003EC4
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00767E
+	dc.l	lbC0018F6
+	dc.l	lbC0023CE
+	dc.l	lbL00259A
+	dc.l	lbC007660
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC006330
+	dc.l	lbC001536
+	dc.l	lbC0023CE
+	dc.l	lbL00259A
+	dc.l	lbC006340
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC006354
+	dc.l	lbC001536
+	dc.l	lbC0023CE
+	dc.l	lbL00259A
+	dc.l	lbC006374
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC001690
+	dc.l	lbC001690
+	dc.l	lbC001690
+	dc.l	lbC001690
+	dc.l	lbC001690
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC001752
+	dc.l	lbC001752
+	dc.l	lbC001752
+	dc.l	lbC001752
+	dc.l	lbC001752
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC001814
+	dc.l	lbC001814
+	dc.l	lbC001814
+	dc.l	lbC001814
+	dc.l	lbC001814
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC007976
+	dc.l	lbC00185E
+	dc.l	lbC001880
+	dc.l	lbC001894
+	dc.l	lbC007966
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC007976
+	dc.l	lbC00185E
+	dc.l	lbC001880
+	dc.l	lbC001894
+	dc.l	lbC007966
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC007976
+	dc.l	lbC00185E
+	dc.l	lbC001880
+	dc.l	lbC001894
+	dc.l	lbC007966
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC007976
+	dc.l	lbC00185E
+	dc.l	lbC001880
+	dc.l	lbC001894
+	dc.l	lbC007966
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC007976
+	dc.l	lbC00185E
+	dc.l	lbC001880
+	dc.l	lbC001894
+	dc.l	lbC007966
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC007976
+	dc.l	lbC00185E
+	dc.l	lbC001880
+	dc.l	lbC001894
+	dc.l	lbC007966
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC007976
+	dc.l	lbC00185E
+	dc.l	lbC001880
+	dc.l	lbC001894
+	dc.l	lbC007966
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC007976
+	dc.l	lbC00185E
+	dc.l	lbC001880
+	dc.l	lbC001894
+	dc.l	lbC007966
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+	dc.l	lbC00151A
+lbL0093D4:	dc.l	$7FFF0000,0,0,0
+lbL0093E4:	dc.l	$7FFE0000,$FFFFFFFF,$FFFFFFFF,0
+lbW0093F4:	dc.w	$407E,0,$FFFF,$FF00,0,0,0,0
+lbL009404:	dc.l	$43FE0000,$FFFFFFFF,$FFFFF800,0
+lbL009414:	dc.l	lbC00950A
+	dc.l	lbC009518
+	dc.l	lbC009520
+	dc.l	lbC00953E
+	dc.l	lbC0095AE
+	dc.l	lbC0095BA
+	dc.l	lbC0095C0
+	dc.l	lbC0095DA
+	dc.l	lbC009560
+	dc.l	lbC00956E
+	dc.l	lbC009576
+	dc.l	lbC009590
+	dc.l	lbC009614
+	dc.l	lbC009614
+	dc.l	lbC009614
+	dc.l	lbC009614
+
+lbC009454:	LEA	(-$00CC,A6),A0
+	BCLR	#7,(-$00CC,A6)
+	SNE	(-$00CA,A6)
+	BFEXTU	(-$007D,A6){0:2},D0
+	BRA.W	lbC0094F6
+
+lbC00946C:	BTST	#1,(-$00DC,A6)
+	BEQ.B	lbC0094A8
+	MOVE.W	(-$00F0,A6),D0
+	ANDI.W	#$0060,D0
+	CMPI.L	#$00000040,D0
+	BEQ.B	lbC0094E2
+	CMPI.L	#$00000060,D0
+	BEQ.B	lbC0094E6
+	MOVE.W	(-$00F0,A6),D0
+	ANDI.L	#$0000007F,D0
+	CMPI.L	#$00000033,D0
+	BEQ.B	lbC0094DE
+	CMPI.L	#$00000030,D0
+	BEQ.B	lbC0094DE
+	BRA.B	lbC0094EA
+
+lbC0094A8:	MOVE.W	(-$00E4,A6),D0
+	ANDI.L	#$00000044,D0
+	CMPI.L	#$00000040,D0
+	BEQ.B	lbC0094E2
+	CMPI.L	#$00000044,D0
+	BEQ.B	lbC0094E6
+	MOVE.W	(-$00E4,A6),D0
+	ANDI.L	#$0000007F,D0
+	CMPI.L	#$00000027,D0
+	BEQ.B	lbC0094DE
+	CMPI.L	#$00000024,D0
+	BEQ.B	lbC0094DE
+	BRA.B	lbC0094EA
+
+lbC0094DE:	MOVEQ	#0,D0
+	BRA.B	lbC0094F6
+
+lbC0094E2:	MOVEQ	#1,D0
+	BRA.B	lbC0094F6
+
+lbC0094E6:	MOVEQ	#2,D0
+	BRA.B	lbC0094F6
+
+lbC0094EA:	BFEXTU	(-$007D,A6){0:2},D0
+	BRA.B	lbC0094F6
+
+lbC0094F2:	BSR.W	lbC0096C4
+lbC0094F6:	LSL.L	#2,D0
+	BFEXTU	(-$007D,A6){2:2},D1
+	OR.L	D1,D0
+	LEA	(lbL009414,PC),A1
+	MOVEA.L	(A1,D0.W*4),A1
+	JMP	(A1)
+
+lbC00950A:	LEA	(lbL0093D4,PC),A1
+	BSET	#1,(-$007C,A6)
+	BRA.W	lbC0095F8
+
+lbC009518:	LEA	(lbL0093E4,PC),A1
+	BRA.W	lbC0095F8
+
+lbC009520:	TST.B	(2,A0)
+	BEQ.B	lbC009536
+	LEA	(lbL0093D4,PC),A1
+	ORI.L	#$0A000000,(-$007C,A6)
+	BRA.W	lbC009604
+
+lbC009536:	LEA	(lbL0093E4,PC),A1
+	BRA.W	lbC009604
+
+lbC00953E:	TST.B	(2,A0)
+	BEQ.B	lbC009552
+	LEA	(lbL0093E4,PC),A1
+	BSET	#3,(-$007C,A6)
+	BRA.W	lbC009604
+
+lbC009552:	LEA	(lbL0093D4,PC),A1
+	BSET	#1,(-$007C,A6)
+	BRA.W	lbC009604
+
+lbC009560:	LEA	(lbL0093D4,PC),A1
+	BSET	#1,(-$007C,A6)
+	BRA.W	lbC0095F8
+
+lbC00956E:	LEA	(lbL009404,PC),A1
+	BRA.W	lbC0095F8
+
+lbC009576:	TST.B	(2,A0)
+	BEQ.B	lbC00958A
+	LEA	(lbL0093D4,PC),A1
+	ORI.L	#$0A000000,(-$007C,A6)
+	BRA.B	lbC009604
+
+lbC00958A:	LEA	(lbL009404,PC),A1
+	BRA.B	lbC009604
+
+lbC009590:	TST.B	(2,A0)
+	BEQ.B	lbC0095A2
+	LEA	(lbL009404,PC),A1
+	BSET	#3,(-$007C,A6)
+	BRA.B	lbC009604
+
+lbC0095A2:	LEA	(lbL0093D4,PC),A1
+	BSET	#1,(-$007C,A6)
+	BRA.B	lbC009604
+
+lbC0095AE:	LEA	(lbL0093D4,PC),A1
+	BSET	#1,(-$007C,A6)
+	BRA.B	lbC0095F8
+
+lbC0095BA:	LEA	(lbW0093F4,PC),A1
+	BRA.B	lbC0095F8
+
+lbC0095C0:	TST.B	(2,A0)
+	BEQ.B	lbC0095D4
+	LEA	(lbL0093D4,PC),A1
+	ORI.L	#$0A000000,(-$007C,A6)
+	BRA.B	lbC009604
+
+lbC0095D4:	LEA	(lbW0093F4,PC),A1
+	BRA.B	lbC009604
+
+lbC0095DA:	TST.B	(2,A0)
+	BEQ.B	lbC0095EC
+	LEA	(lbW0093F4,PC),A1
+	BSET	#3,(-$007C,A6)
+	BRA.B	lbC009604
+
+lbC0095EC:	LEA	(lbL0093D4,PC),A1
+	BSET	#1,(-$007C,A6)
+	BRA.B	lbC009604
+
+lbC0095F8:	TST.B	(2,A0)
+	BEQ.B	lbC009604
+	BSET	#3,(-$007C,A6)
+lbC009604:	MOVE.W	(A1),(A0)
+	MOVE.L	(4,A1),(4,A0)
+	MOVE.L	(8,A1),(8,A0)
+	RTS
+
+lbC009614:	RTS
+
+lbC009616:	BSR.W	lbC0096AE
+	CMP.W	#3,D0
+	BNE.B	lbC009626
+	BSR.W	lbC0096C4
+	RTS
+
+lbC009626:	BTST	#1,(-$00DC,A6)
+	BEQ.B	lbC009662
+	MOVE.L	(-$00F0,A6),D0
+	BFEXTU	D0{9:2},D0
+	CMPI.L	#2,D0
+	BEQ.B	lbC009698
+	CMPI.L	#3,D0
+	BEQ.B	lbC00969C
+	MOVE.W	(-$00F0,A6),D0
+	ANDI.L	#$0000007F,D0
+	CMPI.L	#$00000033,D0
+	BEQ.B	lbC0096A0
+	CMPI.L	#$00000030,D0
+	BEQ.B	lbC0096A0
+	BRA.B	lbC0096A4
+
+lbC009662:	MOVE.L	(-$00E4,A6),D0
+	ANDI.L	#$00440000,D0
+	CMPI.L	#$00400000,D0
+	BEQ.B	lbC009698
+	CMPI.L	#$00440000,D0
+	BEQ.B	lbC00969C
+	MOVE.L	(-$00E4,A6),D0
+	ANDI.L	#$007F0000,D0
+	CMPI.L	#$00270000,D0
+	BEQ.B	lbC0096A0
+	CMPI.L	#$00240000,D0
+	BEQ.B	lbC0096A0
+	BRA.B	lbC0096A4
+
+lbC009698:	MOVEQ	#1,D0
+	RTS
+
+lbC00969C:	MOVEQ	#2,D0
+	RTS
+
+lbC0096A0:	MOVEQ	#0,D0
+	RTS
+
+lbC0096A4:	MOVE.L	(-$0080,A6),D0
+	BFEXTU	D0{$18:2},D0
+	RTS
+
+lbC0096AE:	BTST	#1,(-$00DC,A6)
+	BEQ.B	lbC0096BA
+	MOVEQ	#0,D0
+	RTS
+
+lbC0096BA:	MOVE.L	(-$00E4,A6),D0
+	BFEXTU	D0{0:3},D0
+	RTS
+
+lbC0096C4:	BTST	#1,(-$00DC,A6)
+	BEQ.B	lbC0096D0
+	MOVEQ	#0,D0
+	RTS
+
+lbC0096D0:	MOVE.L	(-$00E4,A6),D0
+	BFEXTU	D0{3:3},D0
+	CMP.B	#1,D0
+	BNE.B	lbC0096E2
+	MOVEQ	#1,D0
+	RTS
+
+lbC0096E2:	CMP.B	#5,D0
+	BNE.B	lbC0096EC
+	MOVEQ	#2,D0
+	RTS
+
+lbC0096EC:	MOVEQ	#0,D0
+	RTS
+
+lbL0096F0:	dcb.l	4,0
+lbL009700:	dc.l	$3F810000,0,0,0
+lbL009710:	dc.l	$3C010000,0,0,0
+lbL009720:	dcb.l	2,0
+	dc.l	1,0
+lbW009730:	dc.w	$3F81,0,0,$0100,0,0,0,0
+lbW009740:	dc.w	$3C01,0,0,0,0,$0800,0,0
+lbL009750:	dc.l	lbC0097A4
+	dc.l	lbC0097B2
+	dc.l	lbC0097C0
+	dc.l	lbC0097E2
+	dc.l	lbC009856
+	dc.l	lbC009862
+	dc.l	lbC00986E
+	dc.l	lbC00988C
+	dc.l	lbC009800
+	dc.l	lbC00980E
+	dc.l	lbC00981C
+	dc.l	lbC00983C
+	dc.l	lbC009800
+	dc.l	lbC00980E
+	dc.l	lbC00981C
+	dc.l	lbC00983C
+
+lbC009790:	LSL.L	#2,D0
+	BFEXTU	(-$007D,A6){2:2},D1
+	OR.L	D1,D0
+	LEA	(lbL009750,PC),A1
+	MOVEA.L	(A1,D0.W*4),A1
+	JMP	(A1)
+
+lbC0097A4:	LEA	(lbL0096F0,PC),A1
+	BSET	#2,(-$007C,A6)
+	BRA.W	lbC0098A6
+
+lbC0097B2:	LEA	(lbL0096F0,PC),A1
+	BSET	#2,(-$007C,A6)
+	BRA.W	lbC0098A6
+
+lbC0097C0:	TST.B	(2,A0)
+	BEQ.B	lbC0097D4
+	LEA	(lbL009720,PC),A1
+	BSET	#3,(-$007C,A6)
+	BRA.W	lbC0098B2
+
+lbC0097D4:	LEA	(lbL0096F0,PC),A1
+	BSET	#2,(-$007C,A6)
+	BRA.W	lbC0098B2
+
+lbC0097E2:	TST.B	(2,A0)
+	BEQ.B	lbC0097F8
+	LEA	(lbL0096F0,PC),A1
+	ORI.L	#$0C000000,(-$007C,A6)
+	BRA.W	lbC0098B2
+
+lbC0097F8:	LEA	(lbL009720,PC),A1
+	BRA.W	lbC0098B2
+
+lbC009800:	LEA	(lbL009710,PC),A1
+	BSET	#2,(-$007C,A6)
+	BRA.W	lbC0098A6
+
+lbC00980E:	LEA	(lbL009710,PC),A1
+	BSET	#2,(-$007C,A6)
+	BRA.W	lbC0098A6
+
+lbC00981C:	TST.B	(2,A0)
+	BEQ.B	lbC009830
+	LEA	(lbW009740,PC),A1
+	BSET	#3,(-$007C,A6)
+	BRA.W	lbC0098B2
+
+lbC009830:	LEA	(lbL009710,PC),A1
+	BSET	#2,(-$007C,A6)
+	BRA.B	lbC0098B2
+
+lbC00983C:	TST.B	(2,A0)
+	BEQ.B	lbC009850
+	LEA	(lbL009710,PC),A1
+	ORI.L	#$0C000000,(-$007C,A6)
+	BRA.B	lbC0098B2
+
+lbC009850:	LEA	(lbW009740,PC),A1
+	BRA.B	lbC0098B2
+
+lbC009856:	LEA	(lbL009700,PC),A1
+	BSET	#2,(-$007C,A6)
+	BRA.B	lbC0098A6
+
+lbC009862:	LEA	(lbL009700,PC),A1
+	BSET	#2,(-$007C,A6)
+	BRA.B	lbC0098A6
+
+lbC00986E:	TST.B	(2,A0)
+	BEQ.B	lbC009880
+	LEA	(lbW009730,PC),A1
+	BSET	#3,(-$007C,A6)
+	BRA.B	lbC0098B2
+
+lbC009880:	LEA	(lbL009700,PC),A1
+	BSET	#2,(-$007C,A6)
+	BRA.B	lbC0098B2
+
+lbC00988C:	TST.B	(2,A0)
+	BEQ.B	lbC0098A0
+	LEA	(lbL009700,PC),A1
+	ORI.L	#$0C000000,(-$007C,A6)
+	BRA.B	lbC0098B2
+
+lbC0098A0:	LEA	(lbW009730,PC),A1
+	BRA.B	lbC0098B2
+
+lbC0098A6:	TST.B	(2,A0)
+	BEQ.B	lbC0098B2
+	BSET	#3,(-$007C,A6)
+lbC0098B2:	MOVE.W	(A1),(A0)
+	MOVE.L	(4,A1),(4,A0)
+	MOVE.L	(8,A1),(8,A0)
+	RTS
+
+lbL0098C2:	dc.l	lbC00992C
+	dc.l	lbC009934
+	dc.l	lbC00993C
+	dc.l	lbC009942
+	dc.l	lbC009948
+	dc.l	lbC00994E
+	dc.l	lbC009954
+	dc.l	lbC00995A
+	dc.l	lbC009960
+	dc.l	lbC009968
+	dc.l	lbC009970
+	dc.l	lbC009976
+	dc.l	lbC00997C
+	dc.l	lbC009982
+	dc.l	lbC009988
+	dc.l	lbC00998E
+	dc.l	lbC009994
+	dc.l	lbC00999C
+	dc.l	lbC0099A4
+	dc.l	lbC0099AA
+	dc.l	lbC0099B0
+	dc.l	lbC0099B6
+	dc.l	lbC0099BC
+	dc.l	lbC0099C2
+
+lbC009922:	LEA	(lbL0098C2,PC),A0
+	MOVEA.L	(A0,D1.W*4),A0
+	JMP	(A0)
+
+lbC00992C:	MOVE.B	(-$0054,A6),(-$00BD,A6)
+	RTS
+
+lbC009934:	MOVE.B	(-$0054,A6),(-$00B9,A6)
+	RTS
+
+lbC00993C:	MOVE.B	(-$0054,A6),D2
+	RTS
+
+lbC009942:	MOVE.B	(-$0054,A6),D3
+	RTS
+
+lbC009948:	MOVE.B	(-$0054,A6),D4
+	RTS
+
+lbC00994E:	MOVE.B	(-$0054,A6),D5
+	RTS
+
+lbC009954:	MOVE.B	(-$0054,A6),D6
+	RTS
+
+lbC00995A:	MOVE.B	(-$0054,A6),D7
+	RTS
+
+lbC009960:	MOVE.W	(-$0054,A6),(-$00BE,A6)
+	RTS
+
+lbC009968:	MOVE.W	(-$0054,A6),(-$00BA,A6)
+	RTS
+
+lbC009970:	MOVE.W	(-$0054,A6),D2
+	RTS
+
+lbC009976:	MOVE.W	(-$0054,A6),D3
+	RTS
+
+lbC00997C:	MOVE.W	(-$0054,A6),D4
+	RTS
+
+lbC009982:	MOVE.W	(-$0054,A6),D5
+	RTS
+
+lbC009988:	MOVE.W	(-$0054,A6),D6
+	RTS
+
+lbC00998E:	MOVE.W	(-$0054,A6),D7
+	RTS
+
+lbC009994:	MOVE.L	(-$0054,A6),(-$00C0,A6)
+	RTS
+
+lbC00999C:	MOVE.L	(-$0054,A6),(-$00BC,A6)
+	RTS
+
+lbC0099A4:	MOVE.L	(-$0054,A6),D2
+	RTS
+
+lbC0099AA:	MOVE.L	(-$0054,A6),D3
+	RTS
+
+lbC0099B0:	MOVE.L	(-$0054,A6),D4
+	RTS
+
+lbC0099B6:	MOVE.L	(-$0054,A6),D5
+	RTS
+
+lbC0099BC:	MOVE.L	(-$0054,A6),D6
+	RTS
+
+lbC0099C2:	MOVE.L	(-$0054,A6),D7
+	RTS
+
+; ---------------------------------------------------------------
+_Free__MMUFrame_a0:	LINK.W	A5,#-$0018
+	MOVEM.L	D7/A2/A3/A6,-(SP)
+	MOVE.L	A0,(-$0010,A5)	;; store mmu table struct
+
+	MOVEA.L	(-$0010,A5),A2	;is there a ptr
+	MOVE.L	A2,D0
+	BEQ.W	.no_ptr
+
+	MOVEA.W	#4,A3	;store execbase
+	MOVEA.L	A3,A0
+	MOVE.L	A0,($0014,SP)
+
+	TST.L	(12,A2)
+	BEQ.W	.partial free
+	TST.L	(16,A2)
+	BEQ.W	.partial free
+	TST.L	(20,A2)
+	BEQ.W	.partial free
+	TST.L	(28,A2)
+	BEQ.B	.partial free
+
+	MOVEQ	#0,D7
+	BRA.B	.loop_cond_1
+
+.loop_1:	MOVEA.L	A2,A0	;get array ptr
+	MOVEA.L	(12,A0),A1
+	ADDA.L	D7,A1
+	MOVEA.L	A1,A2
+
+	MOVE.L	(A2),D0	;out of limits for this scan
+	MOVE.L	D0,D1
+	ANDI.W	#$FFF3,D1
+	CMP.L	($0020,A0),D1
+	BEQ.B	.loop_inc_1
+
+	ANDI.W	#$FE00,D0	;get next layer & boundary ptr
+	MOVEA.L	D0,A3
+	LEA	($0200,A3),A2
+	MOVE.L	D0,($0010,SP)
+	BRA.B	_i_loop_cond_1
+
+_i_loop_1:	MOVE.L	(A3),D0	;get next mmu layer = 4096 / 128 = 32 MB
+	MOVE.L	D0,D1
+	ANDI.W	#$FFF3,D1
+	MOVEA.L	(-$0010,A5),A0
+	CMP.L	($0024,A0),D1
+	BEQ.B	.out_of_range
+	ANDI.W	#$FE00,D0
+
+	MOVEA.L	D0,A1
+	MOVEQ	#$40,D0
+	LSL.L	#2,D0
+	MOVEA.L	($0014,SP),A6
+	MOVEA.L	(A6),A6
+	JSR	(_LVOFreeMem,A6)
+.out_of_range:	ADDQ.L	#4,A3
+
+_i_loop_cond_1:	CMPA.L	A2,A3	;check for table end
+	BCS.B	_i_loop_1
+
+	MOVEA.L	($0014,SP),A3
+	MOVEA.L	($0010,SP),A1
+	MOVEQ	#$40,D0
+	LSL.L	#3,D0
+	MOVEA.L	(A3),A6
+	JSR	(_LVOFreeMem,A6)
+.loop_inc_1:	ADDQ.L	#4,D7	;inc + 1 lw
+.loop_cond_1:	MOVEA.L	(-$0010,A5),A2	;128 enrties
+	CMPI.L	#$00000200,D7
+	BLT.B	.loop_1
+
+.partial free:	TST.L	(12,A2)
+	BEQ.B	.noarg_1
+	MOVEA.L	(12,A2),A1
+	MOVEQ	#$40,D0
+	LSL.L	#3,D0
+	MOVEA.L	(A3),A6
+	JSR	(_LVOFreeMem,A6)
+
+.noarg_1:	TST.L	($0010,A2)
+	BEQ.B	.noarg_2
+	MOVEA.L	($0010,A2),A1
+	MOVEQ	#$40,D0
+	LSL.L	#3,D0
+	MOVEA.L	(A3),A6
+	JSR	(_LVOFreeMem,A6)
+
+.noarg_2:	TST.L	($0014,A2)
+	BEQ.B	.noarg_3
+	MOVEA.L	($0014,A2),A1
+	MOVEQ	#$40,D0
+	LSL.L	#2,D0
+	MOVEA.L	(A3),A6
+	JSR	(_LVOFreeMem,A6)
+
+.noarg_3:	TST.L	($001C,A2)
+	BEQ.B	.noarg_4
+	MOVEA.L	($001C,A2),A1
+	MOVEQ	#$40,D0
+	LSL.L	#6,D0
+	MOVEA.L	(A3),A6
+	JSR	(_LVOFreeMem,A6)
+
+.noarg_4:	ADDA.W	#$002C,A2	;get ptr to mem chunk list
+	BRA.B	.loop_entry_2
+
+.loop_2:	MOVEA.L	A3,A1
+	MOVEA.L	($0014,SP),A6
+	MOVEA.L	(A6),A6
+	JSR	(_LVOFreeVec,A6)
+	MOVEA.L	($0014,SP),A3
+
+.loop_entry_2:	MOVEA.L	A2,A0
+	MOVEA.L	(A3),A6
+	JSR	(_LVORemHead,A6)
+	MOVEA.L	D0,A3
+	MOVE.L	A3,D0
+	BNE.B	.loop_2
+
+	MOVEA.L	(-$0010,A5),A1
+	MOVEA.L	($0014,SP),A6
+	MOVEA.L	(A6),A6
+	JSR	(_LVOFreeVec,A6)
+.no_ptr:	MOVEM.L	(SP)+,D7/A2/A3/A6
+	UNLK	A5
+; ---------------------------------------------------------------------------
+	RTS
+
+cardresource.MSG:	dc.b	'card.resource',0
+cdstrap.MSG:	dc.b	'cdstrap',0
+expansionlibr.MSG:	dc.b	'expansion.library',0
+
+; --------------------------------------------------------------------
+_Alloc_Memory_Aligned:
+	LINK.W	A5,#-4	;d0=size    d1=boundary
+	MOVEM.L	D6/D7/A3/A6,-(SP)
+	MOVE.L	D0,D7
+	MOVE.L	D1,D6
+
+	MOVE.L	D7,D0
+	ADD.L	D6,D0
+	MOVEA.W	#4,A0
+	MOVE.L	D0,($0010,SP)
+	MOVEQ	#MEMF_PUBLIC,D1
+	MOVEA.L	(A0),A6
+	JSR	(_LVOAllocMem,A6)
+	MOVEA.L	D0,A3
+
+	MOVE.L	A3,D0
+	BEQ.B	.nomem
+
+	MOVEA.W	#4,A0	;got enough memory to store array
+	MOVEA.L	(A0),A6
+	JSR	(_LVOForbid,A6)
+	MOVEA.L	A3,A1
+	MOVE.L	($0010,SP),D0
+	JSR	(_LVOFreeMem,A6)
+	MOVE.L	D6,D0	;; negate alignment to get mask
+	NOT.L	D0
+	MOVE.L	A3,D1	;get allocated base + alignment
+	ADD.L	D6,D1
+	AND.L	D0,D1	;now strip lower bits with mask
+	MOVEA.L	D1,A1
+	MOVE.L	D7,D0	;get array size
+	JSR	(_LVOAllocAbs,A6)
+	MOVEA.L	D0,A3
+	JSR	(_LVOPermit,A6)
+.nomem:	MOVE.L	A3,D0
+	MOVEM.L	(SP)+,D6/D7/A3/A6
+	UNLK	A5
+	RTS
+
+; ------------------------------------------------------------------
+_MMUMap_Physical:	LINK.W	A5,#-$0018
+	MOVEM.L	D2/D4-D7/A2/A3,-(SP)
+	MOVE.L	D0,D7	;wo
+	MOVE.L	D1,D6	;length
+	MOVE.L	(8,A5),D5	;mode
+	MOVE.L	A0,(-$0012,A5)	;mmu frame
+
+	CLR.W	(-14,A5)
+
+	MOVE.L	D5,D4	;page mode
+	ORI.W	#1,D4
+
+	MOVEA.L	(-$0012,A5),A2
+	MOVE.L	A2,D0
+	BEQ.W	.no_mmuframe
+
+	MOVE.L	D7,D5	;wo >> 12
+	LSR.L	#8,D5
+	LSR.L	#4,D5
+
+	MOVE.L	D7,D0	;wo+len >> 12
+	ADD.L	D6,D0
+	SUBQ.L	#1,D0
+	LSR.L	#8,D0
+	LSR.L	#4,D0
+
+	MOVE.L	D0,D6
+	CMP.L	D6,D5
+	BLS.W	.loop_1_cond
+
+	MOVE.W	#1,(-14,A5)
+	BRA.W	.loop_1_cond
+
+.loop_1:	CLR.W	(-14,A5)
+	MOVE.L	D5,D0	;wo >> 13 << 2
+	LSR.L	#8,D0
+	LSR.L	#5,D0
+	ASL.L	#2,D0
+
+	MOVE.L	D0,D7	;is this a dummy entry
+	MOVEA.L	(12,A2),A0
+	ADDA.L	D7,A0
+	MOVE.L	(A0),D0
+	CMP.L	($0020,A2),D0
+	BNE.B	.no_dummy_1
+
+	MOVEQ	#$40,D0	;get 512 byte aligned mem
+	LSL.L	#3,D0
+	MOVE.L	#$000001FF,D1
+	BSR.W	_Alloc_Memory_Aligned
+	MOVEA.L	D0,A3
+
+	MOVE.L	A3,D0
+	BEQ.B	.no_dummy_1
+
+	MOVEA.L	(12,A2),A0	;get array entry
+	ADDA.L	D7,A0
+	MOVEA.L	A3,A1
+
+	MOVE.L	A1,D0
+	MOVE.L	D0,D1
+	ORI.W	#3,D1
+	MOVE.L	D1,(A0)
+
+	MOVEA.L	D0,A3	;fill array with next level dummy
+	LEA	($0200,A3),A2
+	BRA.B	.set_loop_cond
+
+.set_loop:	MOVEA.L	(-$0012,A5),A0
+	MOVE.L	($0024,A0),(A3)+
+.set_loop_cond:	CMPA.L	A2,A3
+	BCS.B	.set_loop
+
+************************
+
+.no_dummy_1:	MOVEA.L	(-$0012,A5),A2
+	MOVEA.L	(12,A2),A0
+	ADDA.L	D7,A0
+	MOVEA.L	A0,A3
+	MOVE.L	(A3),D0
+	MOVE.L	($0020,A2),D1
+	CMP.L	D0,D1
+	BEQ.W	.is_dummy2
+
+	MOVE.L	D5,D1	;mode >> 6
+	LSR.L	#6,D1
+
+	MOVEQ	#$7F,D2	;mode & 7f << 2
+	AND.L	D2,D1
+	ASL.L	#2,D1
+
+	MOVE.L	D0,D2	;ist level 2 desc set ?
+	ANDI.W	#$FE00,D2
+	MOVEA.L	D2,A0
+	ADDA.L	D1,A0
+	MOVEA.L	A0,A3
+	MOVEA.L	A3,A0
+	MOVE.L	A0,($001C,SP)
+	MOVE.L	(A3),D0
+	CMP.L	($0024,A2),D0
+	BNE.B	.nopagedesc
+
+	MOVEQ	#$40,D0	;get 512 byte aligned mem
+	LSL.L	#2,D0
+	MOVE.L	#$000001FF,D1
+	BSR.W	_Alloc_Memory_Aligned
+	MOVEA.L	D0,A2
+
+	MOVE.L	A2,D0
+	BEQ.B	.nopagedesc
+
+	MOVE.L	A2,D0
+	ORI.W	#3,D0
+	MOVE.L	D0,(A3)
+	MOVEA.L	A2,A3
+	ADDA.W	#$0100,A2
+	BRA.B	.fill_loop2_cond
+
+.fill_loop2:	MOVEA.L	(-$0012,A5),A0
+	MOVE.L	($0028,A0),(A3)+
+.fill_loop2_cond:	CMPA.L	A2,A3
+	BCS.B	.fill_loop2
+	MOVEA.L	($001C,SP),A3
+
+.nopagedesc:	MOVEA.L	(-$0012,A5),A2
+	MOVE.L	(A3),D0
+	MOVE.L	($0024,A2),D1
+	CMP.L	D0,D1
+	BEQ.B	.is_dummy2
+
+	MOVE.L	D5,D1
+	MOVEQ	#$3F,D2
+	AND.L	D2,D1
+	ASL.L	#2,D1
+
+	MOVE.L	D0,D2	;is this a dummy
+	ANDI.W	#$FE00,D2
+	MOVEA.L	D2,A0
+	ADDA.L	D1,A0
+	MOVEA.L	A0,A3
+	MOVE.L	(A3),D0
+	CMP.L	($0028,A2),D0
+	BNE.B	.setpage_1
+
+	MOVE.L	D5,D1	;set level dummy
+	ASL.L	#8,D1
+	ASL.L	#4,D1
+	MOVE.L	D1,(A3)
+
+.setpage_1:	OR.L	D4,(A3)	;setpagemode
+	MOVEQ	#$60,D0
+	AND.L	(A3),D0
+	MOVEQ	#$60,D1
+	CMP.L	D1,D0
+	BNE.B	.set_page_mode2
+
+	MOVEQ	#$20,D0
+	SUB.L	D0,(A3)
+
+.set_page_mode2:	MOVE.W	#1,(-14,A5)
+.is_dummy2:	ADDQ.L	#1,D5
+.loop_1_cond:	CMP.L	D6,D5
+	BLS.W	.loop_1
+
+.no_mmuframe:	TST.W	(-14,A5)
+	BNE.B	.ret_mmuframe
+
+	MOVEA.L	A2,A0
+	BSR.W	_Free__MMUFrame_a0
+	SUBA.L	A2,A2
+
+.ret_mmuframe:	MOVE.L	A2,D0
+	MOVEM.L	(SP)+,D2/D4-D7/A2/A3
+	UNLK	A5
+	RTS
+
+; ----------------------------------------------------------------------
+_CreatePrivateMem:	LINK.W	A5,#-12
+	MOVEM.L	D2/D3/D6/D7/A2/A3/A6,-(SP)
+	MOVEA.L	A0,A3
+	MOVE.L	D0,D7
+	MOVE.L	D1,D6
+
+	MOVE.L	A3,D0
+	BEQ.B	.noframe
+
+	MOVE.L	D7,D0	;lowerbound & $f000 
+	ANDI.W	#$F000,D0
+	LSR.L	#8,D0	;bound >> 12 
+	LSR.L	#4,D0
+
+	MOVE.L	D6,D1	;upperbound & 0xffe
+	ADDI.L	#$00000FFE,D1	;round to next page
+	ANDI.W	#$F000,D1	;>> 12
+	LSR.L	#8,D1
+	LSR.L	#4,D1
+
+	MOVE.L	D1,D2	;get length
+	SUB.L	D0,D2
+
+	ADDQ.L	#1,D2	;+1
+	ADD.L	D2,D2	;*2
+
+	MOVEQ	#$10,D3	;+16
+	ADD.L	D3,D2
+
+	MOVEA.W	#4,A0
+
+	MOVE.L	D0,($0024,SP)
+	MOVE.L	D1,($0020,SP)
+
+	MOVE.L	D2,D0	;allocate memory for private array
+	MOVE.L	#(MEMF_PUBLIC|MEMF_CLEAR),D1
+	MOVEA.L	(A0),A6
+	JSR	(_LVOAllocVec,A6)
+	TST.L	D0
+	BEQ.B	.nomem
+
+	MOVEA.L	D0,A0
+	MOVE.L	($0024,SP),(8,A0)
+	MOVE.L	($0020,SP),(12,A0)
+
+	LEA	($002C,A3),A1	;queue memory to list
+	MOVEA.W	#4,A2
+	MOVEA.L	A1,A0
+	MOVEA.L	D0,A1
+	MOVEA.L	(A2),A6
+	JSR	(_LVOAddTail,A6)
+	BRA.B	.noframe
+
+.nomem:	MOVEA.L	A3,A0
+	BSR.W	_Free__MMUFrame_a0
+	SUBA.L	A3,A3
+.noframe:	MOVE.L	A3,D0
+	MOVEM.L	(SP)+,D2/D3/D6/D7/A2/A3/A6
+	UNLK	A5
+	RTS
+
+; -----------------------------------------------------------------------------------
+_Map_Kickstart:	MOVEM.L	D6/D7/A3,-(SP)
+	MOVEA.L	A0,A3
+	MOVE.L	D0,D7
+	CLR.L	-(SP)
+
+	MOVE.L	#$00F80000,D0
+	MOVEQ	#8,D1
+	SWAP	D1
+	MOVEA.L	A3,A0
+	BSR.W	_MMUMap_Physical
+	ADDQ.W	#4,SP
+
+	MOVEA.L	D0,A3
+	MOVE.L	A3,D0
+	BEQ.B	.userom
+
+	CMPI.L	#$00F80000,D7	;is imageaddress == romaddress ?
+	BEQ.B	.userom
+
+	MOVEQ	#$7C,D6
+	LSL.L	#5,D6
+	BRA.B	.loop_cond
+
+.map_loop:	MOVE.L	D6,D0	;map physikal loc to $f80000 !
+	LSR.L	#8,D0
+	LSR.L	#5,D0
+	ASL.L	#2,D0
+
+	MOVEA.L	(12,A3),A0	;travers tables
+	ADDA.L	D0,A0
+
+	MOVE.L	D6,D0
+	LSR.L	#6,D0
+	MOVEQ	#$7F,D1
+	AND.L	D1,D0
+	ASL.L	#2,D0
+	MOVE.L	(A0),D1
+
+	ANDI.W	#$FE00,D1
+	MOVEA.L	D1,A0
+	ADDA.L	D0,A0
+	MOVE.L	D6,D0
+	MOVEQ	#$3F,D1
+	AND.L	D1,D0
+	ASL.L	#2,D0
+	MOVE.L	(A0),D1
+	ANDI.W	#$FE00,D1
+	MOVEA.L	D1,A0
+	ADDA.L	D0,A0
+
+	MOVE.L	D7,D0
+	ORI.W	#1,D0
+	MOVE.L	D0,(A0)
+
+	ADDQ.L	#1,D6
+
+	ADDI.L	#$00001000,D7
+
+.loop_cond:	CMPI.L	#$00000FFF,D6
+	BLS.B	.map_loop
+
+.userom:	MOVE.L	A3,D0
+	MOVEM.L	(SP)+,D6/D7/A3
+	RTS
+
+; --------------------------------------------------------------------
+_Build_MMUFrame:	MOVEM.L	D6/D7/A3/A6,-(SP)
+	MOVEQ	#0,D6
+
+	MOVEA.W	#4,A0	;allocate mmu frame struct
+	MOVEQ	#56,D0
+	MOVE.L	#(MEMF_PUBLIC|MEMF_CLEAR),D1
+	MOVEA.L	(A0),A6
+	JSR	(_LVOAllocVec,A6)
+	MOVEA.L	D0,A3
+
+	MOVE.L	A3,D0
+	BEQ.W	.noframe_found
+
+	LEA	($0030,A3),A0	;NewList MemListe
+	MOVE.L	A0,($002C,A3)
+	LEA	($002C,A3),A0
+	MOVE.L	A0,($0034,A3)
+
+	MOVEQ	#$40,D0	;Alloc 512/4=128 LW Array on 512 align page
+	LSL.L	#3,D0
+	MOVE.L	#$000001FF,D1
+	BSR.W	_Alloc_Memory_Aligned
+	MOVE.L	D0,(12,A3)
+
+	MOVEQ	#$40,D0	;Alloc 512/4=128 LW Array on 512 align page
+	LSL.L	#3,D0
+	MOVE.L	#$000001FF,D1
+	BSR.W	_Alloc_Memory_Aligned
+	MOVE.L	D0,($0010,A3)
+
+	MOVEQ	#$40,D0	;Alloc 256/4=64 LW Array on 512 align page
+	LSL.L	#2,D0
+	MOVE.L	#$000001FF,D1
+	BSR.W	_Alloc_Memory_Aligned
+	MOVE.L	D0,($0014,A3)
+
+	MOVEQ	#$40,D0	;Alloc 4096 Byte Page on 4 kb align
+	LSL.L	#6,D0
+	MOVE.L	#$00000FFF,D1
+	BSR.W	_Alloc_Memory_Aligned
+	MOVE.L	D0,($001C,A3)
+
+	TST.L	(12,A3)
+	BEQ.W	.noframe_found
+	TST.L	($0010,A3)
+	BEQ.W	.noframe_found
+	TST.L	($0014,A3)
+	BEQ.W	.noframe_found
+	TST.L	D0
+	BEQ.W	.noframe_found
+
+	ORI.W	#$0040,D0	;or 65 to page address
+	ORI.W	#1,D0
+	MOVE.L	D0,($0018,A3)
+
+	LEA	($0018,A3),A0	;or $43 to page base
+	MOVE.L	A0,D0
+	ORI.W	#2,D0
+	MOVE.L	D0,($0028,A3)
+
+	MOVE.L	($0014,A3),D0	;or $3 to 64 LW array
+	ORI.W	#3,D0
+	MOVE.L	D0,($0024,A3)
+
+	MOVE.L	($0010,A3),D0	;or $3 to 128 LW array
+	ORI.W	#3,D0
+	MOVE.L	D0,($0020,A3)
+
+	MOVEQ	#0,D7
+	BRA.B	.loop_1_cond
+
+.loop_1:	MOVEA.L	($0014,A3),A0	;set ptr to error page
+	ADDA.L	D7,A0
+	MOVE.L	($0028,A3),(A0)
+	ADDQ.L	#4,D7
+.loop_1_cond:	CMPI.L	#256,D7
+	BLT.B	.loop_1
+
+	MOVEQ	#0,D7
+	BRA.B	.loop_2_cond
+
+.loop_2:	MOVEA.L	($0010,A3),A0	;set dummy descriptor
+	ADDA.L	D7,A0
+	MOVE.L	($0024,A3),(A0)
+	ADDQ.L	#4,D7
+.loop_2_cond:	CMPI.L	#512,D7
+	BLT.B	.loop_2
+
+	MOVEQ	#0,D7
+	BRA.B	.loop_3_cond
+
+.loop3:	MOVEA.L	(12,A3),A0	;dummy descriptor
+	ADDA.L	D7,A0
+	MOVE.L	($0020,A3),(A0)
+	ADDQ.L	#4,D7
+.loop_3_cond:	CMPI.L	#$00000200,D7
+	BLT.B	.loop3
+
+	MOVE.L	#32768,(8,A3)	;set a 32 K Value
+
+	MOVE.L	(12,A3),D0	;Clone Upper Level Ptr
+	MOVE.L	D0,(A3)
+	MOVE.L	D0,(4,A3)
+
+	MOVEQ	#1,D6
+.noframe_found:	TST.W	D6
+	BNE.B	.ret_frame
+
+	MOVEA.L	A3,A0	;something failed
+	BSR.W	_Free__MMUFrame_a0
+	SUBA.L	A3,A3
+.ret_frame:	MOVE.L	A3,D0
+	MOVEM.L	(SP)+,D6/D7/A3/A6
+	RTS
+
+; ----------------------------------------------------------------------------
+_BuildMMUTables:	LINK.W	A5,#-$0014
+	MOVEM.L	D2/D7/A2/A3/A6,-(SP)
+	MOVE.L	D0,D7
+	BSR.W	_Build_MMUFrame
+
+	PEA	($40).W
+	MOVEA.L	D0,A0
+	MOVE.L	#$00BC0000,D0
+	MOVEQ	#4,D1
+	SWAP	D1
+	BSR.W	_MMUMap_Physical
+
+	PEA	($40).W
+	MOVEA.L	D0,A0
+	MOVE.L	#$00D80000,D0
+	MOVEQ	#8,D1
+	SWAP	D1
+	BSR.W	_MMUMap_Physical
+
+	CLR.L	(SP)
+	MOVEA.L	D0,A0
+	MOVE.L	#$00F00000,D0
+	MOVEQ	#8,D1
+	SWAP	D1
+	BSR.W	_MMUMap_Physical
+
+	MOVEA.L	D0,A0
+	MOVE.L	D7,D0
+	BSR.W	_Map_Kickstart
+
+	ADDQ.W	#8,SP
+	MOVEA.L	D0,A3
+
+	MOVEA.W	#4,A0	;care about pcmcia
+	LEA	(cardresource.MSG,PC),A1
+	MOVEA.L	(A0),A6
+	JSR	(_LVOOpenResource,A6)
+	TST.L	D0
+	BEQ.B	.no_pcmcia
+
+	PEA	($40).W
+	MOVEQ	#$60,D0
+	SWAP	D0
+	MOVE.L	#$00440002,D1
+	MOVEA.L	A3,A0
+	BSR.W	_MMUMap_Physical
+
+	ADDQ.W	#4,SP
+	MOVEA.L	D0,A3
+
+.no_pcmcia:	MOVEA.W	#4,A0	;care about cd32 bootstrap
+	LEA	(cdstrap.MSG,PC),A1
+	MOVEA.L	(A0),A6
+	JSR	(_LVOFindResident,A6)
+	TST.L	D0
+	BEQ.B	.no_cdstrap
+
+	PEA	($40).W
+	MOVE.L	#$00E00000,D0
+	MOVEQ	#8,D1
+	SWAP	D1
+	MOVEA.L	A3,A0
+	BSR.W	_MMUMap_Physical
+	ADDQ.W	#4,SP
+	MOVEA.L	D0,A3
+
+.no_cdstrap:	MOVEA.W	#4,A0	;is exec name in $200000 mem
+	MOVEA.L	(A0),A1
+	MOVE.L	(LN_NAME,A1),D0
+	CLR.W	D0
+	SWAP	D0
+	MOVEQ	#$20,D1
+	CMP.L	D1,D0
+	BNE.B	.nofastexec
+
+	CLR.L	-(SP)	;map $zorro2 area
+	MOVEQ	#$20,D0
+	SWAP	D0
+	MOVEQ	#8,D1
+	SWAP	D1
+	MOVEA.L	A3,A0
+	BSR.W	_MMUMap_Physical
+	ADDQ.W	#4,SP
+	MOVEA.L	D0,A3
+
+.nofastexec:	PEA	($40).W	;map chipmem
+	MOVEQ	#0,D0
+	MOVEQ	#$40,D1
+	LSL.L	#6,D1
+	MOVEA.L	A3,A0
+	BSR.W	_MMUMap_Physical
+
+	ADDQ.W	#4,SP
+	MOVEA.L	D0,A3
+
+	MOVEA.W	#4,A0
+	MOVE.L	A0,($0014,SP)
+	MOVEA.L	(A0),A6
+	JSR	(_LVOForbid,A6)
+	MOVEA.L	(MemList,A6),A2
+	BRA.B	.mem_loop_cond
+
+.mem_loop:	MOVEA.L	(MH_LOWER,A2),A1
+	MOVEA.L	A3,A6
+	JSR	(_LVOTypeOfMem,A6)
+	BTST	#MEMF_PUBLIC,D0
+	BEQ.B	.no_public_mem
+
+	MOVEQ	#$40,D0
+	BRA.B	.map_memory
+
+.no_public_mem:	MOVEQ	#$20,D0
+
+.map_memory:	MOVE.L	(MH_LOWER,A2),D1	;map memory block
+	MOVE.L	(MH_UPPER,A2),D2
+	SUB.L	D1,D2
+	MOVE.L	D0,-(SP)
+	MOVE.L	D0,($001C,SP)
+	MOVE.L	D1,D0
+	MOVE.L	D2,D1
+	MOVEA.L	(-12,A5),A0
+	BSR.W	_MMUMap_Physical
+	ADDQ.W	#4,SP
+	MOVEA.L	D0,A3
+
+	MOVEQ	#$20,D0	;
+	CMP.L	($0018,SP),D0
+	BNE.B	.was_nopublic
+
+	MOVE.L	(MH_LOWER,A2),D0	;it's private memory
+	MOVE.L	(MH_UPPER,A2),D1
+	MOVEA.L	A3,A0
+	BSR.W	_CreatePrivateMem
+	MOVEA.L	D0,A3
+.was_nopublic:	MOVEA.L	(A2),A2
+
+.mem_loop_cond:	MOVE.L	A3,(-12,A5)
+	MOVEA.L	($0014,SP),A0
+	MOVEA.L	(A0),A3
+	TST.L	(LN_SUCC,A2)
+	BNE.B	.mem_loop
+	MOVEA.L	A3,A6
+	JSR	(_LVOPermit,A6)
+
+	LEA	(expansionlibr.MSG,PC),A1
+	MOVEQ	#0,D0
+	MOVEA.L	($0014,SP),A6
+	MOVEA.L	(A6),A6
+	JSR	(_LVOOpenLibrary,A6)
+	MOVEA.L	D0,A2
+
+	MOVE.L	A2,D0
+	BEQ.B	.noexpansion_lib
+
+	SUBA.L	A3,A3
+	BRA.B	.board_loop_cond
+
+.board_loop:	BTST	#(CDF_SHUTUP|CDF_BADMEMORY),(cd_Rom,A3)
+	BNE.B	.board_loop_cond
+
+	MOVE.L	(cd_BoardAddr,A3),D0	;map config board
+	PEA	($40).W
+	MOVE.L	(cd_BoardSize,A3),D1
+	MOVEA.L	(-12,A5),A0
+	BSR.W	_MMUMap_Physical
+	ADDQ.W	#4,SP
+	MOVE.L	D0,(-12,A5)
+
+.board_loop_cond:	MOVEA.L	A3,A0
+	MOVEQ	#-1,D0
+	MOVE.L	D0,D1
+	MOVEA.L	A2,A6
+	JSR	(_LVOFindConfigDev,A6)
+	MOVEA.L	D0,A3
+	MOVE.L	A3,D0
+	BNE.B	.board_loop
+
+	MOVEA.W	#4,A0
+	MOVEA.L	A2,A1
+	MOVEA.L	(A0),A6
+	JSR	(_LVOCloseLibrary,A6)
+
+.noexpansion_lib:	MOVE.L	(-12,A5),D0	;return mmu frame
+	MOVEM.L	(SP)+,D2/D7/A2/A3/A6
+	UNLK	A5
+	RTS
+
+RomTagEnd:	dc.b	'End',0
+
+	end

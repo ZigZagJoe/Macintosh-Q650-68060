@@ -1,0 +1,132 @@
+/*-------------------------------------------------------------------------------
+**  /\    |\     Silicon Department     
+**  \_  o| \_ _  Software Entwicklung
+**      \||  |_)|)   Copyright by Carsten Schlote, 1990-2016
+** \__/||_/\_|     Released under CC-BY-NC-SA 4.0 license in 2016
+** See      http://creativecommons.org/licenses/by-nc-sa/4.0/legalcode
+**------------------------------------------------------------------------------
+*/
+
+Changes for Amiga Porting:
+--------------------------
+
+- Renamed Files to *.asm
+- got some hassle with RCS -> short filenames
+- Smake file added for SAS/C 6.5x
+- Compiled and optimized ISP Package (with all tricks kept alive)
+  (Rem: strange coding ...)
+- Switch to HWGRCS because of filename size :-/
+
+
+ToDO:                                                         DONE
+-----                                                       ---------
+
+- Port ISP							X
+- Test ISP Package (address decoding)
+
+- Port ISP Link Lib
+- create ISP Linkfiles & includes for SAS/C
+- Test ISP Link Lib
+
+- Port FPSP
+- Test FPSP
+
+- Port FPSP Link Lib
+- create FPSP Linkfiles & includes for SAS/C
+- Test FPSP Link Lib
+
+- Do Resident Tags for ISP & FPSP core kernal
+
+- Do shared libs for link libs
+
+- adapt SAS/C for best 060 code
+
+1.01: CHANGES SINCE LAST RELEASE 1.00:
+--------------------------------------
+
+1)
+"movep"  emulation  where  data  was  being  read from memory was reading the
+intermediate bytes.  Emulation now only reads the required bytes.
+
+2)
+"flogn",  "flog2",  and  "flog10"  of  "1" was setting the Inexact FPSR bit.
+Emulation now does not set Inexact for this case.
+
+3)
+For  an  opclass three FP instruction where the effective addressing mode was
+pre-decrement  or  post-increment  and the address register was A0 or A1, the
+address  register  was  not being updated as a result of the operation.  This
+has been corrected.
+
+4) Beta 1.2 version had the following erratum:
+
+	Scenario:
+	---------
+	If {i,d}mem_{read,write}_{byte,word,long}() returns a failing value to
+        the 68060SP, the package ignores this  return value and continues with
+	program execution as if it never received a failing value.
+
+	Effect:
+	-------
+	For example, if a user executed "fsin.x ADDR,fp0" where ADDR should
+	cause a "segmentation violation", the memory read requested by the 
+	package should return a failing value to the package. Since the 
+	package currently ignores this return value, the user program will 
+	continue to the next instruction, and the result created in fp0 will 
+	be undefined.
+
+	Fix:
+	----
+	This has been fixed in the current release.
+
+	Notes:
+	------
+	Upon receiving a non-zero (failing) return value from a
+	{i,d}mem_{read,write}_{byte,word,long}() "call-out",
+	the package creates a 16-byte access error stack frame from the current
+	exception stack frame and exits through the "call-out" _real_access().
+	This is the process as described in the MC68060 User's Manual.
+
+	For instruction read access errors, the info stacked is:
+		SR 	= SR at time of exception
+		PC 	= PC of instruction being emulated
+		VOFF	= $4008 (stack frame format type)
+		ADDRESS	= PC of instruction being emulated
+		FSLW	= FAULT STATUS LONGWORD
+
+	The valid FSLW bits are:
+		bit 27 		= 1	(misaligned bit)
+		bit 24 		= 1	(read)
+		bit 23 		= 0	(write)
+		bit 22:21	= 10	(SIZE = word)
+		bit 20:19	= 00	(TT)
+		bit 18:16	= x10	(TM; x = 1 for supervisor mode)
+		bit 15		= 1	(IO)
+		bit 0		= 1	(Software Emulation Error)
+
+	all other bits are EQUAL TO ZERO and can be set by the _real_access()
+	"call-out" stub by the user as appropriate. The MC68060 User's Manual
+	stated that ONLY "bit 0" would be set. The 060SP attempts to set a few
+	other bits.
+
+	For data read/write access errors, the info stacked is:
+		SR 	= SR at time of exception
+		PC 	= PC of instruction being emulated
+		VOFF	= $4008 (stack frame format type)
+		ADDRESS	= Address of source or destination operand
+		FSLW	= FAULT STATUS LONGWORD
+
+	The valid FSLW bits are:
+		bit 27 		= 0	(misaligned bit)
+		bit 24 		= x	(read; 1 if read, 0 if write)
+		bit 23		= x	(write; 1 if write, 0 if read)
+		bit 22:21	= xx	(SIZE; see MC68060 User's Manual)
+		bit 20:19	= 00	(TT)
+		bit 18:16	= x01	(TM; x = 1 for supervisor mode)
+		bit 15		= 0	(IO)
+		bit 0		= 1	(Software Emulation Error)
+
+	all other bits are EQUAL TO ZERO and can be set by the _real_access()
+	"call-out" stub by the user as appropriate. The MC68060 User's Manual
+	stated that ONLY "bit 0" would be set. The 060SP attempts to set a few
+	other bits.

@@ -1,0 +1,11 @@
+FROM LIB:c.o "mc60_mmu.o"
+TO "mc60_mmu"
+LIB lib:debug.lib LIB:scnb.lib LIB:amiga.lib
+ADDSYM
+VERBOSE
+NOICONS
+DEFINE __CXM33=__UCXM33
+DEFINE __CXD33=__UCXD33
+DEFINE __CXM22=__UCXM22
+DEFINE __CXD22=__UCXD22
+
