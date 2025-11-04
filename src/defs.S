@@ -11,7 +11,7 @@
 
 /* TODOs / Unproven */
 #define PATCH_ROMENTRY          // disable 68060 FPU initially. NOTE: this will prevent an 040 from booting! 
-//#define INSTALL_FPSP            // install the FPSP and vectors and enable FPU
+#define INSTALL_FPSP            // install the FPSP and vectors and enable FPU. (TODO-Not fully working)
 #define ENABLE_BRANCH_CACHE     // enable branch prediction cache  (TODO-seems to not work)
 //#define ENABLE_LOADSTORE_FIFO   // enable load store FIFO, don't use on rev5 and earlier due to errata TODO-seems to not work)
 #define PATCH_SLOTMGR_BERR_HACK // during slot manager, assume any bus errors are slot manager's fault (TODO)
