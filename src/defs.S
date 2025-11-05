@@ -16,12 +16,14 @@
 //#define ENABLE_BRANCH_CACHE     // enable branch prediction cache  (TODO-seems to not work)
 //#define ENABLE_LOADSTORE_FIFO   // enable load store FIFO, don't use on rev5 and earlier due to errata TODO-seems to not work)
 #define PATCH_SLOTMGR_BERR_HACK // during slot manager, assume any bus errors are slot manager's fault (TODO)
-#define PATCH_NOTESTFORFPU // do not test for FPU in testforFPU
 
 /* OLD hacks, no longer needed */
 //#define PATCH_SANE_FLUSHIT_HACK   // cache flush hack in SANE flushit just flush all caches
 //#define PATCH_BADDIVIDES          // ugly hack out the early 64/32 divides in sound stuff
 //#define PATCH_FLUSHCRANGE_HACK    // cache flush hack just flush all caches
+//#define PATCH_NOTESTFORFPU // do not test for FPU in testforFPU
+
+/* constants */
 
 #define INITIAL_PC 0x0000002A
 
