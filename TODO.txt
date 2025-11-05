@@ -13,8 +13,10 @@ TODO / Known bugs
         sane trap behavior wrt 040 probably needs expansion
             hands over to system handlers for some of the traps not used for 040 but 060 fpsp would use those
         seems to cause crashes if FPU code is called.
-
+        TESTFORFPU happens very early in boot
+        
     bus error handling (in general)
         Need to correctly handled the new exception stack frame in slot manager  PATCH_SLOTMGR_BERR_HACK
 
-    
+    SPs
+        need to hand off to appropriate vectors off VBR for stuff like /v, chk, etc

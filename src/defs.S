@@ -8,13 +8,15 @@
 #define PATCH_FLUSHCRANGE       // cache flush replace ptest correctly
 #define PATCH_SANE_FLUSHIT      // sane cache flush replace ptest correctly
 #define ENABLE_SUPERSCALAR      // pentium-like superscalar execution
+#define PATCH_FORCE_32BIT       // always run in 32 bit mode as known issues will prevent 24 bit mode
 
 /* TODOs / Unproven */
 #define PATCH_ROMENTRY          // disable 68060 FPU initially. NOTE: this will prevent an 040 from booting! 
 #define INSTALL_FPSP            // install the FPSP and vectors and enable FPU. (TODO-Not fully working)
-#define ENABLE_BRANCH_CACHE     // enable branch prediction cache  (TODO-seems to not work)
+//#define ENABLE_BRANCH_CACHE     // enable branch prediction cache  (TODO-seems to not work)
 //#define ENABLE_LOADSTORE_FIFO   // enable load store FIFO, don't use on rev5 and earlier due to errata TODO-seems to not work)
 #define PATCH_SLOTMGR_BERR_HACK // during slot manager, assume any bus errors are slot manager's fault (TODO)
+#define PATCH_NOTESTFORFPU // do not test for FPU in testforFPU
 
 /* OLD hacks, no longer needed */
 //#define PATCH_SANE_FLUSHIT_HACK   // cache flush hack in SANE flushit just flush all caches
@@ -60,3 +62,8 @@ FPOVFL_VEC040	=	0x1FD8
 FPSNAN_VEC040	=	0x1FDC
 
 noErr = 0	
+
+ /* defaults for 32 bit */
+MMFlagsDefault	=       0x25 /* (1<<mmFigEnable) | (1<<MMSysheap) | (1<<MMStartMode) */
+MMPRAMloc       =       0x0001008A
+

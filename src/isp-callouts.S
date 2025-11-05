@@ -74,7 +74,6 @@
 #
 */
 _060_isp_done:
-|    bra _060_isp_done | break things deliberately for testing
 	rte
 
 /*

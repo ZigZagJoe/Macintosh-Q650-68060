@@ -63,9 +63,9 @@
 */
 
 .macro _fpsp_rte_noerr_todo
-    fsave	%sp@-
-	movew	#0x6000,%sp@(0x2)
-	frestore	%sp@+
+    fsave	-(%sp)
+	move.w	#0x6000,2(%sp)
+	frestore (%sp)+
 	rte
 .endm
 
@@ -96,6 +96,8 @@ _060_fpsp_done:
 #
 */
 _060_real_ovfl:
+    _fpsp_rte_noerr_todo
+
 	move.l	(FPOVFL_VEC040).W,-(%sp)	| push vector to user OVFL handler <1/8/91, JPO>
 	rts				| execute user handler <1/8/91, JPO>
 
@@ -113,6 +115,7 @@ _060_real_ovfl:
 #
 */
 _060_real_unfl:
+    _fpsp_rte_noerr_todo
 	move.l	(FPUNFL_VEC040).W,-(%sp)	| push vector to user UNFL handler <1/9/91, JPO>
 	rts				| execute user handler <1/9/91, JPO>
 
@@ -131,6 +134,7 @@ _060_real_unfl:
 #
 */
 _060_real_operr:
+    _fpsp_rte_noerr_todo
 	move.l	(FPOPERR_VEC040).W,-(%sp)	| push vector to user's handler <1/9/91, JPO>
 	rts					| execute user's handler <1/9/91, JPO>
 
@@ -149,6 +153,7 @@ _060_real_operr:
 #
 */
 _060_real_snan:
+    _fpsp_rte_noerr_todo
 	move.l	(FPSNAN_VEC040).W,-(%sp)	| push vector to user handler <1/9/91, JPO>
 	rts				| execute user handler <1/9/91, JPO>
 
@@ -201,6 +206,7 @@ _060_real_inex:
 #
 */
 _060_real_bsun:
+    _fpsp_rte_noerr_todo
     move.l	(FPBSUN_VEC040).W,-(%sp)	| push vector to user's handler <1/8/91, JPO>
 	rts				| execute user's handler <1/8/91, JPO>
 
@@ -217,6 +223,7 @@ _060_real_bsun:
 # 
 */
 _060_real_fline:
+    _fpsp_rte_noerr_todo
 	move.l	(FLINE_VEC040).W,-(%sp)	| push vector to user's handler <1/8/91, JPO>
 	rts				| execute user's handler <1/8/91, JPO>
 
@@ -238,14 +245,13 @@ _060_real_fline:
 #
 */
 _060_real_fpu_disabled:
-	movel	%d0,%sp@-		|# enabled the fpu
+	movel	%d0,-(%sp)
+	movec.l %pcr,%d0		|* movec.l pcr,d0
+	bclr	#1,%d0		    |# enable the fpu
+	movec.l %d0,%pcr		|* movec.l d0,pcr
+	movel	(%sp)+,%d0
 
-	.short	0x4e7a,0x0808		|* movec.l pcr,d0
-	bclr	#0x1,%d0
-	.short	0x4e7b,0x0808		|* movec.l d0,pcr
-	movel	%sp@+,%d0
-
-	movel	%sp@(0xc),%sp@(0x2)	|# set "Current PC"
+	movel	0xC(%sp),2(%sp)	|# set "Current PC"
 	rte
 
 /*
@@ -307,21 +313,19 @@ _060_fpsp_effadd:
 # The size of this section MUST be 128 bytes!!!
 */
 FP_CALL_TOP:
-	.long	_060_real_bsun-FP_CALL_TOP
-	.long	_060_real_snan-FP_CALL_TOP
-	.long	_060_real_operr-FP_CALL_TOP
-	.long	_060_real_ovfl-FP_CALL_TOP
-	.long	_060_real_unfl-FP_CALL_TOP
-	.long	_060_real_dz-FP_CALL_TOP
-	.long	_060_real_inex-FP_CALL_TOP
-	.long	_060_real_fline-FP_CALL_TOP     |
-	.long	_060_real_fpu_disabled-FP_CALL_TOP
-
-	.long	_060_real_trap-FP_CALL_TOP      | unused
-
-	.long	_060_real_trace-FP_CALL_TOP     | shared with ISP
-	.long	_060_real_access-FP_CALL_TOP    | shared with ISP
-	.long	_060_fpsp_done-FP_CALL_TOP
+	.long	_060_real_bsun		- FP_CALL_TOP
+	.long	_060_real_snan		- FP_CALL_TOP
+	.long	_060_real_operr		- FP_CALL_TOP
+	.long	_060_real_ovfl		- FP_CALL_TOP
+	.long	_060_real_unfl		- FP_CALL_TOP
+	.long	_060_real_dz		- FP_CALL_TOP
+	.long	_060_real_inex		- FP_CALL_TOP
+	.long	_060_real_fline		- FP_CALL_TOP
+	.long	_060_real_fpu_disabled	- FP_CALL_TOP
+	.long	_060_real_trap		- FP_CALL_TOP
+	.long	_060_real_trace		- FP_CALL_TOP     | shared with ISP
+	.long	_060_real_access	- FP_CALL_TOP     | shared with ISP
+	.long	_060_fpsp_done		- FP_CALL_TOP
 
 	.long	0x00000000,0x00000000,0x00000000
 

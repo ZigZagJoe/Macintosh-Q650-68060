@@ -1,10 +1,12 @@
+/* patch to disable the FPU at early boot */
 myRomEntry:
-   
-    moveq #2,%d0        | disable FPU (bit 1 = 1) and superscalar execution (bit 0 = 0)
+    moveq.l #2,%d0      | disable FPU (bit 1 = 1)
     movec %d0, %pcr     | NOTE: this will prevent an 040 from booting at all! 
 
     jmp INITIAL_PC      | back to original entry
 
+/* runs much later after VBR is in RAM, and after SysErrInit blows away our unimplemented integer handler 
+so install vectors again here. Called from InstallFPSP */
 PatchInstallSP:
     movem.l  %d0/%a0-%a1, -(%sp)
 
@@ -43,7 +45,6 @@ PatchInstallSP:
     /* BSUN vector is not used on 060 - handled in fline */
 #endif
 
-
     movec %pcr, %d0 
 
 #ifdef INSTALL_FPSP    
@@ -58,7 +59,6 @@ PatchInstallSP:
 #endif
 
     movec %d0, %pcr     
-
 
     movec %cacr, %d0    | set up the CACR for 060 added features
 
@@ -78,3 +78,17 @@ PatchInstallSP:
 
     movem.l  (%sp)+,%d0/%a0-%a1
     rts
+
+/* Because we have known issues with 32 bit mode, we can patch INITMMU to come here
+we'll always force the PRAM to 32 bit mode before anything else inits. */  
+Force32PRAM:
+    move.l  %a1, -(%sp)             | preserve %a1, thrashed by writexpram
+
+    MOVE.L	#0x25252525, -(%SP)     | MMFlagsDefault repeated across all bytes on stack
+    MOVE.L	%sp,%A0	                | address of data to write
+    MOVE.L	#MMPRAMloc,%D0			| address in pram to write
+    jsr WRITEXPRAM 					| do it
+    move.L (%sp)+,%d0 
+    move.l  (%sp)+, %a1
+    
+    rts                             | return MMUFlags in %D0
