@@ -92,19 +92,20 @@ Force32PRAM:
     rts                             | return MMUFlags in %D0
 
 /* experimental function to install a new access error handler that deals with branch prediction error correctly
-see amiga code for reference, based on that */
+see amiga code for reference, based on that 
+doesn't seem to work (Branch cache still crashes)*/
 .global TurnOnBC
 TurnOnBC:
     movem.l %d0/%a0-%a1, -(%sp)
 
     movec.l %VBR, %a0
 
-    move.l VECI_ACCERR(%a0), %d0
     lea New_AccessFault, %a1
+    /*move.l VECI_ACCERR(%a0), %d0
     cmp.l %a1, %d0              
     beq AlreadyInstalled        | already installed, don't overwrite the old handler
 
-    move.l VECI_ACCERR(%a0), (Old_AccessFault).W
+    move.l VECI_ACCERR(%a0), (Old_AccessFault).W*/
     move.l %a1, VECI_ACCERR(%a0)
 
 AlreadyInstalled:
@@ -112,22 +113,23 @@ AlreadyInstalled:
     bset #CACR060_EBC, %d0      | enable
     bset #CACR060_CABC, %d0     | and clear all
     movec %d0, %cacr
-
+    
     movem.l  (%sp)+,%d0/%a0-%a1
 
     rts
 
 /* borrowed wholesale from amiga */
 New_AccessFault:	
-	BTST	#2,(12+3,%SP)		| BPE ?
+	/*BTST	#2,(12+3,%SP)		| BPE ?
 	BNE.B	BranchPredictionError
-	MOVE.L	(Old_AccessFault).w,-(%sp)
+	|MOVE.L	(Old_AccessFault).w,-(%sp)
+    MOVE.L	(GENEXCPS),-(%sp) | call to Deepshit bus error handler
+    
 	RTS                         | continue in original handler
 
-BranchPredictionError:
+BranchPredictionError:*/
 	move.l %d0, -(%sp)
-    CPUSHA	%BC                 | not needed as cpush also clears branch cache, but w/e
-	NOP
+
     movec %cacr, %d0
     bset #CACR060_CABC, %d0 
     movec %d0, %cacr
