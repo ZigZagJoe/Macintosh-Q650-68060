@@ -2,9 +2,13 @@ TODO / Known bugs
 
     System 7.5 hangs in boot at welcome to macintosh, probably FPU-related.
 
-    branch cache probably not working
+    branch cache not working
         no change in performance noted if changed at installfpsp time. might be cleared somewhere
-        may need to begin clearing at similar times to ATC?
+            it's cleared immediately afterwards, added a patch for 060 cache initialization
+        may need to begin clearing at similar times to ATC
+        critical problem: bus error (access error) handlers must check for branch predict error bit
+            if set, clear branch cache and resume...
+            bus error handler is monkeyed with very often....
 
     FPU   
         no FPU detected in tattletech or speedometer
@@ -15,11 +19,14 @@ TODO / Known bugs
         TESTFORFPU happens very early in boot
 
     bus error handling (in general)
-        Need to correctly handled the new exception stack frame in slot manager  PATCH_SLOTMGR_BERR_HACK
+        Need to correctly handle the new exception stack frame in slot manager  PATCH_SLOTMGR_BERR_HACK
+        as well as anything else that actually uses the fields from the handler...
 
     SPs
         need to hand off to appropriate vectors off VBR for stuff like /v, chk, etc
 
+    PRAM clear
+        hangs on first go on finder but works after... why?
 
 ### DONE??
 

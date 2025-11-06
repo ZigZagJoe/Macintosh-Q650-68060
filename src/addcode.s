@@ -2,7 +2,6 @@
 myRomEntry:
     moveq.l #2,%d0      | disable FPU (bit 1 = 1)
     movec %d0, %pcr     | NOTE: this will prevent an 040 from booting at all! 
-
     jmp INITIAL_PC      | back to original entry
 
 /* runs much later after VBR is in RAM, and after SysErrInit blows away our unimplemented integer handler 
@@ -60,24 +59,23 @@ PatchInstallSP:
 
     movec %d0, %pcr     
 
-    movec %cacr, %d0    | set up the CACR for 060 added features
+    movem.l  (%sp)+,%d0/%a0-%a1
+    rts
 
-#ifdef ENABLE_BRANCH_CACHE
-    or.l #0xe00000, %d2 | enable branch cache (bit 23) and clear it (22,21)
-#else
-    bclr #23, %d0
-#endif
+/* OK to thrash D0. replaces ENABLECACHESPATCH / part of StartInit*/
+Initialize060Caches:
+    
+    clr.l %d0
+    bset #CACR060_EDC, %d0
+    bset #CACR060_EIC, %d0
 
 #ifdef ENABLE_LOADSTORE_FIFO
-    bset #29, %d0
-#else
-    bclr #29, %d0 
+    bset #CACR060_ESB, %d0 
 #endif
 
     movec %d0, %cacr
 
-    movem.l  (%sp)+,%d0/%a0-%a1
-    rts
+    rts  
 
 /* Because we have known issues with 32 bit mode, we can patch INITMMU to come here
 we'll always force the PRAM to 32 bit mode before anything else inits. */  
@@ -92,3 +90,47 @@ Force32PRAM:
     move.l  (%sp)+, %a1
     
     rts                             | return MMUFlags in %D0
+
+/* experimental function to install a new access error handler that deals with branch prediction error correctly
+see amiga code for reference, based on that */
+.global TurnOnBC
+TurnOnBC:
+    movem.l %d0/%a0-%a1, -(%sp)
+
+    movec.l %VBR, %a0
+
+    move.l VECI_ACCERR(%a0), %d0
+    lea New_AccessFault, %a1
+    cmp.l %a1, %d0              
+    beq AlreadyInstalled        | already installed, don't overwrite the old handler
+
+    move.l VECI_ACCERR(%a0), (Old_AccessFault).W
+    move.l %a1, VECI_ACCERR(%a0)
+
+AlreadyInstalled:
+    movec %cacr, %d0            | set up the CACR for 060 added featuresget
+    bset #CACR060_EBC, %d0      | enable
+    bset #CACR060_CABC, %d0     | and clear all
+    movec %d0, %cacr
+
+    movem.l  (%sp)+,%d0/%a0-%a1
+
+    rts
+
+/* borrowed wholesale from amiga */
+New_AccessFault:	
+	BTST	#2,(12+3,%SP)		| BPE ?
+	BNE.B	BranchPredictionError
+	MOVE.L	(Old_AccessFault).w,-(%sp)
+	RTS                         | continue in original handler
+
+BranchPredictionError:
+	move.l %d0, -(%sp)
+    CPUSHA	%BC                 | not needed as cpush also clears branch cache, but w/e
+	NOP
+    movec %cacr, %d0
+    bset #CACR060_CABC, %d0 
+    movec %d0, %cacr
+	
+	move.l (%sp)+,%d0
+    RTE  

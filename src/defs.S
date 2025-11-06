@@ -7,26 +7,28 @@
 #define PATCH_ROM_MAP_8MB       // map 8MB of ROM space. note 24 bit mode only has 1MB addr space still!
 #define PATCH_FLUSHCRANGE       // cache flush replace ptest correctly
 #define PATCH_SANE_FLUSHIT      // sane cache flush replace ptest correctly
-#define ENABLE_SUPERSCALAR      // pentium-like superscalar execution
+#define ENABLE_SUPERSCALAR      // enable pentium-like superscalar execution
 #define PATCH_FORCE_32BIT       // always run in 32 bit mode as known issues will prevent 24 bit mode
+#define PATCH_060CACHE          // initialize 060 caches specifically (required for branch, loadstore)
 
 /* TODOs / Unproven */
 #define PATCH_ROMENTRY          // disable 68060 FPU initially. NOTE: this will prevent an 040 from booting! 
 #define INSTALL_FPSP            // install the FPSP and vectors and enable FPU. (TODO-Not fully working)
-//#define ENABLE_BRANCH_CACHE     // enable branch prediction cache  (TODO-seems to not work)
-//#define ENABLE_LOADSTORE_FIFO   // enable load store FIFO, don't use on rev5 and earlier due to errata TODO-seems to not work)
+//#define ENABLE_BRANCH_CACHE     // enable branch prediction cache  (TODO, will break things)
+#define ENABLE_LOADSTORE_FIFO   // enable load store FIFO (unproven), don't use on rev5 and earlier due to errata
 #define PATCH_SLOTMGR_BERR_HACK // during slot manager, assume any bus errors are slot manager's fault (TODO)
 
 /* OLD hacks, no longer needed */
 //#define PATCH_SANE_FLUSHIT_HACK   // cache flush hack in SANE flushit just flush all caches
 //#define PATCH_BADDIVIDES          // ugly hack out the early 64/32 divides in sound stuff
 //#define PATCH_FLUSHCRANGE_HACK    // cache flush hack just flush all caches
-//#define PATCH_NOTESTFORFPU // do not test for FPU in testforFPU
+//#define PATCH_NOTESTFORFPU        // do not test for FPU in testforFPU
 
 /* constants */
 
 #define INITIAL_PC 0x0000002A
 
+#define	VECI_ACCERR		    0x08	/* Access Error AKA Bus Error */
 #define	VECI_LINE1111		0x2C	/* Line 1111 Emulator */
 #define	VECI_FP_BSUN		0xC0	/* FPCP Branch or Set on Unordered */
 #define	VECI_FP_INEX		0xC4	/* FPCP Inexact Result */
@@ -69,3 +71,18 @@ noErr = 0
 MMFlagsDefault	=       0x25 /* (1<<mmFigEnable) | (1<<MMSysheap) | (1<<MMStartMode) */
 MMPRAMloc       =       0x0001008A
 
+/* CACR bits for 060 */
+#define CACR060_EDC     31  /* 1=enable data cache */
+#define CACR060_NAD     30  /* 1=misses don't allocate */
+#define CACR060_ESB     29  /* 1=enable store buffer: DANGEROUS on <rev6 */
+#define CACR060_DPI     28  /* 1=cpush doesn't invalidate */
+#define CACR060_FOC     27  /* 1=half data cache mode */
+#define CACR060_EBC     23  /* 1=enable branch cache */
+#define CACR060_CABC    22  /* 1=clear branch cache */
+#define CACR060_CUBC    21  /* 1=clear user branch cache only */
+#define CACR060_EIC     15  /* 1=enable instruction cache */
+#define CACR060_NAI     14  /* 1=misses don't allocate */
+#define CACR060_FIC     13  /* 1=half inst cache mode */
+
+/* memory location for old access handler (long) */
+Old_AccessFault=0x40
