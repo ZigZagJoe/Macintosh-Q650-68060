@@ -263,7 +263,7 @@ _060_isp_cas_restart:
 
 # The size of this section MUST be 128 bytes!!!
 */
-
+.global I_CALL_TOP
 I_CALL_TOP:
 	.long	_060_real_chk-I_CALL_TOP
 	.long	_060_real_divbyzero-I_CALL_TOP

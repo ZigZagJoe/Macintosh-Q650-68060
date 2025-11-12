@@ -1,22 +1,25 @@
 /* Tested patches */
 #define INSTALL_ISP             // include the ISP
+#define PATCH_ROMENTRY          // initialize 68060 PCR. NOTE: this will prevent an 040 from booting! 
 #define PATCH_INSTALLFPSP       // patch installFPSP to install SP vectors
 #define PATCH_TMVECTORS_ISP     // patch tmVectors (test manager ROM vectors) to point to ISP
-#define PATCH_NORAMTEST         // no memory tests
-#define PATCH_NOCHECKSUM        // no ROM checksum
-#define PATCH_ROM_MAP_8MB       // map 8MB of ROM space. note 24 bit mode only has 1MB addr space still!
-#define PATCH_FLUSHCRANGE       // cache flush replace ptest correctly
-#define PATCH_SANE_FLUSHIT      // sane cache flush replace ptest correctly
+#define PATCH_ROM_MAP_8MB       // map 8MB of ROM space. note: 24 bit mode only has 1MB addr space still!
+#define PATCH_FLUSHCRANGE       // cache flush, replace ptest
+#define PATCH_SANE_FLUSHIT      // SANE cache flush, replace ptest
+#define PATCH_ENABLECACHES          // initialize 060 caches specifically (required for branch, loadstore)
+#define DISABLE_RAMTEST         // no memory tests
+#define DISABLE_CHECKSUM        // no ROM checksum
+#define DISABLE_LOADSTOREBYPASS // rev5 and below require this per errata I14
+#define DISABLE_FPU             // disable 68060 FPU early, prevents Mac OS from detecting it
+#define ENABLE_LOADSTORE_FIFO   // enable load store FIFO
 #define ENABLE_SUPERSCALAR      // enable pentium-like superscalar execution
-#define PATCH_FORCE_32BIT       // always run in 32 bit mode as known issues will prevent 24 bit mode
-#define PATCH_060CACHE          // initialize 060 caches specifically (required for branch, loadstore)
 
 /* TODOs / Unproven */
-#define PATCH_ROMENTRY          // disable 68060 FPU initially. NOTE: this will prevent an 040 from booting! 
-#define INSTALL_FPSP            // install the FPSP and vectors and enable FPU. (TODO-Not fully working)
-//#define ENABLE_BRANCH_CACHE     // enable branch prediction cache  (TODO, will break things)
-//#define ENABLE_LOADSTORE_FIFO   // enable load store FIFO (unproven), don't use on rev5 and earlier due to errata
+#define INSTALL_FPSP            // install the FPSP and enable FPU. (TODO-Not fully working)
+//#define ENABLE_BRANCH_CACHE     // enable branch prediction cache  (TODO)
+
 #define PATCH_SLOTMGR_BERR_HACK // during slot manager, assume any bus errors are slot manager's fault (TODO)
+//#define PATCH_FORCE_32BIT       // always run in 32 bit mode as known issues will prevent 24 bit mode (TODO)
 
 /* OLD hacks, no longer needed */
 //#define PATCH_SANE_FLUSHIT_HACK   // cache flush hack in SANE flushit just flush all caches
@@ -67,14 +70,14 @@ FPSNAN_VEC040	=	0x1FDC
 
 noErr = 0	
 
- /* defaults for 32 bit */
-MMFlagsDefault	=       0x25 /* (1<<mmFigEnable) | (1<<MMSysheap) | (1<<MMStartMode) */
+ /* defaults for 32 bit https://github.com/elliotnunn/sys7.1-doc-wip/blob/62f7e0d5dc1d9a047822d5e73ffa8aa50a97e3fa/Internal/Asm/InternalOnlyEqu.a#L205 */
+MMFlagsDefault	=       0b100101 /* 0x25 = (1<<mmFigEnable) | (1<<MMSysheap) | (1<<MMStartMode) */
 MMPRAMloc       =       0x0001008A
 
 /* CACR bits for 060 */
 #define CACR060_EDC     31  /* 1=enable data cache */
 #define CACR060_NAD     30  /* 1=misses don't allocate */
-#define CACR060_ESB     29  /* 1=enable store buffer: DANGEROUS on <rev6 */
+#define CACR060_ESB     29  /* 1=enable store buffer */
 #define CACR060_DPI     28  /* 1=cpush doesn't invalidate */
 #define CACR060_FOC     27  /* 1=half data cache mode */
 #define CACR060_EBC     23  /* 1=enable branch cache */
@@ -86,3 +89,26 @@ MMPRAMloc       =       0x0001008A
 
 /* memory location for old access handler (long) */
 Old_AccessFault=0x40
+
+.macro put_char ch
+	move.b	#0x30,(aCtl)	|reset any errors			
+	move.b	#\ch,(aData)	|send character			
+
+1:			                |wait until all sent 		
+	move.b	#1,(aCtl)		|select RR1			
+	
+	btst	#0,(aCtl)		|All Sent?			
+	beq.s	1b
+.endm
+		
+.macro put_string str 
+    move.l %a0, -(%sp)
+    lea (1f, %pc), %a0
+    jsr _puts
+    bra 2f
+1:
+    .string "\str"
+    .align 2
+2:
+    move.l (%sp)+,%a0
+.endm

@@ -28,11 +28,11 @@ all: ${FULLROM}
 
 obj/%.o: %.S
 	@mkdir -p $(@D)
-	${CC} ${ASFLAGS} ${VGA_ASFLAGS} $< -o $@
+	${CC} ${ASFLAGS} $< -o $@
 
 obj/%.o: %.c
 	@mkdir -p $(@D)
-	${CC} ${CFLAGS} ${VGA_CFLAGS} $< -o $@
+	${CC} ${CFLAGS} $< -o $@
 
 ${FULLROM}: linker.ld ${COBJ} ${SOBJ} 
 # linker script must be first

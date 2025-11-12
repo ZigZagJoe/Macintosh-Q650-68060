@@ -1,5 +1,5 @@
 # 68060 in Macintosh Quadra 650
-This project is a collection of ROM modifications to get a minimum level of functionality out of a Macintosh Quadra 650/800 / Centris 650 with a 68060 installed on an appropriate adapter. As currently sits it can boot an unmodified System 7.1 install. Much will not work and much work is required to bring into a truly usable state; I do not expect to finish it.
+This project is a collection of ROM modifications to get a minimum level of functionality out of a Macintosh Quadra 650/800 / Centris 650 with a Motorola 68060 CPU installed on an appropriate adapter. As currently sits it can boot an unmodified System 7.1 install. Much will not work and much work is required to bring into a truly usable state; I do not expect to finish it.
 
 [Booti video @ youtube](https://www.youtube.com/watch?v=KXSWiKu-ASA)
 [Writeup @ 68kmla](https://68kmla.org/bb/index.php?threads/macintosh-68060-redux.51016/)

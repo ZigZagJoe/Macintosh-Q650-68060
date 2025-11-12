@@ -21,6 +21,7 @@ TODO / Known bugs
     bus error handling (in general)
         Need to correctly handle the new exception stack frame in slot manager  PATCH_SLOTMGR_BERR_HACK
         as well as anything else that actually uses the fields from the handler...
+        need to handle branch cache also (this seems to happen rarely, at least, but still must check)
 
     SPs
         need to hand off to appropriate vectors off VBR for stuff like /v, chk, etc
@@ -28,8 +29,19 @@ TODO / Known bugs
     PRAM clear
         hangs on first go on finder but works after... why?
 
+    On the other board the forced 32 bit hangs in early boot...?
+
 ### DONE??
 
     almost certainly won't work in 24 bit mode as fpsp/isp are after the 1MB ROM mapping boundary (80000 - 8FFFFF) 
         probably just have to accept that
         patch to force 32 bit added
+
+
+SS no BC 66mhz interleaved  16.6fps doom
+ss no bc 50 interleaved     12.36
+ss bc 50 interleaved    14.3
+040 25 interleaved 10.4
+
+    bset #CACR060_DPI, %d0 
+ doesn't seem to do anything
