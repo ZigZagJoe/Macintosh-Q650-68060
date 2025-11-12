@@ -7,7 +7,7 @@ myRomEntry:
 #endif
 
 #ifdef DISABLE_LOADSTOREBYPASS
-    bset #5, %d0
+    bset #5, %d0        | documented in 060 errata document
 #endif
 
     movec %d0, %pcr     | NOTE: this will prevent an 040 from booting at all! 
@@ -19,9 +19,11 @@ so install vectors again here. Called from InstallFPSP */
 PatchInstallSP:
     movem.l  %d0/%a0-%a1, -(%sp)
 
+#ifdef INSTALL_ISP
     movec.l %VBR, %a0
     lea _060_isp_unimp, %a1
     move.l %a1, VECI_UNIMP_II(%a0)
+#endif
 
 #ifdef INSTALL_FPSP
     lea _060_fpsp_inex, %a1
@@ -91,7 +93,6 @@ Initialize060Caches:
     bset #CACR060_ESB, %d0 
 #endif
 
-
     movec %d0, %cacr
 
 #ifdef ENABLE_BRANCH_CACHE    
@@ -100,19 +101,16 @@ Initialize060Caches:
 
     rts  
 
-/* Because we have known issues with 32 bit mode, we can patch INITMMU to come here
-we'll always force the PRAM to 32 bit mode before anything else inits. */  
-Force32PRAM:
-    move.l  %a1, -(%sp)             | preserve %a1, thrashed by writexpram
-
-    MOVE.L	#0x2D2D2D2D, -(%SP)     | MMFlagsDefault repeated across all bytes on stack
-    MOVE.L	%sp,%A0	                | address of data to write
-    MOVE.L	#MMPRAMloc,%D0			| address in pram to write
-    jsr WRITEXPRAM 					| do it
-    move.L (%sp)+, %d0              | return MMUFlags in %D0
-    move.l (%sp)+, %a1
-    
-    rts                             
+/* Because we have known issues with 32 bit mode, we can patch validatePRAM to come here
+we'll always force the XPRAM to 32 bit mode before anything else happens (such as MM init). */  
+ValidatePRAM_Patch:
+    MOVE.L  %sp, %a3                | temporary buffer on the stack already from VALIDATEPRAM 
+    move.b  #MMFlagsDefault, (%a3)  | default value into buffer
+    MOVE.L  #MMFlags_Write, %D3		| write 1 byte into mmflags (See defs.s)
+	JSR		PRAMIO                  | do the write. trashes A3, D3
+    LEA		256(%SP),%SP            | continue patched code, release the buffer
+    move.l  (%sp)+,%d3              | and restore D3
+    rts                           
 
 /* experimental function to install a new access error handler that deals with branch prediction error correctly
 see amiga code for reference, based on that 

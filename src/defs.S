@@ -17,9 +17,8 @@
 /* TODOs / Unproven */
 #define INSTALL_FPSP            // install the FPSP and enable FPU. (TODO-Not fully working)
 //#define ENABLE_BRANCH_CACHE     // enable branch prediction cache  (TODO)
-
 #define PATCH_SLOTMGR_BERR_HACK // during slot manager, assume any bus errors are slot manager's fault (TODO)
-//#define PATCH_FORCE_32BIT       // always run in 32 bit mode as known issues will prevent 24 bit mode (TODO)
+#define PATCH_FORCE_32BIT       // always run in 32 bit mode as known issues will prevent 24 bit mode (TODO)
 
 /* OLD hacks, no longer needed */
 //#define PATCH_SANE_FLUSHIT_HACK   // cache flush hack in SANE flushit just flush all caches
@@ -71,8 +70,12 @@ FPSNAN_VEC040	=	0x1FDC
 noErr = 0	
 
  /* defaults for 32 bit https://github.com/elliotnunn/sys7.1-doc-wip/blob/62f7e0d5dc1d9a047822d5e73ffa8aa50a97e3fa/Internal/Asm/InternalOnlyEqu.a#L205 */
-MMFlagsDefault	=       0b100101 /* 0x25 = (1<<mmFigEnable) | (1<<MMSysheap) | (1<<MMStartMode) */
-MMPRAMloc       =       0x0001008A
+#define MMFlagsDefault  0x25   /* 0b100101 0x25 = (1<<mmFigEnable) | (1<<MMSysheap) | (1<<MMStartMode) */
+#define MMPRAMloc       0x8A
+#define MMFlags_Write   0x8001008A 
+/* #(1<<31)|\			; write													
+	(1<<16)|\			; 1 byte from %A3										
+	(MMPRAMloc<<0)		; starting at PRAM address MMPRAMloc*/
 
 /* CACR bits for 060 */
 #define CACR060_EDC     31  /* 1=enable data cache */
