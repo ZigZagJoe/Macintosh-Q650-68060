@@ -1,35 +1,43 @@
-/* Tested patches */
-#define INSTALL_ISP             // include the ISP
+/* patches */
 #define PATCH_ROMENTRY          // initialize 68060 PCR. NOTE: this will prevent an 040 from booting! 
 #define PATCH_INSTALLFPSP       // patch installFPSP to install SP vectors
-#define PATCH_TMVECTORS_ISP     // patch tmVectors (test manager ROM vectors) to point to ISP
 #define PATCH_ROM_MAP_8MB       // map 8MB of ROM space. note: 24 bit mode only has 1MB addr space still!
 #define PATCH_FLUSHCRANGE       // cache flush, replace ptest
 #define PATCH_SANE_FLUSHIT      // SANE cache flush, replace ptest
-#define PATCH_ENABLECACHES          // initialize 060 caches specifically (required for branch, loadstore)
+#define PATCH_ENABLECACHES      // initialize 060 caches specifically (required for branch, loadstore fifo)
+#define PATCH_LATEINIT          // replace SetupDockBases with LateInit
+#define PATCH_FORCE_32BIT       // always run in 32 bit mode as known issues will prevent 24 bit mode (TODO)
+
+/* features */
+#define INSTALL_ISP             // include the ISP and patch TMVectors
 #define DISABLE_RAMTEST         // no memory tests
 #define DISABLE_CHECKSUM        // no ROM checksum
 #define DISABLE_LOADSTOREBYPASS // rev5 and below require this per errata I14
-#define DISABLE_FPU             // disable 68060 FPU early, prevents Mac OS from detecting it
+#define DISABLE_FPU             // disable 68060 FPU and patch the Quadra 650 table, overrides installFPSP
 #define ENABLE_LOADSTORE_FIFO   // enable load store FIFO
 #define ENABLE_SUPERSCALAR      // enable pentium-like superscalar execution
+#define ENABLE_BRANCH_CACHE     // enable branch prediction cache 
 
 /* TODOs / Unproven */
-#define INSTALL_FPSP            // install the FPSP and enable FPU. (TODO-Not fully working)
-//#define ENABLE_BRANCH_CACHE     // enable branch prediction cache  (TODO)
+//#define INSTALL_FPSP            // install the FPSP and enable FPU. (TODO-Not fully working)
 #define PATCH_SLOTMGR_BERR_HACK // during slot manager, assume any bus errors are slot manager's fault (TODO)
-#define PATCH_FORCE_32BIT       // always run in 32 bit mode as known issues will prevent 24 bit mode (TODO)
+#define CPUSH_NO_INVALIDATE     // CPUSH'd lines remain valid in cache, no performance impact seen
 
-/* OLD hacks, no longer needed */
+/* MISC */
+#define SERIAL_DEBUG            // enable serial debugging over modem port
+
+/* OLD hacks, no longer needed and can be removed */
 //#define PATCH_SANE_FLUSHIT_HACK   // cache flush hack in SANE flushit just flush all caches
 //#define PATCH_BADDIVIDES          // ugly hack out the early 64/32 divides in sound stuff
 //#define PATCH_FLUSHCRANGE_HACK    // cache flush hack just flush all caches
 //#define PATCH_NOTESTFORFPU        // do not test for FPU in testforFPU
 
+#ifdef DISABLE_FPU
+    #undef INSTALL_FPSP     // no FPSP if we disable the FPU
+#endif
+
 /* constants */
-
-#define INITIAL_PC 0x0000002A
-
+/* vector table (partial) */
 #define	VECI_ACCERR		    0x08	/* Access Error AKA Bus Error */
 #define	VECI_LINE1111		0x2C	/* Line 1111 Emulator */
 #define	VECI_FP_BSUN		0xC0	/* FPCP Branch or Set on Unordered */
@@ -55,23 +63,48 @@ _060_fpsp_fline=(FP_CALL_TOP+0x80+0x30) /* "Line F emulator", handles bsun, unim
 _060_fpsp_unsupp=(FP_CALL_TOP+0x80+0x38) /* Unimplemented Data Type" exception */
 _060_fpsp_effadd=(FP_CALL_TOP+0x80+0x40) /* unimplemented effective address */
 
-| SANE vector stuff
-| fpPriv
-| almost certainly TODO.
-| https://github.com/elliotnunn/supermario/blob/9dd3c4bef84df2ea30f5ec2c5e97b043e8267b3f/base/SuperMarioProj.1994-02-09/Toolbox/InSANE/FPPrivTrap.a#L216
-| FLINE exception vector for system  <1/03/91, JPO>
-FLINE_VEC040	=	0x1FC8
-FPBSUN_VEC040	=	0x1FCC
-FPUNFL_VEC040	=	0x1FD0
-FPOPERR_VEC040	=	0x1FD4
-FPOVFL_VEC040	=	0x1FD8
-FPSNAN_VEC040	=	0x1FDC
+/* memory location for old access handler (long) */
+Old_AccessFault=0x40
 
-noErr = 0	
+/* Serial constant routines for debugging. */
+.macro init_serial
+#ifdef SERIAL_DEBUG
+    jsr InitSerialFunc
+#endif
+.endm
+
+.macro put_char ch
+#ifdef SERIAL_DEBUG
+	move.b	#0x30,(aCtl)	|reset any errors			
+	move.b	#\ch,(aData)	|send character			
+
+1:			                |wait until all sent 		
+	move.b	#1,(aCtl)		|select RR1			
+	
+	btst	#0,(aCtl)		|All Sent?			
+	beq.s	1b
+#endif
+.endm
+		
+.macro put_string str 
+#ifdef SERIAL_DEBUG
+    move.l %a0, -(%sp)
+    lea (1f, %pc), %a0
+    jsr _puts
+    bra 2f
+1:
+    .string "\str"
+    .align 2
+2:
+    move.l (%sp)+,%a0
+#endif
+.endm
+
+/* ##### CONSTANTS ##### */
 
  /* defaults for 32 bit https://github.com/elliotnunn/sys7.1-doc-wip/blob/62f7e0d5dc1d9a047822d5e73ffa8aa50a97e3fa/Internal/Asm/InternalOnlyEqu.a#L205 */
-#define MMFlagsDefault  0x25   /* 0b100101 0x25 = (1<<mmFigEnable) | (1<<MMSysheap) | (1<<MMStartMode) */
-#define MMPRAMloc       0x8A
+#define MMFlagsDefault  0x25    /* 0b100101 0x25 = (1<<mmFigEnable) | (1<<MMSysheap) | (1<<MMStartMode) */
+#define MMPRAMloc       0x8A    /* xpram */
 #define MMFlags_Write   0x8001008A 
 /* #(1<<31)|\			; write													
 	(1<<16)|\			; 1 byte from %A3										
@@ -90,28 +123,18 @@ noErr = 0
 #define CACR060_NAI     14  /* 1=misses don't allocate */
 #define CACR060_FIC     13  /* 1=half inst cache mode */
 
-/* memory location for old access handler (long) */
-Old_AccessFault=0x40
+/* ##### APPLE CONSTANTS PAST HERE ##### */
 
-.macro put_char ch
-	move.b	#0x30,(aCtl)	|reset any errors			
-	move.b	#\ch,(aData)	|send character			
+| SANE vector stuff
+| fpPriv
+| almost certainly TODO.
+| https://github.com/elliotnunn/supermario/blob/9dd3c4bef84df2ea30f5ec2c5e97b043e8267b3f/base/SuperMarioProj.1994-02-09/Toolbox/InSANE/FPPrivTrap.a#L216
+| FLINE exception vector for system  <1/03/91, JPO>
+FLINE_VEC040	=	0x1FC8
+FPBSUN_VEC040	=	0x1FCC
+FPUNFL_VEC040	=	0x1FD0
+FPOPERR_VEC040	=	0x1FD4
+FPOVFL_VEC040	=	0x1FD8
+FPSNAN_VEC040	=	0x1FDC
 
-1:			                |wait until all sent 		
-	move.b	#1,(aCtl)		|select RR1			
-	
-	btst	#0,(aCtl)		|All Sent?			
-	beq.s	1b
-.endm
-		
-.macro put_string str 
-    move.l %a0, -(%sp)
-    lea (1f, %pc), %a0
-    jsr _puts
-    bra 2f
-1:
-    .string "\str"
-    .align 2
-2:
-    move.l (%sp)+,%a0
-.endm
+noErr = 0	

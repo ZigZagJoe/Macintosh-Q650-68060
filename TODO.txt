@@ -2,34 +2,33 @@ TODO / Known bugs
 
     System 7.5 hangs in boot at welcome to macintosh, probably FPU-related.
 
-    branch cache not working
-        no change in performance noted if changed at installfpsp time. might be cleared somewhere
-            it's cleared immediately afterwards, added a patch for 060 cache initialization
-        may need to begin clearing at similar times to ATC
-        critical problem: bus error (access error) handlers must check for branch predict error bit
-            if set, clear branch cache and resume...
-            bus error handler is monkeyed with very often....
-
     FPU   
         no FPU detected in tattletech or speedometer
-            might happen at early boot while we have the FPU disabled
+            might happen at early boot while we have the FPU disabled. 
+            yes, it does. TESTFORFPU happens very early in boot
         sane trap behavior wrt 040 probably needs expansion
             hands over to system handlers for some of the traps not used for 040 but 060 fpsp would use those
-        seems to cause crashes if FPU code is called.
-        TESTFORFPU happens very early in boot
+        seems to cause hangs if FPU code is called with no fpsp
+            this is the same issue 040 rom has; fixed via a resource tweak
+        
+        fsave/frestore
+            anything that looks at the content of the frame or makes an assumption about the frame is gonna have a problem
 
     bus error handling (in general)
         Need to correctly handle the new exception stack frame in slot manager  PATCH_SLOTMGR_BERR_HACK
         as well as anything else that actually uses the fields from the handler...
         need to handle branch cache also (this seems to happen rarely, at least, but still must check)
+        seems like this can probably just be a hop to genexcps always and hope nobody touches the handler
+        ** probably branch cache should be turned on after slot manager completes - DONE **
 
-    SPs
-        need to hand off to appropriate vectors off VBR for stuff like /v, chk, etc
+    SPs need to hand off to appropriate vectors off VBR for excepetions like /v, chk, etc
 
-    PRAM clear
-        hangs on first go on finder but works after... why?
+    PRAM clear hangs on first go on finder but works after... why?
 
-    On the other board the forced 32 bit hangs in early boot...?
+    memory/vram throughput is reduced vs 040
+        25, 33mhz bus clocks
+        but inexplicably fine at 32mhz
+        does NOT show in L2 cache comparison without BC at 64 and 66 ???
 
 ### DONE??
 
@@ -37,11 +36,31 @@ TODO / Known bugs
         probably just have to accept that
         patch to force 32 bit added
 
+    branch cache not working
+        no change in performance noted if changed at installfpsp time. might be cleared somewhere
+            it's cleared immediately afterwards, added a patch for 060 cache initialization
+        may need to begin clearing at similar times to ATC
+        critical problem: bus error (access error) handlers must check for branch predict error bit
+            if set, clear branch cache and resume...
+            bus error handler is monkeyed with very often....
+        no the CPU just didn't like 66mhz
 
-SS no BC 66mhz interleaved  16.6fps doom
-ss no bc 50 interleaved     12.36
-ss bc 50 interleaved    14.3
-040 25 interleaved 10.4
+    On the other board the forced 32 bit hangs in early boot...?
+        PRAM forcing issue
+
+############################################################################
+
+ultimate doom TD
+
+
+040 25 ilv              10.4
+040 33                  13.5
+040 40 ilv              16
+060 50 ilv ss           12.36
+060 50 ilv bc ss        14.3
+060 64 ilv bc ss        17.6
+060 64 ilv bc ss l2     19
+060 66 ilv ss           16.6
 
     bset #CACR060_DPI, %d0 
  doesn't seem to do anything

@@ -1,21 +1,25 @@
-/* patch to disable the FPU at early boot */
-myRomEntry:
-    clr.l %d0           | disable superscalar
+/* ################################################################################
+  patch to initialize the 68060 PCR immediately after boot, replacing normal entry */
+RomEntryNew:
+    clr.l %d0                       | disable superscalar (bit0=0)
 
 #ifdef DISABLE_FPU
-    bset #1, %d0
+    bset #1, %d0                    | disable FPU (bit1=1)
 #endif
 
 #ifdef DISABLE_LOADSTOREBYPASS
-    bset #5, %d0        | documented in 060 errata document
+    bset #5, %d0                    | I14, documented in 060 errata document
 #endif
 
-    movec %d0, %pcr     | NOTE: this will prevent an 040 from booting at all! 
-    jmp INITIAL_PC      | back to original entry
+    movec %d0, %pcr                 | NOTE: this will prevent an 040 from booting at all! 
+    jmp OrigiEntry                  | back to original entry
 
     
-/* runs much later after VBR is in RAM, and after SysErrInit blows away our unimplemented integer handler 
-so install vectors again here. Called from InstallFPSP */
+/* ################################################################################
+ InstallFPSP replacement.
+ runs much later after VBR is in RAM, and after SysErrInit blows away our unimplemented integer handler 
+ so install vectors again*/
+
 PatchInstallSP:
     movem.l  %d0/%a0-%a1, -(%sp)
 
@@ -53,56 +57,61 @@ PatchInstallSP:
     lea _060_fpsp_fline, %a1
     move.l %a1, VECI_LINE1111(%a0)
 
-    /* BSUN vector is not used on 060 - handled in fline */
+    /* BSUN vector is not used on 060, it's handled in fline */
 #endif
 
     movec %pcr, %d0 
 
-#ifdef DISABLE_LOADSTOREBYPASS
-    bset #5, %d0        | should already be disabled but set it anyways
+#ifdef INSTALL_FPSP    
+    bclr #1, %d0                    | clear FPU disable bit (bit=0)
 #endif
 
-#ifdef INSTALL_FPSP    
-    bclr #1, %d0        | clear FPU disable bit (bit=0)
-#else
-    bset #1, %d0        | set FPU disable bit (bit=1)
-#endif
 #ifdef ENABLE_SUPERSCALAR
-    bset #0, %d0        | enable superscalar (bit=1)
-#else
-    bclr #0, %d0        | disable superscalar (bit=0)
+    bset #0, %d0                    | enable superscalar (bit=1)
 #endif
 
     movec %d0, %pcr     
 
-    jsr InitSerialFunc
-
-    put_string "\nHi!\n"
+    init_serial
+    put_string "\nHello!\nPatchInstallSP\n"
 
     movem.l  (%sp)+,%d0/%a0-%a1
     rts
 
-/* OK to thrash D0. replaces ENABLECACHESPATCH / part of StartInit*/
-Initialize060Caches:
-    
-    clr.l %d0
-    bset #CACR060_EDC, %d0
-    bset #CACR060_EIC, %d0
-
-#ifdef ENABLE_LOADSTORE_FIFO
-    bset #CACR060_ESB, %d0 
-#endif
-
-    movec %d0, %cacr
+/* ################################################################################
+  Do any late boot initialization. Replaces SetupDockBase since we're never gonna have a dock */
+LateInit:
+    put_string "Late Init\n"
 
 #ifdef ENABLE_BRANCH_CACHE    
-    jsr TurnOnBC
+    jsr TurnOnBC                    | turn on branch cache here since we can patch the vector table and have it stick
 #endif
+
+    rts
+
+/* ################################################################################
+ Initialize caches. replaces 040-centric ENABLECACHESPATCH / part of StartInit
+ OK to thrash D0. */
+Initialize060Caches:
+    clr.l %d0
+    bset #CACR060_EDC, %d0          | data cache
+    bset #CACR060_EIC, %d0          | instruction cache
+
+#ifdef ENABLE_LOADSTORE_FIFO
+    bset #CACR060_ESB, %d0          | load store FIFO
+#endif
+
+#ifdef CPUSH_NO_INVALIDATE
+    bset #CACR060_DPI, %d0          | cpush doesn't invalidate lines, could help performance
+#endif
+
+    movec %d0, %cacr                | ...and make it live
 
     rts  
 
-/* Because we have known issues with 32 bit mode, we can patch validatePRAM to come here
-we'll always force the XPRAM to 32 bit mode before anything else happens (such as MM init). */  
+/* ################################################################################
+ Because we have known issues with 32 bit mode, we can patch validatePRAM to come here
+ we'll always force the XPRAM to 32 bit mode before anything else happens (such as MM init). */  
 ValidatePRAM_Patch:
     MOVE.L  %sp, %a3                | temporary buffer on the stack already from VALIDATEPRAM 
     move.b  #MMFlagsDefault, (%a3)  | default value into buffer
@@ -112,10 +121,8 @@ ValidatePRAM_Patch:
     move.l  (%sp)+,%d3              | and restore D3
     rts                           
 
-/* experimental function to install a new access error handler that deals with branch prediction error correctly
-see amiga code for reference, based on that 
-doesn't seem to work (Branch cache still crashes)*/
-.global TurnOnBC
+/* ################################################################################
+ experimental function to install a new access error handler that deals with branch prediction error correctly */
 TurnOnBC:
     movem.l %d0/%a0-%a1, -(%sp)
 
@@ -126,15 +133,15 @@ TurnOnBC:
     lea New_AccessFault, %a1
     /*move.l VECI_ACCERR(%a0), %d0
     cmp.l %a1, %d0              
-    beq AlreadyInstalled        | already installed, don't overwrite the old handler
+    beq AlreadyInstalled            | already installed, don't overwrite the old handler
 
     move.l VECI_ACCERR(%a0), (Old_AccessFault).W*/
     move.l %a1, VECI_ACCERR(%a0)
 
 AlreadyInstalled:
-    movec %cacr, %d0            | set up the CACR for 060 added featuresget
-    bset #CACR060_EBC, %d0      | enable
-    bset #CACR060_CABC, %d0     | and clear all
+    movec %cacr, %d0                | set up the CACR for 060 added featuresget
+    bset #CACR060_EBC, %d0          | enable
+    bset #CACR060_CABC, %d0         | and clear all
     movec %d0, %cacr
 
     put_string " done\n"
@@ -143,28 +150,17 @@ AlreadyInstalled:
 
     rts
 
-.macro print_longword
-    move.l (%a0)+, %d0
-    jsr _puthexlong
-    put_char ' '
-.endm
-
-.macro print_word
-    move.w (%a0)+, %d0
-    jsr _puthexword
-    put_char ' '
-.endm
-
-.global New_AccessFault
-/* borrowed wholesale from amiga */
+/* ################################################################################
+ new access fault handler. Must check for BPE bit and clear branch cache if set, 
+ then either return if no further error or proceed to normal bus error handler */
 New_AccessFault:	
 
-	/*BTST	#2,(12+3,%SP)		| BPE ?
+	/*BTST	#2,(12+3,%SP)		    | BPE ?
 	BNE.B	BranchPredictionError
 	|MOVE.L	(Old_AccessFault).w,-(%sp)
-    MOVE.L	(GENEXCPS),-(%sp) | call to Deepshit bus error handler
+    MOVE.L	(GENEXCPS),-(%sp)       | call to Deepshit bus error handler
     
-	RTS                         | continue in original handler
+	RTS                             | continue in original handler
 */
     move.l %d0, -(%sp)
 
@@ -176,41 +172,4 @@ New_AccessFault:
 	move.l (%sp)+,%d0
 
 BranchPredictionError:
-	/*cpusha %bc
-    nop
-    move.l %d0, -(%sp)
-
-    movec %cacr, %d0
-    bset #CACR060_CABC, %d0 
-    nop
-    movec %d0, %cacr
-	nop
-    cpusha %bc
-    nop
-	move.l (%sp)+,%d0*/
-    /*cpusha %bc
-    movem.l %d0/%a0-%a1, -(%sp) | 12 bytes on stack
-
-    put_string "\nBus Error\n SR    PC     4VEC   FAddr   FSLW|PC\n"
-    lea (12,%sp),%a0
-
-    print_word | SR
-    print_longword | PC
-    print_word | Vector offset
-    print_longword | fault addr
-    print_longword | FSLW
-
-    BTST	#2,(12+12+3,%SP)		| BPE ?
-	beq notbpe
-    put_string "BPE"
-notbpe:
-
-    put_char '\n'
-    
-   | 1: bra 1b | hang it
-
-    movem.l  (%sp)+,%d0/%a0-%a1*/
-
     RTE  
-
-#include "serial.S"
