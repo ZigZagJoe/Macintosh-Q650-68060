@@ -262,7 +262,8 @@ _060_dmem_write_long:
 #
 */
 _060_real_trace:
-	rte
+    move.l #GENEXCPS_Trace,-(%sp) | address of Deepshit error handler on stack
+	RTS                             | continue in original handler
 
 /*
 #
@@ -277,7 +278,6 @@ _060_real_trace:
 # If we had a sane ld, we could use use that entry point directly...
 #
 */
-_060_real_access:
-    rte
-	| TODO!
-    | jra	_C_LABEL(buserr60)
+_060_real_access: | TODO, UNTESTED
+    move.l #GENEXCPS_BusError,-(%sp) | address of Deepshit bus error handler on stack
+	RTS                             | continue in original handler

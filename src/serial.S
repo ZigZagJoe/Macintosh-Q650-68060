@@ -1,3 +1,9 @@
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+| Serial debug tooling
+| steal the modem SCC and use it for debug strings!
+
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+| addresses for wombat
 .set ADDR_SCC,   0x50F0C020     | SCC read/write
 .set ADDR_VIA1,  0x50F00000     | VIA1
 
@@ -34,7 +40,8 @@
 
 .set vSync, 3 				    | Synchronous modem bit in via2
 
-| setup SCC, preserve registers
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+| setup SCC on modem port, preserve registers
 InitSerialFunc:
     movem.l  %d0/%a0-%a1,-(%sp)
     tst.b (ADDR_SCC)              |sync up accept address byte
@@ -58,6 +65,8 @@ InitSerialFunc:
     movem.l  (%sp)+,%d0/%a0-%a1
     rts
 
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+| SCC initialization table
 PortSetUp:
 	dc.b	0x09,0xC0			|reg  9, reset hardware
 	dc.b	0x0F,0x00			|reg 15, disable interrupts
@@ -117,6 +126,8 @@ _puthexword:
     move.w (%SP)+, %D0
     rts
 
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+| put hex byte in %d0    
 _puthexbyte:
     movem.l %A0/%D0, -(%SP)        | save regs
     
@@ -129,6 +140,8 @@ _puthexbyte:
     movem.l (%SP)+, %A0/%D0        | restore regs
     rts
 
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+| put hex digit in %d0    
 _puthdigit:
     lea (%pc,_hexchars), %A0
     and.w #0xF, %D0

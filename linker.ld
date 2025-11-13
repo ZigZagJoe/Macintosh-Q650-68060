@@ -11,7 +11,6 @@ SECTIONS {
   }
 
  .text : SUBALIGN (4) {
-    /* resource dir & sRSRCs */
     *F1ACAD13.o (.text)
  } > ROM
 

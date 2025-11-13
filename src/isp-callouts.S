@@ -109,9 +109,9 @@ _060_real_chk:
 	moveb	#0x24,%sp@(0x7)		|# set trace vecno
 	bral	_060_real_trace
 
-real_chk_end:
-	rte
-    | TODO - need to go to chk  handler
+real_chk_end: | TODO, UNTESTED
+	move.l #GENEXCPS_CHK,-(%sp) | address of Deepshit error handler on stack
+	RTS                             | continue in original handler
 
 /*
 #
@@ -151,9 +151,9 @@ _060_real_divbyzero:
 	moveb	#0x24,%sp@(0x7)		|# set trace vecno
 	bral	_060_real_trace
 
-real_divbyzero_end:
-	rte
-    | TODO - need to go to div/0 handler
+real_divbyzero_end: | TODO, UNTESTED
+	move.l #GENEXCPS_DivBy0,-(%sp) | address of Deepshit error handler on stack
+	RTS                             | continue in original handler
 
 |###########################
 

@@ -2,6 +2,22 @@ TODO / Known bugs
 
     System 7.5 hangs in boot at welcome to macintosh, probably FPU-related.
 
+    bus error handling (in general)
+        Need to correctly handle the new exception stack frame in slot manager  PATCH_SLOTMGR_BERR_HACK
+        as well as anything else that actually uses the fields from the handler...
+        need to handle branch cache also (this seems to happen rarely, at least, but still must check)
+            seems like this can probably just be a hop to genexcps always and hope nobody touches the handler
+            DONE, UNTESTED
+        ** probably branch cache should be turned on after slot manager completes - DONE **
+
+    SPs need to hand off to appropriate vectors off VBR for excepetions like /v, chk, etc
+        DONE, UNTESTED
+
+    memory/vram throughput is reduced vs 040
+        25, 33mhz bus clocks
+        but inexplicably fine at 32mhz
+        does NOT show in L2 cache comparison without BC at 64 and 66 ???
+
     FPU   
         no FPU detected in tattletech or speedometer
             might happen at early boot while we have the FPU disabled. 
@@ -14,24 +30,11 @@ TODO / Known bugs
         fsave/frestore
             anything that looks at the content of the frame or makes an assumption about the frame is gonna have a problem
 
-    bus error handling (in general)
-        Need to correctly handle the new exception stack frame in slot manager  PATCH_SLOTMGR_BERR_HACK
-        as well as anything else that actually uses the fields from the handler...
-        need to handle branch cache also (this seems to happen rarely, at least, but still must check)
-        seems like this can probably just be a hop to genexcps always and hope nobody touches the handler
-        ** probably branch cache should be turned on after slot manager completes - DONE **
-
-    SPs need to hand off to appropriate vectors off VBR for excepetions like /v, chk, etc
-
-    PRAM clear hangs on first go on finder but works after... why?
-
-    memory/vram throughput is reduced vs 040
-        25, 33mhz bus clocks
-        but inexplicably fine at 32mhz
-        does NOT show in L2 cache comparison without BC at 64 and 66 ???
-
 ### DONE??
 
+    PRAM clear hangs on first go on finder but works after... why?
+        fixed, something to do with FPU i guess
+        
     almost certainly won't work in 24 bit mode as fpsp/isp are after the 1MB ROM mapping boundary (80000 - 8FFFFF) 
         probably just have to accept that
         patch to force 32 bit added
@@ -50,17 +53,3 @@ TODO / Known bugs
 
 ############################################################################
 
-ultimate doom TD
-
-
-040 25 ilv              10.4
-040 33                  13.5
-040 40 ilv              16
-060 50 ilv ss           12.36
-060 50 ilv bc ss        14.3
-060 64 ilv bc ss        17.6
-060 64 ilv bc ss l2     19
-060 66 ilv ss           16.6
-
-    bset #CACR060_DPI, %d0 
- doesn't seem to do anything
