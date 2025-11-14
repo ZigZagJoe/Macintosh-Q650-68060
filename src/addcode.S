@@ -12,7 +12,7 @@ ROMEntryNew:
 #endif
 
     movec %d0, %pcr                 | NOTE: this will prevent an 040 from booting at all! 
-    jmp ROMEntryOrig                  | back to original entry
+    jmp ROMEntryOrig                | back to original entry
 
 /* ################################################################################
 | InstallFPSP replacement.
@@ -22,8 +22,12 @@ ROMEntryNew:
 PatchInstallSP:
     movem.l  %d0/%a0-%a1, -(%sp)
 
-#ifdef INSTALL_ISP
+    INIT_SERIAL
+    PUT_STRING "\nHello!\nPatchInstallSP\n"
+
     movec.l %VBR, %a0
+    
+#ifdef INSTALL_ISP
     lea _060_isp_unimp, %a1
     move.l %a1, VECI_UNIMP_II(%a0)
 #endif
@@ -59,27 +63,24 @@ PatchInstallSP:
     /* BSUN vector is not used on 060, it's handled in fline */
 #endif
 
-    movec %pcr, %d0 
-
-#ifdef ENABLE_SUPERSCALAR
-    bset #0, %d0                    | enable superscalar (bit=1)
-#endif
-
-    movec %d0, %pcr     
-
-    init_serial
-    put_string "\nHello!\nPatchInstallSP\n"
-
     movem.l  (%sp)+,%d0/%a0-%a1
     rts
 
 /* ################################################################################
-| Do any late boot initialization. Replaces SetupDockBase since we're never gonna have a dock */
+| Do any late boot initialization. Replaces SetupDockBase since we're never gonna have a dock 
+| OK to trash D0-D2, A0-A1 */
 LateInit:
-    put_string "LateInit\n"
+    PUT_STRING "LateInit\n"
+
+#ifdef ENABLE_SUPERSCALAR
+    movec %pcr, %d0                 | turn on superscalar after timedbra has run
+    bset #0, %d0                    | enable superscalar (bit0=1)
+    movec %d0, %pcr     
+#endif
 
 #ifdef ENABLE_BRANCH_CACHE    
-    jsr TurnOnBC                    | turn on branch cache here since we can patch the vector table and have it stick
+    jsr TurnOnBC                    | turn on branch cache. we can patch the vector table and have it stick
+                                    | and slot manager is done messing with bus error vector too.
 #endif
 
     rts
@@ -89,11 +90,11 @@ LateInit:
 | OK to thrash D0. */
 Initialize060Caches:
     clr.l %d0
-    bset #CACR060_EDC, %d0          | data cache
-    bset #CACR060_EIC, %d0          | instruction cache
+    bset #CACR060_EDC, %d0          | enable data cache
+    bset #CACR060_EIC, %d0          | enable instruction cache
 
 #ifdef ENABLE_LOADSTORE_FIFO
-    bset #CACR060_ESB, %d0          | load store FIFO
+    bset #CACR060_ESB, %d0          | enable loadstore FIFO (distinct from the bypass errata)
 #endif
 
 #ifdef CPUSH_NO_INVALIDATE
@@ -101,7 +102,6 @@ Initialize060Caches:
 #endif
 
     movec %d0, %cacr                | ...and make it live
-
     rts  
 
 /* ################################################################################
@@ -121,15 +121,15 @@ ValidatePRAM_Patch:
 TurnOnBC:
     movem.l %d0/%a0-%a1, -(%sp)
 
-    put_string "TurnOnBC\n"
+    PUT_STRING "TurnOnBC\n"
 
     movec.l %VBR, %a0
     lea New_AccessFault, %a1
     move.l %a1, VECI_ACCERR(%a0)
 
-    movec %cacr, %d0                | set up the CACR for 060 added featuresget
-    bset #CACR060_EBC, %d0          | enable
-    bset #CACR060_CABC, %d0         | and clear all
+    movec %cacr, %d0                | get current CACR
+    bset #CACR060_EBC, %d0          | enable branch prediction cache
+    bset #CACR060_CABC, %d0         | and clear it
     movec %d0, %cacr
 
     movem.l  (%sp)+,%d0/%a0-%a1
@@ -140,14 +140,17 @@ TurnOnBC:
 | then either return if no further error or proceed to normal bus error handler 
 | NOTE: not yet verified as don't seem to be hitting BPEs */
 New_AccessFault:	
-	BTST	#2,(12+3,%SP)		    | BPE ?
+	PUT_STRING "BERR\n"
+    
+    BTST	#2,(12+3,%SP)		    | BPE ?
 	BNE.B	BranchPredictionError
-    move.l #GENEXCPS_BusError,-(%sp) | address of Deepshit bus error handler on stack
-	RTS                             | continue in original handler
+
+    move.l #GENEXCPS_BusError, -(%sp) 
+    rts                             | hand off to Deepshit BusError
 
 BranchPredictionError:
     move.l %d0, -(%sp)
-    put_char 'B'                    | DEBUG note we hit a BPE
+    PUT_STRING "BPE\n"              | DEBUG note we hit a BPE
 	
     movec %cacr, %d0
     bset #CACR060_CABC, %d0 

@@ -12,6 +12,14 @@ ROM definitions
 | constants */
 /* vector table (partial) */
 #define	VECI_ACCERR		    0x08	/* Access Error AKA Bus Error */
+#define VECI_ADDRERR        0x0C
+#define VECI_ILLEGAL        0x10
+#define VECI_DIV0           0x14
+#define VECI_CHK            0x18
+#define VECI_TRAP           0x1C
+#define VECI_PRIV           0x20
+#define VECI_TRACE          0x24
+#define VECI_LINE1010       0x28
 #define	VECI_LINE1111		0x2C	/* Line 1111 Emulator */
 #define	VECI_FP_BSUN		0xC0	/* FPCP Branch or Set on Unordered */
 #define	VECI_FP_INEX		0xC4	/* FPCP Inexact Result */
@@ -23,6 +31,16 @@ ROM definitions
 #define	VECI_UNIMP_FP_DATA	0xDC	/* FP Unimplemented Data Type */
 #define	VECI_UNIMP_EA		0xF0	/* Unimplemented Effective Address */
 #define	VECI_UNIMP_II		0xF4	/* Unimplemented Integer Instruction */
+
+/* helper macro to get us to a vector based off VBR */
+.macro RTS_TO_VECTOR vec
+    clr.l -(%sp)            | allocate space for the address
+    move.l %a0, -(%sp)      | save %a0
+    movec %vbr, %a0         | get vbr
+    move.l \vec(%a0), 4(%sp)| retrieve vector with offset from VBR and store it in the space
+    move.l (%sp)+, %a0      | restore %a0
+    rts                     | ... and go to the vector 
+.endm
 
 /* sp entry points */
 _060_isp_unimp=(I_CALL_TOP+0x80+0x00) /* unimplemented integer */
@@ -76,13 +94,13 @@ noErr = 0
 
 /* ################################################################################
 | Serial constant routines for debugging. */
-.macro init_serial
+.macro INIT_SERIAL
 #ifdef SERIAL_DEBUG
     jsr InitSerialFunc
 #endif
 .endm
 
-.macro put_char ch
+.macro PUT_CHAR ch
 #ifdef SERIAL_DEBUG
 	move.b	#0x30,(aCtl)	|reset any errors			
 	move.b	#\ch,(aData)	|send character			
@@ -95,7 +113,7 @@ noErr = 0
 #endif
 .endm
 		
-.macro put_string str 
+.macro PUT_STRING str 
 #ifdef SERIAL_DEBUG
     move.l %a0, -(%sp)
     lea (1f, %pc), %a0

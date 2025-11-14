@@ -10,7 +10,7 @@ Thanks to Jockelill for a pointer on the MMU ROM mapping, Aprezbios for supplyin
 
 ## Requirements
 * System 7.1 + Enabler 040 V1.1
-* System gestalt ID 35 for Quadra 650 (J25 disconnected, R152 installed, R151 empty)
+* System gestalt ID 36 for Quadra 650 (J25 disconnected, R152 installed, R151 empty)
 * Any version of 68060, LC chips should work too.
 * Bear in mind that if your machine is 33mhz bus not all 060s will run at 66mhz!
 

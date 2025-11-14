@@ -1,36 +1,40 @@
-TODO / Known bugs
-
-    System 7.5 hangs in boot at welcome to macintosh, probably FPU-related.
-
-    bus error handling (in general)
-        Need to correctly handle the new exception stack frame in slot manager  PATCH_SLOTMGR_BERR_HACK
-        as well as anything else that actually uses the fields from the handler...
-        need to handle branch cache also (this seems to happen rarely, at least, but still must check)
-            seems like this can probably just be a hop to genexcps always and hope nobody touches the handler
-            DONE, UNTESTED
-        ** probably branch cache should be turned on after slot manager completes - DONE **
-
-    SPs need to hand off to appropriate vectors off VBR for excepetions like /v, chk, etc
-        DONE, UNTESTED
-
+TODO / Known bugs  
     memory/vram throughput is reduced vs 040
         25, 33mhz bus clocks
-        but inexplicably fine at 32mhz
         does NOT show in L2 cache comparison without BC at 64 and 66 ???
+        let's try enabling superscalar late in boot. 
+            Seems to fix timedbra calculation, though what does that affect?
+        oddly, cbits l/a is consistent on 25mhz bclk
 
-    FPU   
-        no FPU detected in tattletech or speedometer
-            might happen at early boot while we have the FPU disabled. 
-            yes, it does. TESTFORFPU happens very early in boot
-        sane trap behavior wrt 040 probably needs expansion
+    bus error handler for slot manager  PATCH_SLOTMGR_BERR_HACK
+        needs to be updated to actually check the fields correctly on the new one
+
+    System 7.5 hangs in boot at welcome to macintosh
+        code 10? fline?
+        a vector might have been clobbered? 
+        or a ptest? this would result in an illegal
+
+    FPU & FPSP   
+        sane trap behavior wrt 040 probably needs expansion / hand off from FPSP calls
             hands over to system handlers for some of the traps not used for 040 but 060 fpsp would use those
         seems to cause hangs if FPU code is called with no fpsp
             this is the same issue 040 rom has; fixed via a resource tweak
-        
         fsave/frestore
             anything that looks at the content of the frame or makes an assumption about the frame is gonna have a problem
 
+### NEEDS TESTING
+    branch cache
+        ** probably branch cache should be turned on after slot manager completes - DONE **
+        need to verify bus except handler actually works correctly...
+        supposedly some apps hate this, like Microsoft Word. If i were doing this for real a blacklist to disable BC while these apps are running would be indicated
+
+    ISP need to hand off to appropriate vectors off VBR for exceptions like /v, chk, etc
+        RTS_TO_VECTOR: DONE, UNTESTED
+
 ### DONE??
+    FPU disable/LC CPUs
+        have to change resource layout in universaltables. only done for q650 almost
+        not sure what this affects?? maybe FPU-optional machines always use FPU-less SANE??
 
     PRAM clear hangs on first go on finder but works after... why?
         fixed, something to do with FPU i guess
@@ -52,4 +56,8 @@ TODO / Known bugs
         PRAM forcing issue
 
 ############################################################################
+NOTES
 
+no FPU detected in tattletech or speedometer
+    fpu detect happen at early boot while we have the FPU disabled. 
+        TESTFORFPU

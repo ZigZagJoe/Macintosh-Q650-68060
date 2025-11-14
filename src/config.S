@@ -5,12 +5,12 @@ ROM configuration
 /* patches */
 #define PATCH_ROMENTRY          // initialize 68060 PCR. NOTE: this will prevent an 040 from booting! 
 #define PATCH_INSTALLFPSP       // patch installFPSP to install SP vectors
-#define PATCH_ROM_MAP_8MB       // map 8MB of ROM space. note: 24 bit mode only has 1MB addr space still!
 #define PATCH_FLUSHCRANGE       // cache flush, replace ptest
 #define PATCH_SANE_FLUSHIT      // SANE cache flush, replace ptest
 #define PATCH_ENABLECACHES      // initialize 060 caches specifically (required for branch, loadstore fifo)
 #define PATCH_LATEINIT          // replace SetupDockBases with LateInit
-#define PATCH_FORCE_32BIT       // always run in 32 bit mode as known issues will prevent 24 bit mode
+#define PATCH_ROM_MAP_8MB       // map 8MB of ROM space. note: 24 bit mode only has 1MB addr space still!
+#define PATCH_FORCE_32BIT       // always run in 32 bit mode as 24 bit mode can't work ROM >1MB
 
 /* features */
 #define INSTALL_ISP             // include the ISP and patch TMVectors
@@ -25,10 +25,10 @@ ROM configuration
 /* TODOs / Unproven */
 //#define INSTALL_FPSP            // install the FPSP and enable FPU. (TODO-Not fully working)
 #define PATCH_SLOTMGR_BERR_HACK // during slot manager, assume any bus errors are slot manager's fault (TODO)
-#define CPUSH_NO_INVALIDATE     // CPUSH'd lines remain valid in cache, no performance impact/improvement seen
+#define CPUSH_NO_INVALIDATE     // CPUSH'd lines remain valid in cache. no performance impact/improvement seen
 
 /* MISC */
-//#define SERIAL_DEBUG            // enable serial debugging over modem port
+#define SERIAL_DEBUG            // enable serial debugging over modem port
 
 /* OLD hacks, no longer needed and can be removed */
 //#define PATCH_SANE_FLUSHIT_HACK   // cache flush hack in SANE flushit just flush all caches
