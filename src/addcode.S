@@ -145,8 +145,8 @@ New_AccessFault:
     BTST	#2,(12+3,%SP)		    | BPE ?
 	BNE.B	BranchPredictionError
 
-    move.l #GENEXCPS_BusError, -(%sp) 
-    rts                             | hand off to Deepshit BusError
+    PUT_STRING "Sendit\n"
+    jmp GENEXCPS_BusError           | hand off to Deepshit BusError
 
 BranchPredictionError:
     move.l %d0, -(%sp)

@@ -28,10 +28,9 @@ ROM configuration
 #define CPUSH_NO_INVALIDATE     // CPUSH'd lines remain valid in cache. no performance impact/improvement seen
 
 /* MISC */
-#define SERIAL_DEBUG            // enable serial debugging over modem port
+//#define SERIAL_DEBUG            // enable serial debugging over modem port
 
 /* OLD hacks, no longer needed and can be removed */
 //#define PATCH_SANE_FLUSHIT_HACK   // cache flush hack in SANE flushit just flush all caches
 //#define PATCH_BADDIVIDES          // ugly hack out the early 64/32 divides in sound stuff
 //#define PATCH_FLUSHCRANGE_HACK    // cache flush hack just flush all caches
-//#define PATCH_NOTESTFORFPU        // do not test for FPU in testforFPU

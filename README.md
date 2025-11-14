@@ -1,5 +1,5 @@
 # 68060 in Macintosh Quadra 650
-This project is a collection of ROM modifications to get a minimum level of functionality out of a Macintosh Quadra 650/800 / Centris 650 with a Motorola 68060 CPU installed on an appropriate adapter. As currently sits it can boot an unmodified System 7.1 install. Much will not work and much work is required to bring into a truly usable state; I do not expect to finish it.
+This project is a collection of ROM modifications to get a minimum level of functionality out of a Macintosh Quadra 650/800 / Centris 650 with a Motorola 68060 CPU installed on an appropriate adapter. As currently sits it can boot an unmodified System 7.1 install. Much will not work and further work is required to bring into a truly usable state; I do not expect to finish it.
 
 [Boot video @ youtube](https://www.youtube.com/watch?v=KXSWiKu-ASA)
 [Writeup @ 68kmla](https://68kmla.org/bb/index.php?threads/macintosh-68060-redux.51016/)
@@ -12,12 +12,15 @@ Thanks to Jockelill for a pointer on the MMU ROM mapping, Aprezbios for supplyin
 * System 7.1 + Enabler 040 V1.1
 * System gestalt ID 36 for Quadra 650 (J25 disconnected, R152 installed, R151 empty)
 * Any version of 68060, LC chips should work too.
-* Bear in mind that if your machine is 33mhz bus not all 060s will run at 66mhz!
+Bear in mind that if your machine is 33mhz bus not all 060s will run at 66mhz!
 
 ## Building
 Build [Retro68](https://github.com/autc04/Retro68) or a standard m68K GCC toolchain and point the Makefile at it. Issue make and pray.
 Flash the resulting image to a Quadra-compatible ROM SIMM such as those sold by Caymac, install a 68060 on an appropriate adapter, and let 'er rip.
 
 ## License
-I assert no ownership to any material in this repository. Do with it what you will.
-*Licenses of reference content vary, please credit the original teams appropriately.*
+I do not assert ownership of material in this repository. Do with it what you will, but credit is appreciated :)
+
+The Macintosh ROM is property of Apple Computer.
+
+*Licenses of reference content vary, please see the licenses in the respective directories for details.*

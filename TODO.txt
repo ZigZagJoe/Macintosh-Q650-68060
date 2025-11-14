@@ -1,4 +1,5 @@
-TODO / Known bugs  
+############################################################################
+### TODO / Known bugs  
     memory/vram throughput is reduced vs 040
         25, 33mhz bus clocks
         does NOT show in L2 cache comparison without BC at 64 and 66 ???
@@ -13,15 +14,15 @@ TODO / Known bugs
         code 10? fline?
         a vector might have been clobbered? 
         or a ptest? this would result in an illegal
+        seems to be generating infinite bus errors with BC enabled
 
     FPU & FPSP   
         sane trap behavior wrt 040 probably needs expansion / hand off from FPSP calls
             hands over to system handlers for some of the traps not used for 040 but 060 fpsp would use those
-        seems to cause hangs if FPU code is called with no fpsp
-            this is the same issue 040 rom has; fixed via a resource tweak
         fsave/frestore
             anything that looks at the content of the frame or makes an assumption about the frame is gonna have a problem
 
+############################################################################
 ### NEEDS TESTING
     branch cache
         ** probably branch cache should be turned on after slot manager completes - DONE **
@@ -31,10 +32,13 @@ TODO / Known bugs
     ISP need to hand off to appropriate vectors off VBR for exceptions like /v, chk, etc
         RTS_TO_VECTOR: DONE, UNTESTED
 
+############################################################################
 ### DONE??
+
     FPU disable/LC CPUs
         have to change resource layout in universaltables. only done for q650 almost
         not sure what this affects?? maybe FPU-optional machines always use FPU-less SANE??
+        this is the same issue 040 has unless ID is centris
 
     PRAM clear hangs on first go on finder but works after... why?
         fixed, something to do with FPU i guess
