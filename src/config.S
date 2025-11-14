@@ -23,12 +23,16 @@ ROM configuration
 #define ENABLE_BRANCH_CACHE     // enable branch prediction cache and install new bus error handler
 
 /* TODOs / Unproven */
-//#define INSTALL_FPSP            // install the FPSP and enable FPU. (TODO-Not fully working)
+#define INSTALL_FPSP            // install the FPSP and enable FPU. (TODO-Not fully working)
 #define PATCH_SLOTMGR_BERR_HACK // during slot manager, assume any bus errors are slot manager's fault (TODO)
 #define CPUSH_NO_INVALIDATE     // CPUSH'd lines remain valid in cache. no performance impact/improvement seen
 
-/* MISC */
-//#define SERIAL_DEBUG            // enable serial debugging over modem port
+/* DEBUGGING */
+//#define ENABLE_SERIAL_DEBUG     // enable serial debugging over modem port
+//#define TRACE_SP_MEM          // log SP memory accesses
+//#define TRACE_ISP             // log ISP calls
+//#define TRACE_FPSP            // log FPSP calls
+#define SERIAL_BAUD_57600       // use 57600 baud, otherwise 9600 is used
 
 /* OLD hacks, no longer needed and can be removed */
 //#define PATCH_SANE_FLUSHIT_HACK   // cache flush hack in SANE flushit just flush all caches

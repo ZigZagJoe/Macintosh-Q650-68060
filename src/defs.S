@@ -8,6 +8,13 @@ ROM definitions
     #undef INSTALL_FPSP     // no FPSP if we disable the FPU
 #endif
 
+#if defined(SP_MEM_TRACE) || defined(TRACE_ISP) || defined(TRACE_FPSP)
+    #ifndef ENABLE_SERIAL_DEBUG
+        #error Must define ENABLE_SERIAL_DEBUG to trace
+    #endif
+    #define PATCH_BADDIVIDES   // will cause ISP logs before serial is ready
+#endif
+
 /* ################################################################################ 
 | constants */
 /* vector table (partial) */
@@ -41,18 +48,6 @@ ROM definitions
     move.l (%sp)+, %a0      | restore %a0
     rts                     | ... and go to the vector 
 .endm
-
-/* sp entry points */
-_060_isp_unimp=(I_CALL_TOP+0x80+0x00) /* unimplemented integer */
-_060_fpsp_snan=(FP_CALL_TOP+0x80+0x00) /* signalling not a number */
-_060_fpsp_operr=(FP_CALL_TOP+0x80+0x08) /* FP Operand Error */
-_060_fpsp_ovfl=(FP_CALL_TOP+0x80+0x10) /* overflow */
-_060_fpsp_unfl=(FP_CALL_TOP+0x80+0x18) /* underflow */
-_060_fpsp_dz=(FP_CALL_TOP+0x80+0x20) /* FP DZ (/0) exception. */
-_060_fpsp_inex=(FP_CALL_TOP+0x80+0x28) /* FP Inexact exception */
-_060_fpsp_fline=(FP_CALL_TOP+0x80+0x30) /* "Line F emulator", handles bsun, unimpl, etc */
-_060_fpsp_unsupp=(FP_CALL_TOP+0x80+0x38) /* Unimplemented Data Type" exception */
-_060_fpsp_effadd=(FP_CALL_TOP+0x80+0x40) /* unimplemented effective address */
 
 /* CACR bits for 060 */
 #define CACR060_EDC     31  /* 1=enable data cache */
@@ -95,13 +90,13 @@ noErr = 0
 /* ################################################################################
 | Serial constant routines for debugging. */
 .macro INIT_SERIAL
-#ifdef SERIAL_DEBUG
+#ifdef ENABLE_SERIAL_DEBUG
     jsr InitSerialFunc
 #endif
 .endm
 
 .macro PUT_CHAR ch
-#ifdef SERIAL_DEBUG
+#ifdef ENABLE_SERIAL_DEBUG
 	move.b	#0x30,(aCtl)	|reset any errors			
 	move.b	#\ch,(aData)	|send character			
 
@@ -114,7 +109,7 @@ noErr = 0
 .endm
 		
 .macro PUT_STRING str 
-#ifdef SERIAL_DEBUG
+#ifdef ENABLE_SERIAL_DEBUG
     move.l %a0, -(%sp)
     lea (1f, %pc), %a0
     jsr _puts
@@ -124,5 +119,23 @@ noErr = 0
     .align 2
 2:
     move.l (%sp)+,%a0
+#endif
+.endm
+
+.macro DBG_TRACE_MEM arg
+#ifdef TRACE_SP_MEM
+    PUT_STRING \arg
+#endif
+.endm
+
+.macro DBG_TRACE_ISP arg
+#ifdef TRACE_ISP
+    PUT_STRING \arg
+#endif
+.endm
+
+.macro DBG_TRACE_FPSP arg
+#ifdef TRACE_FPSP
+    PUT_STRING \arg
 #endif
 .endm

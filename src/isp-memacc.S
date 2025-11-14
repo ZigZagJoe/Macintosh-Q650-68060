@@ -96,7 +96,8 @@
 */
 _060_dmem_write:
 super_write:
-	moveb	%a0@+,%a1@+	|# copy 1 byte
+	DBG_TRACE_MEM "super_write\n"
+    moveb	%a0@+,%a1@+	|# copy 1 byte
 	subql	#0x1,%d0	|# decr byte counter
 	bnes	super_write	|# quit if ctr = 0
 	clrl	%d1		|# return success
@@ -119,6 +120,7 @@ super_write:
 _060_imem_read:
 _060_dmem_read:
 super_read:
+	DBG_TRACE_MEM "super_read\n"
 	moveb	%a0@+,%a1@+	|# copy 1 byte
 	subql	#0x1,%d0	|# decr byte counter
 	bnes	super_read	|# quit if ctr = 0
@@ -140,6 +142,7 @@ super_read:
 #
 */
 _060_dmem_read_byte:
+	DBG_TRACE_MEM "_060_dmem_read_byte\n"
 	clrl	%d1			|# return success
 	clrl	%d0			|# clear whole longword
 	moveb	%a0@,%d0		|# fetch super byte
@@ -163,6 +166,7 @@ _060_dmem_read_byte:
 */
 _060_imem_read_word:
 _060_dmem_read_word:
+	DBG_TRACE_MEM "_060_dmem_read_word\n"
 	clrl	%d1			|# return success
 	clrl	%d0			|# clear whole longword
 	movew	%a0@,%d0		|# fetch super word
@@ -187,6 +191,7 @@ _060_dmem_read_word:
 */
 _060_imem_read_long:
 _060_dmem_read_long:
+	DBG_TRACE_MEM "_060_dmem_read_long\n"
 	clrl	%d1			|# return success
 	movel	%a0@,%d0		|# fetch super longword
 	rts
@@ -206,6 +211,7 @@ _060_dmem_read_long:
 #
 */
 _060_dmem_write_byte:
+	DBG_TRACE_MEM "_060_dmem_write_byte\n"
 	clrl	%d1			|# return success
 	moveb	%d0,%a0@		|# store super byte
 	rts
@@ -225,6 +231,7 @@ _060_dmem_write_byte:
 #
 */
 _060_dmem_write_word:
+	DBG_TRACE_MEM "_060_dmem_write_word\n"
 	clrl	%d1			|# return success
 	movew	%d0,%a0@		|# store super word
 	rts
@@ -244,6 +251,7 @@ _060_dmem_write_word:
 #
 */
 _060_dmem_write_long:
+	DBG_TRACE_MEM "_060_dmem_write_long\n"
 	clrl	%d1			|# return success
 	movel	%d0,%a0@		|# store super longword
 	rts

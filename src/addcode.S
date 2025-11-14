@@ -170,6 +170,6 @@ BranchPredictionError:
     #include "fpsp-callouts.S"
 #endif
 
-#ifdef SERIAL_DEBUG
+#ifdef ENABLE_SERIAL_DEBUG
     #include "serial.S"
 #endif

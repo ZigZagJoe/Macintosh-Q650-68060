@@ -80,7 +80,8 @@
 #
 */
 _060_fpsp_done:
-	rte
+	DBG_TRACE_FPSP "_060_fpsp_done\n"
+    rte
 
 /*
 #
@@ -96,6 +97,7 @@ _060_fpsp_done:
 #
 */
 _060_real_ovfl:
+    DBG_TRACE_FPSP "_060_real_ovfl\n"
     _fpsp_rte_noerr_todo
 
 	move.l	(FPOVFL_VEC040).W,-(%sp)	| push vector to user OVFL handler <1/8/91, JPO>
@@ -115,6 +117,7 @@ _060_real_ovfl:
 #
 */
 _060_real_unfl:
+    DBG_TRACE_FPSP "_060_real_unfl\n"
     _fpsp_rte_noerr_todo
 	move.l	(FPUNFL_VEC040).W,-(%sp)	| push vector to user UNFL handler <1/9/91, JPO>
 	rts				| execute user handler <1/9/91, JPO>
@@ -134,6 +137,7 @@ _060_real_unfl:
 #
 */
 _060_real_operr:
+    DBG_TRACE_FPSP "_060_real_operr\n"
     _fpsp_rte_noerr_todo
 	move.l	(FPOPERR_VEC040).W,-(%sp)	| push vector to user's handler <1/9/91, JPO>
 	rts					| execute user's handler <1/9/91, JPO>
@@ -153,6 +157,7 @@ _060_real_operr:
 #
 */
 _060_real_snan:
+    DBG_TRACE_FPSP "_060_real_snan\n"
     _fpsp_rte_noerr_todo
 	move.l	(FPSNAN_VEC040).W,-(%sp)	| push vector to user handler <1/9/91, JPO>
 	rts				| execute user handler <1/9/91, JPO>
@@ -172,7 +177,8 @@ _060_real_snan:
 #
 */
 _060_real_dz:
-	_fpsp_rte_noerr_todo
+    DBG_TRACE_FPSP "_060_real_dz\n"
+    _fpsp_rte_noerr_todo
 
 /*
 #
@@ -189,7 +195,8 @@ _060_real_dz:
 #
 */
 _060_real_inex:
-	_fpsp_rte_noerr_todo
+    DBG_TRACE_FPSP "_060_real_inex\n"
+    _fpsp_rte_noerr_todo
 
 /*
 #
@@ -206,6 +213,7 @@ _060_real_inex:
 #
 */
 _060_real_bsun:
+    DBG_TRACE_FPSP "_060_real_bsun\n"
     _fpsp_rte_noerr_todo
     move.l	(FPBSUN_VEC040).W,-(%sp)	| push vector to user's handler <1/8/91, JPO>
 	rts				| execute user's handler <1/8/91, JPO>
@@ -223,6 +231,7 @@ _060_real_bsun:
 # 
 */
 _060_real_fline:
+    DBG_TRACE_FPSP "_060_real_fline\n"
     _fpsp_rte_noerr_todo
 	move.l	(FLINE_VEC040).W,-(%sp)	| push vector to user's handler <1/8/91, JPO>
 	rts				| execute user's handler <1/8/91, JPO>
@@ -245,7 +254,8 @@ _060_real_fline:
 #
 */
 _060_real_fpu_disabled:
-	movel	%d0,-(%sp)
+    DBG_TRACE_FPSP "_060_real_fpu_disabled\n"
+    movel	%d0,-(%sp)
 	movec.l %pcr,%d0		|* movec.l pcr,d0
 	bclr	#1,%d0		    |# enable the fpu
 	movec.l %d0,%pcr		|* movec.l d0,pcr
@@ -266,7 +276,8 @@ _060_real_fpu_disabled:
 #
 */
 _060_real_trap:
-	rte
+	DBG_TRACE_FPSP "_060_real_trap\n"
+    rte
 
 /*
 #############################################################################
@@ -275,33 +286,56 @@ _060_real_trap:
 # (2) EXAMPLE PACKAGE ENTRY CODE #
 ##################################
 */
-/*
+
+#ifdef TRACE_FPSP
 _060_fpsp_snan: 
-	bral	FP_CALL_TOP+0x80+0x00
+	DBG_TRACE_FPSP "_060_fpsp_snan\n"
+    bral	FP_CALL_TOP+0x80+0x00
 
 _060_fpsp_operr: 
-	bral	FP_CALL_TOP+0x80+0x08
+	DBG_TRACE_FPSP "_060_fpsp_operr\n"
+    bral	FP_CALL_TOP+0x80+0x08
 
 _060_fpsp_ovfl: 
-	bral	FP_CALL_TOP+0x80+0x10
+	DBG_TRACE_FPSP "_060_fpsp_ovfl\n"
+    bral	FP_CALL_TOP+0x80+0x10
 
 _060_fpsp_unfl: 
-	bral	FP_CALL_TOP+0x80+0x18
+	DBG_TRACE_FPSP "_060_fpsp_unfl\n"
+    bral	FP_CALL_TOP+0x80+0x18
 
 _060_fpsp_dz:
-	bral	FP_CALL_TOP+0x80+0x20
+	DBG_TRACE_FPSP "_060_fpsp_dz\n"
+    bral	FP_CALL_TOP+0x80+0x20
 
 _060_fpsp_inex:
-	bral	FP_CALL_TOP+0x80+0x28
-
-_060_fpsp_fline: 
-	bral	FP_CALL_TOP+0x80+0x30
+	DBG_TRACE_FPSP "_060_fpsp_inex\n"
+    bral	FP_CALL_TOP+0x80+0x28
 
 _060_fpsp_unsupp: 
-	bral	FP_CALL_TOP+0x80+0x38
+	DBG_TRACE_FPSP "_060_fpsp_unsupp\n"
+    bral	FP_CALL_TOP+0x80+0x38
 
 _060_fpsp_effadd: 
-	bral	FP_CALL_TOP+0x80+0x40*/
+	DBG_TRACE_FPSP "_060_fpsp_effadd\n"
+    bral	FP_CALL_TOP+0x80+0x40
+
+_060_fpsp_fline: 
+	DBG_TRACE_FPSP "_060_fpsp_fline\n"
+    bral	FP_CALL_TOP+0x80+0x30
+
+#else
+    /* go straight into the package routines */
+    _060_fpsp_snan=(FP_CALL_TOP+0x80+0x00) /* signalling not a number */
+    _060_fpsp_operr=(FP_CALL_TOP+0x80+0x08) /* FP Operand Error */
+    _060_fpsp_ovfl=(FP_CALL_TOP+0x80+0x10) /* overflow */
+    _060_fpsp_unfl=(FP_CALL_TOP+0x80+0x18) /* underflow */
+    _060_fpsp_dz=(FP_CALL_TOP+0x80+0x20) /* FP DZ (/0) exception. */
+    _060_fpsp_inex=(FP_CALL_TOP+0x80+0x28) /* FP Inexact exception */
+    _060_fpsp_fline=(FP_CALL_TOP+0x80+0x30) /* "Line F emulator", handles bsun, unimpl, etc */
+    _060_fpsp_unsupp=(FP_CALL_TOP+0x80+0x38) /* Unimplemented Data Type" exception */
+    _060_fpsp_effadd=(FP_CALL_TOP+0x80+0x40) /* unimplemented effective address */
+#endif
 
 /*
 #############################################################################

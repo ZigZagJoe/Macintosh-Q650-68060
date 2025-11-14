@@ -227,11 +227,16 @@ _060_real_unlock_page:
 ##################################
 */
 
-/*
+#ifdef TRACE_ISP
 _060_isp_unimp:
-	bral	I_CALL_TOP+0x80+0x00
+	DBG_TRACE_ISP "_060_isp_unimp\n"
+    bral	I_CALL_TOP+0x80+0x00
+#else
+    /* go straight into the package routines */
+    _060_isp_unimp=(I_CALL_TOP+0x80+0x00) /* unimplemented integer */
+#endif
 
-_060_isp_cas:
+/*_060_isp_cas:
 	bral	I_CALL_TOP+0x80+0x08
 
 _060_isp_cas2:

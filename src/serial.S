@@ -73,8 +73,12 @@ PortSetUp:
 	dc.b	0x04,0x44			|reg  4, X16clk,8 bit,1 stop (original 2 stop 0x4C)
 	dc.b	0x0B,0x50			|reg 11, rClk = tClk = BR gen
 	dc.b	0x0E,0x00			|reg 14, disable BR gen
-	dc.b	0x0D,0x00			|reg 13, high byte 9600 baud	
+	dc.b	0x0D,0x00			|reg 13, high byte 57600/9600 baud
+#ifdef SERIAL_BAUD_57600
+	dc.b	0x0C,0x00			|reg 12, low  byte 9600 baud	
+#else	
 	dc.b	0x0C,0x0A			|reg 12, low  byte 9600 baud	
+#endif
 	dc.b	0x0E,0x01			|reg 14, enable BR gen
 	dc.b	0x0A,0x00			|reg 10, NRZ
 	dc.b	0x03,0xC1			|reg  3, Rx 8 bits, enabled
