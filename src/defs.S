@@ -8,7 +8,7 @@ ROM definitions
     #undef INSTALL_FPSP     // no FPSP if we disable the FPU
 #endif
 
-#if defined(SP_MEM_TRACE) || defined(TRACE_ISP) || defined(TRACE_FPSP)
+#if defined(SP_MEM_TRACE) || defined(TRACE_ISP)
     #ifndef ENABLE_SERIAL_DEBUG
         #error Must define ENABLE_SERIAL_DEBUG to trace
     #endif
@@ -88,7 +88,7 @@ FPSNAN_VEC040	=	0x1FDC
 noErr = 0	
 
 /* ################################################################################
-| Serial constant routines for debugging. */
+| Serial constant macros for debugging. */
 .macro INIT_SERIAL
 #ifdef ENABLE_SERIAL_DEBUG
     jsr InitSerialFunc

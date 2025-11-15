@@ -114,10 +114,11 @@ ValidatePRAM_Patch:
 	JSR		PRAMIO                  | do the write. trashes A3, D3
     LEA		256(%SP),%SP            | continue patched code, release the buffer
     move.l  (%sp)+,%d3              | and restore D3
-    rts                           
+    rts    
 
 /* ################################################################################
 | install a new bus error (Access error) handler that deals with branch prediction error correctly */
+.global TurnOnBC
 TurnOnBC:
     movem.l %d0/%a0-%a1, -(%sp)
 
@@ -133,6 +134,16 @@ TurnOnBC:
     movec %d0, %cacr
 
     movem.l  (%sp)+,%d0/%a0-%a1
+    rts
+
+/* ################################################################################
+| VBL patch for shenanigans (debug)
+| do not trash any registers!! */
+DebugVBLPatch:
+
+    /* patched code from DoVBLTask, do not move */
+	.long 0x52A9000A	| +A334     addq.l	#1,slotTickCount-slotVBLQHdr(A1)	; increment slot tickcount
+	.long 0xB3F80D10	| +A338     cmpa.l	ScrnVBLPtr,a1		; is it the main screen?
     rts
 
 /* ################################################################################

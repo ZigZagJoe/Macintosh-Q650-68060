@@ -6,9 +6,14 @@
         let's try enabling superscalar late in boot. 
             Seems to fix timedbra calculation, though what does that affect?
         oddly, cbits l/a is consistent on 25mhz bclk
+        is it hardware or is it software?
 
-    bus error handler for slot manager  PATCH_SLOTMGR_BERR_HACK
-        needs to be updated to actually check the fields correctly on the new one
+    bus error handlers 
+        slot manager needs to be updated to actually check the fields correctly (PATCH_SLOTMGR_BERR_HACK)
+        scsi mgr 4.3 plays with bus error too BUSERRHANDLER_96_BIOS
+        derefhandle too https://github.com/elliotnunn/sys7.1-doc-wip/blob/62f7e0d5dc1d9a047822d5e73ffa8aa50a97e3fa/OS/MemoryMgr/MemoryMgrInternal.a#L514
+        then system 7.1 is overriding it too! ugh!
+        critical: if we hit a BPE, we are in deep shit: we need a way to make sure that we always have a bus error handler that understands BPE
 
     System 7.5 hangs in boot at welcome to macintosh
         code 10? fline?
@@ -21,20 +26,22 @@
             hands over to system handlers for some of the traps not used for 040 but 060 fpsp would use those
         fsave/frestore
             anything that looks at the content of the frame or makes an assumption about the frame is gonna have a problem
+        current status: if FPU enables, hangs when finder is loading. Doesn't seem to be hitting the FPSP though...
 
 ############################################################################
 ### NEEDS TESTING
-    branch cache
-        ** probably branch cache should be turned on after slot manager completes - DONE **
-        need to verify bus except handler actually works correctly...
-        supposedly some apps hate this, like Microsoft Word. If i were doing this for real a blacklist to disable BC while these apps are running would be indicated
 
     ISP need to hand off to appropriate vectors off VBR for exceptions like /v, chk, etc
         RTS_TO_VECTOR: DONE, UNTESTED
 
 ############################################################################
 ### DONE??
-
+    branch cache
+        ** probably branch cache should be turned on after slot manager completes - DONE **
+        need to verify bus except handler actually works correctly...
+        supposedly some apps hate this, like Microsoft Word. If i were doing this for real a blacklist to disable BC while these apps are running would be indicated
+        handoff to genexceps works... up until the bus error handler gets patched. new issue for that...
+        
     FPU disable/LC CPUs
         have to change resource layout in universaltables. only done for q650 almost
         not sure what this affects?? maybe FPU-optional machines always use FPU-less SANE??
