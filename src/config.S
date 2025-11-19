@@ -10,7 +10,7 @@ ROM configuration
 #define PATCH_ENABLECACHES      // initialize 060 caches specifically
 #define PATCH_LATEINIT          // replace SetupDockBases with LateInit
 #define PATCH_ROM_MAP_8MB       // map 8MB of ROM space. note: 24 bit mode only has 1MB addr space still!
-#define PATCH_FORCE_32BIT       // always run in 32 bit mode as 24 bit mode can't work ROM >1MB
+//#define PATCH_FORCE_32BIT       // force booting in 32 bit mode always
 //#define PATCH_BIGSIMMS_HACK     // allow sizing 64/128MB simms, but may fail to size <64mb simms
 
 /* FEATURES */
@@ -27,6 +27,7 @@ ROM configuration
 //#define INSTALL_FPSP            // install the FPSP and enable FPU. (TODO-Not fully working)
 #define PATCH_SLOTMGR_BERR_HACK // during slot manager, assume any bus errors are slot manager's fault (TODO)
 //#define CPUSH_NO_INVALIDATE     // CPUSH'd lines remain valid in cache. no performance impact/improvement seen
+#define REPLACE_040FPSP            // experimental: replace 040FPSP with ISP and addcode
 
 /* DEBUGGING */
 //#define ENABLE_SERIAL_DEBUG     // enable serial debugging over modem port

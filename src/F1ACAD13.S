@@ -12111,7 +12111,7 @@ VALIDATEPRAM:
     bra.l ValidatePRAM_Patch     | perform the removed instructions then we RTS from there... 
 #else
     .long 0x4FEF0100    | +B302 LEA		256(SP),SP				; clean up the stack	temporary buffer
-    .long 0x261F        | +B306 move.l  (sp)+,d3
+    .word 0x261F        | +B306 move.l  (sp)+,d3
 #endif
 	.word 0x4E75        | +B308 rts
     .word 0x4E75        | +B30A
@@ -147753,18 +147753,20 @@ LCDSCREENCHK:
 	.long 0x00000000	| +8D1F4
 	.long 0x00000000	| +8D1F8
 	.long 0x00000000	| +8D1FC
-INSTALLFPSP: | +8D200 https://github.com/elliotnunn/supermario/blob/9dd3c4bef84df2ea30f5ec2c5e97b043e8267b3f/base/SuperMarioProj.1994-02-09/OS/FPUEmulation/FPEmulation.a#L46
+INSTALLFPSP:            | +8D200 https://github.com/elliotnunn/supermario/blob/9dd3c4bef84df2ea30f5ec2c5e97b043e8267b3f/base/SuperMarioProj.1994-02-09/OS/FPUEmulation/FPEmulation.a#L46
 #ifdef PATCH_INSTALLFPSP
-    .patchStart
-    
     bral PatchInstallSP
 
-    .patchEnd 0x85B0    | a bit over 33K bytes here
+    /* around 33.4kb of space used by the old 040 FPSP; replace it with new code 
+    .org statement at FPSPEnd */
+    #ifdef REPLACE_040FPSP
+        #include "addcode.S"
+    #endif
 #else   
     .long 0x4E7A8801	| +8D200 movec   vbr,a0
 	.long 0x21E8002C	| +8D204 original installFPSP code installs the FPSP vectors without any consideration to if the CPU actually has a FPU!
 	.long 0x1FC843FA	| +8D208 after installFPSP the rest of the FPSP follows...
-	.long 0x07F22149	| +8D20C
+	.long 0x07F22149	| +8D20C structure https://github.com/elliotnunn/supermario/blob/9dd3c4bef84df2ea30f5ec2c5e97b043e8267b3f/base/SuperMarioProj.1994-02-09/OS/FPUEmulation/FPEmulation.a#L78
 	.long 0x002C43FA	| +8D210
 	.long 0x003E2149	| +8D214
 	.long 0x00C043FA	| +8D218
@@ -156316,9 +156318,10 @@ GENEXCEPTPATCHRTN:
 	.long 0x00000000	| +9579C
 	.long 0x3FFE0000	| +957A0
 	.long 0xB07197A2	| +957A4
-	.long 0x3C46C654	| +957A8    FPSP structure https://github.com/elliotnunn/supermario/blob/9dd3c4bef84df2ea30f5ec2c5e97b043e8267b3f/base/SuperMarioProj.1994-02-09/OS/FPUEmulation/FPEmulation.a#L78
+	.long 0x3C46C654	| +957A8   
 	.long 0x00000000	| +957AC    END OF THE FPSP - https://github.com/elliotnunn/supermario/blob/9dd3c4bef84df2ea30f5ec2c5e97b043e8267b3f/base/SuperMarioProj.1994-02-09/OS/FPUEmulation/Constants.a#L770
 #endif
+.org 0x957B0            | make sure following code starts at the correct offset
 FPSPEnd:
 INSTALLPRIVTRAP:
 	.long 0x08380004	| +957B0
@@ -265756,4 +265759,39 @@ FlushIT:
 	.long 0x2BC7000F	| +FFFFC
 ROMEND:
 
-#include "addcode.S"
+/* if we're replacing the 040FPSP with the ISP code, and need the FPSP, then put at the end of the ROM (for now) */
+#ifdef REPLACE_040FPSP
+    #ifdef INSTALL_FPSP
+        #include "fpsp-callouts.S"
+    #endif
+#else
+/* not putting the ISP in place of 040FPSP, include it all here */
+    #include "addcode.S"
+#endif
+
+/* ################################################################################
+| stick some build info on the very end of the ROM */
+
+.section .text.end
+    .ascii "\n\n"       /* clear lines off end of ROM if viewed in a text editor */
+ROMBuild:
+    .ascii "zigzagjoe 68060-Q650 ROM\n"
+    .ascii xpandstr(built BUILD_DATE \n)
+    .ascii xpandstr(git rev GIT_REV \n)
+#ifdef DISABLE_FPU 
+    .ascii "FPU Disabled\n"
+#endif
+#ifdef INSTALL_FPSP
+    .ascii "FPSP Enabled\n"
+#endif
+#ifdef ENABLE_SUPERSCALAR 
+    .ascii "Superscalar Enabled\n"
+#endif
+#ifdef ENABLE_BRANCH_CACHE 
+    .ascii "Branch Cache Enabled\n"
+#endif
+#ifdef ENABLE_SERIAL_DEBUG
+    .ascii "Serial Debug Enabled\n"
+#endif
+    .byte 0
+.section .text

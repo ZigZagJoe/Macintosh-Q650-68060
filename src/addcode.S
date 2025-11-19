@@ -155,36 +155,13 @@ BranchPredictionError:
     #include "isp-callouts.S"
 #endif
 
-#ifdef INSTALL_FPSP
-    #include "fpsp-callouts.S"
+/* include the FPSP if we aren't replacing the 040FPSP */
+#ifndef REPLACE_040FPSP
+    #ifdef INSTALL_FPSP
+        #include "fpsp-callouts.S"
+    #endif
 #endif
 
 #ifdef ENABLE_SERIAL_DEBUG
     #include "serial.S"
 #endif
-
-/* ################################################################################
-| stick some build info on the very end of the ROM */
-
-.section .text.end
-    .ascii "\n\n"       /* clear lines off end of ROM if viewed in a text editor */
-ROMBuild:
-    .ascii "zigzagjoe 68060-Q650 ROM\n"
-    .ascii xpandstr(built BUILD_DATE \n)
-    .ascii xpandstr(git rev GIT_REV \n)
-#ifdef DISABLE_FPU 
-    .ascii "FPU Disabled\n"
-#endif
-#ifdef INSTALL_FPSP
-    .ascii "FPSP Enabled\n"
-#endif
-#ifdef ENABLE_SUPERSCALAR 
-    .ascii "Superscalar Enabled\n"
-#endif
-#ifdef ENABLE_BRANCH_CACHE 
-    .ascii "Branch Cache Enabled\n"
-#endif
-#ifdef ENABLE_SERIAL_DEBUG
-    .ascii "Serial Debug Enabled\n"
-#endif
-    .byte 0

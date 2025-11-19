@@ -4,8 +4,13 @@ ROM definitions
 
 #include "config.S"
 
+/* Config sanity checks */
 #ifdef DISABLE_FPU
     #undef INSTALL_FPSP     // no FPSP if we disable the FPU
+#endif
+
+#if !defined(DISABLE_FPU) && !defined(INSTALL_FPSP)
+    #warning "FPU not disabled but FPSP not installed"
 #endif
 
 #if defined(SP_MEM_TRACE) || defined(TRACE_ISP) || defined(TRACE_FPSP)
@@ -17,6 +22,17 @@ ROM definitions
     #endif
 #endif
 
+#if defined(INSTALL_FPSP) && !defined(PATCH_FORCE_32BIT)
+    #define PATCH_FORCE_32BIT
+    #warning "PATCH_FORCE_32BIT forced due to FPSP length"
+#endif
+
+#if !defined(REPLACE_040FPSP) && defined(INSTALL_ISP) && !defined(PATCH_FORCE_32BIT)
+    #define PATCH_FORCE_32BIT
+    #warning "PATCH_FORCE_32BIT forced due to ISP length"
+#endif
+
+/* Preproc Macros */
 #define xpandstr(s) str(s)
 #define str(s) #s
 
