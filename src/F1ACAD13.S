@@ -141380,11 +141380,11 @@ FLUSHCRANGE: | https://github.com/elliotnunn/sys7.1-doc-wip/blob/62f7e0d5dc1d9a0
 	.long 0x0800000D	| +870C4
 	.long 0x66047008	| +870C8
 	.word 0xA08D        | +870CC  _DebugUtil
+CheckCnt:
 #ifdef PATCH_FLUSHCRANGE
     Cmpi.l	#0x1800,%D1  | check against 8KB * 3 / 4 for 68060
 #else
-    .word 0x0C81	    | +870CE @CheckCnt	Cmpi.l	#$0C00,D1					; Less than 3/4 the size of the cache?  ***Tune***
-	.long 0x00000C00	| +870D0 
+    Cmpi.l	#0x0C00,D1	| Less than 3/4 the size of the cache?  ***Tune***
 #endif
 	.long 0x6D064E71	| +870D4
 	.long 0xF4F8605C	| +870D8
@@ -167290,9 +167290,14 @@ HMMMMMM:
 	.long 0x00054BF9	| +A0158
 	.long 0x50F0E000	| +A015C
 	.long 0x2A8070FF	| +A0160
-	.long 0x2B40002C	| +A0164
-	.long 0x223C0000	| +A0168
-	.long 0x01007009	| +A016C
+	.long 0x2B40002C	| +A0164     http://synack.net/~bbraun/djmemcrom.html
+	.long 0x223C0000	| +A0168    Move.L    #$100, D1
+#ifdef ENABLE_BIGSIMMS_HACK
+    .word 0
+#else
+	.word 0x0100        | https://github.com/elliotnunn/sys7.1-doc-wip/blob/62f7e0d5dc1d9a047822d5e73ffa8aa50a97e3fa/OS/StartMgr/SizeMem.a#L671
+#endif 
+    .word 0x7009	    | +A016E
 	.long 0x4BED0004	| +A0170
 	.long 0x2AC10641	| +A0174
 	.long 0x001051C8	| +A0178

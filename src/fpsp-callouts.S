@@ -288,6 +288,8 @@ _060_real_trap:
 */
 
 #ifdef TRACE_FPSP
+    /* for debug tracing */
+    
 _060_fpsp_snan: 
 	DBG_TRACE_FPSP "_060_fpsp_snan\n"
     bral	FP_CALL_TOP+0x80+0x00

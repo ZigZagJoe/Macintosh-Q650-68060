@@ -21,6 +21,7 @@ ROM configuration
 #define ENABLE_LOADSTORE_FIFO   // enable load store FIFO
 #define ENABLE_SUPERSCALAR      // enable pentium-like superscalar execution
 #define ENABLE_BRANCH_CACHE     // enable branch prediction cache and install new bus error handler
+//#define ENABLE_BIGSIMMS_HACK      // allow sizing 64/128MB simms, but may fail to size <64mb simms
 
 /* TODOs / Unproven */
 //#define INSTALL_FPSP            // install the FPSP and enable FPU. (TODO-Not fully working)

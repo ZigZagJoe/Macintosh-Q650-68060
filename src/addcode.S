@@ -28,38 +28,19 @@ PatchInstallSP:
     movec.l %VBR, %a0
     
 #ifdef INSTALL_ISP
-    lea _060_isp_unimp, %a1
-    move.l %a1, VECI_UNIMP_II(%a0)
+    move.l #_060_isp_unimp, VECI_UNIMP_II(%a0)
 #endif
 
 #ifdef INSTALL_FPSP
-    lea _060_fpsp_inex, %a1
-    move.l %a1, VECI_FP_INEX(%a0)
-
-    lea _060_fpsp_dz, %a1
-    move.l %a1, VECI_FP_DZ(%a0)
-
-    lea _060_fpsp_unfl, %a1
-    move.l %a1, VECI_FP_UNFL(%a0)
-
-    lea _060_fpsp_operr, %a1
-    move.l %a1, VECI_FP_OPERR(%a0)
-    
-    lea _060_fpsp_ovfl, %a1
-    move.l %a1, VECI_FP_OVFL(%a0)
-    
-    lea _060_fpsp_snan, %a1
-    move.l %a1, VECI_FP_SNAN(%a0)
-    
-    lea _060_fpsp_unsupp, %a1
-    move.l %a1, VECI_UNIMP_FP_DATA(%a0)
-    
-    lea _060_fpsp_effadd, %a1
-    move.l %a1, VECI_UNIMP_EA(%a0)
-    
-    lea _060_fpsp_fline, %a1
-    move.l %a1, VECI_LINE1111(%a0)
-
+    move.l #_060_fpsp_inex, VECI_FP_INEX(%a0)
+    move.l #_060_fpsp_dz, VECI_FP_DZ(%a0)
+    move.l #_060_fpsp_unfl, VECI_FP_UNFL(%a0)
+    move.l #_060_fpsp_operr, VECI_FP_OPERR(%a0)
+    move.l #_060_fpsp_ovfl, VECI_FP_OVFL(%a0)
+    move.l #_060_fpsp_snan, VECI_FP_SNAN(%a0)
+    move.l #_060_fpsp_unsupp, VECI_UNIMP_FP_DATA(%a0)
+    move.l #_060_fpsp_effadd, VECI_UNIMP_EA(%a0)
+    move.l #_060_fpsp_fline, VECI_LINE1111(%a0)
     /* BSUN vector is not used on 060, it's handled in fline */
 #endif
 

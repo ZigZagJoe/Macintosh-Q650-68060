@@ -8,11 +8,13 @@ ROM definitions
     #undef INSTALL_FPSP     // no FPSP if we disable the FPU
 #endif
 
-#if defined(SP_MEM_TRACE) || defined(TRACE_ISP)
+#if defined(SP_MEM_TRACE) || defined(TRACE_ISP) || defined(TRACE_FPSP)
     #ifndef ENABLE_SERIAL_DEBUG
         #error Must define ENABLE_SERIAL_DEBUG to trace
     #endif
-    #define PATCH_BADDIVIDES   // will cause ISP logs before serial is ready
+    #if defined(SP_MEM_TRACE) || defined(TRACE_ISP) 
+        #define PATCH_BADDIVIDES   // will cause ISP logs before serial is ready
+    #endif
 #endif
 
 /* ################################################################################ 
@@ -28,6 +30,7 @@ ROM definitions
 #define VECI_TRACE          0x24
 #define VECI_LINE1010       0x28
 #define	VECI_LINE1111		0x2C	/* Line 1111 Emulator */
+/* ... */
 #define	VECI_FP_BSUN		0xC0	/* FPCP Branch or Set on Unordered */
 #define	VECI_FP_INEX		0xC4	/* FPCP Inexact Result */
 #define	VECI_FP_DZ		    0xC8	/* FPCP Divide by Zero */
