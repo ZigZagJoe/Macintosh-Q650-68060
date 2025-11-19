@@ -12,6 +12,8 @@ SECTIONS {
 
  .text : SUBALIGN (4) {
     *F1ACAD13.o (.text)
+    *.o (.text)
+    *F1ACAD13.o (.text.end)
  } > ROM
 
   /DISCARD/ : { *(*) }

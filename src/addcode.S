@@ -12,16 +12,14 @@ ROMEntryNew:
 #endif
 
     movec %d0, %pcr                 | NOTE: this will prevent an 040 from booting at all! 
-    jmp ROMEntryOrig                | back to original entry
+    bral ROMEntryOrig                | back to original entry
 
 /* ################################################################################
 | InstallFPSP replacement.
 | runs much later after VBR is in RAM, and after SysErrInit blows away our unimplemented integer handler 
-| so install vectors again*/
+| so install vectors again. OK to thrash A0, A1 */
 
 PatchInstallSP:
-    movem.l  %d0/%a0-%a1, -(%sp)
-
     INIT_SERIAL
     PUT_STRING "\nHello!\nPatchInstallSP\n"
 
@@ -44,7 +42,6 @@ PatchInstallSP:
     /* BSUN vector is not used on 060, it's handled in fline */
 #endif
 
-    movem.l  (%sp)+,%d0/%a0-%a1
     rts
 
 /* ################################################################################
@@ -123,8 +120,8 @@ TurnOnBC:
 DebugVBLPatch:
 
     /* patched code from DoVBLTask, do not move */
-	.long 0x52A9000A	| +A334     addq.l	#1,slotTickCount-slotVBLQHdr(A1)	; increment slot tickcount
-	.long 0xB3F80D10	| +A338     cmpa.l	ScrnVBLPtr,a1		; is it the main screen?
+	.long 0x52A9000A	            | +A334     addq.l	#1,slotTickCount-slotVBLQHdr(A1)	; increment slot tickcount
+	.long 0xB3F80D10	            | +A338     cmpa.l	ScrnVBLPtr,a1		; is it the main screen?
     rts
 
 /* ################################################################################
@@ -138,7 +135,7 @@ New_AccessFault:
 	BNE.B	BranchPredictionError
 
     PUT_STRING "Sendit\n"
-    jmp GENEXCPS_BusError           | hand off to Deepshit BusError
+    bral GENEXCPS_BusError           | hand off to Deepshit BusError
 
 BranchPredictionError:
     move.l %d0, -(%sp)
@@ -168,16 +165,13 @@ BranchPredictionError:
 
 /* ################################################################################
 | stick some build info on the very end of the ROM */
-#define xpandstr(s) str(s)
-#define str(s) #s
 
-#define strifdef(a,str)
+.section .text.end
+    .ascii "\n\n"       /* clear lines off end of ROM if viewed in a text editor */
 ROMBuild:
-    .ascii "\nzigzagjoe 68060-Q650 ROM\n"
-    .ascii xpandstr(built BUILD_DATE)
-    .byte '\n'
-    .ascii xpandstr(git rev GIT_REV)
-    .byte '\n'
+    .ascii "zigzagjoe 68060-Q650 ROM\n"
+    .ascii xpandstr(built BUILD_DATE \n)
+    .ascii xpandstr(git rev GIT_REV \n)
 #ifdef DISABLE_FPU 
     .ascii "FPU Disabled\n"
 #endif
@@ -194,4 +188,3 @@ ROMBuild:
     .ascii "Serial Debug Enabled\n"
 #endif
     .byte 0
-    .align 4

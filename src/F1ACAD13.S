@@ -4337,10 +4337,9 @@ WHICHCPUPATCH:
 	.word 0x4E75		| +4030
 ENABLECACHESPATCH: |  https://github.com/elliotnunn/sys7.1-doc-wip/blob/62f7e0d5dc1d9a047822d5e73ffa8aa50a97e3fa/OS/StartMgr/StartInit.a#L1587
 #ifdef PATCH_ENABLECACHES
-    jmp Initialize060Caches | jump to patchcode and rts from there
-    .rep 13
-    .word 0 | never end up here
-    .endr
+    .patchStart
+    bral Initialize060Caches | jump to patchcode and rts from there
+    .patchEnd 32
 #else
 	.word 0x0C38		| +4032
 	.long 0x0004012F	|           cmp.b	#cpu68040,CpuFlag				; check if we're on an 040
@@ -5554,10 +5553,6 @@ MOVEREQHANDLER:
 	.long 0x00074EF0	| +5210
 	.long 0x81E1061C	| +5214
 INITIOPMGR:
-    | serial stuff works if put here. we are not making to serialtest for some reason
-    |jmp SerialTest
-    
-    |.word 0
 	.long 0x48E780F0	| +5218
     .long 0x40E7007C	| +521C
 	.long 0x07007000	| +5220
@@ -12113,7 +12108,7 @@ VALIDATEPRAM:
 					    |               (32<<0),D3				;   starting at PRAM address 32							<H2>
     .long 0x6100FE6A    | +B2F8 BSR		PramIO
 #ifdef PATCH_FORCE_32BIT
-    jmp ValidatePRAM_Patch     | perform the removed instructions then we RTS from there... 
+    bra.l ValidatePRAM_Patch     | perform the removed instructions then we RTS from there... 
 #else
     .long 0x4FEF0100    | +B302 LEA		256(SP),SP				; clean up the stack	temporary buffer
     .long 0x261F        | +B306 move.l  (sp)+,d3
@@ -75744,10 +75739,7 @@ STARTTEST1:
 	.long 0x4EF23800	| +472B4
 
 #ifdef DISABLE_CHECKSUM /* Kill the ROM Checksum for clearer execution traces. Also, I'm not updating the checksum as part of the build process. */
-    .rep 9
-    nop       |          nope out the CRC check
-    .endr
-    
+    .nopFill 18  
 #else
      | CRC check, from http://synack.net/~bbraun/djmemcrom.html
 	.long 0x3E3C0001	| +472B8 Move      $1, D7
@@ -141398,14 +141390,14 @@ CheckCnt:
     .long 0x46452248	| +870F8    Move.l	A0,A1						; Set scratch register (A1) with logical address.
 
 #ifdef PATCH_FLUSHCRANGE
+    .patchStart
+    
     Move.w	%A1,%D2     | Logical address in D2.
     And.w	%D5,%D2		| Grab low n bits of original address.
 			
     plpar (%a1)         | load %A1 with the physical address 
-  
-    .rep 5
-    .word 0x4e71        | NOP
-    .endr
+
+    .patchEnd 16
 #else
     .word 0xF569        | +870FC    Ptestr	(A1)						; Get translated physical address.
     .long 0x4E7A3805	| +871FE    Movec	MMUSR,D3					; Address is in high 19 or 20 bits of MMUSR.
@@ -146349,9 +146341,7 @@ p040BusException:		| https://github.com/elliotnunn/supermario/blob/9dd3c4bef84df
     off to genexps if it was not slot space. */
 
 #ifdef PATCH_SLOTMGR_BERR_HACK
-    .rep 22
-    nop                 | we assume any bus error is slot's fault
-    .endr
+    .nopFill 44
 #else
 
 	.long 0x02400518	| +8BCB8
@@ -146365,7 +146355,7 @@ p040BusException:		| https://github.com/elliotnunn/supermario/blob/9dd3c4bef84df
 	.long 0x0C0000FF	| +8BCD8
 	.long 0x670E0C00	| +8BCDC
 	.long 0x00F06708	| +8BCE0
-    #endif
+#endif
 
 	.long 0x2F4A0006	| +8BCE4
 	.long 0x201F4E73	| +8BCE8
@@ -147763,17 +147753,17 @@ LCDSCREENCHK:
 	.long 0x00000000	| +8D1F4
 	.long 0x00000000	| +8D1F8
 	.long 0x00000000	| +8D1FC
-INSTALLFPSP: | https://github.com/elliotnunn/supermario/blob/9dd3c4bef84df2ea30f5ec2c5e97b043e8267b3f/base/SuperMarioProj.1994-02-09/OS/FPUEmulation/FPEmulation.a#L46
+INSTALLFPSP: | +8D200 https://github.com/elliotnunn/supermario/blob/9dd3c4bef84df2ea30f5ec2c5e97b043e8267b3f/base/SuperMarioProj.1994-02-09/OS/FPUEmulation/FPEmulation.a#L46
 #ifdef PATCH_INSTALLFPSP
-    jmp PatchInstallSP
+    .patchStart
+    
+    bral PatchInstallSP
 
-    .rep 62
-    .byte 0
-    .endr
-#else   /* original installFPSP code installs the FPSP vectors without any consideration to if the CPU actually has a FPU! */
+    .patchEnd 0x85B0    | a bit over 33K bytes here
+#else   
     .long 0x4E7A8801	| +8D200 movec   vbr,a0
-	.long 0x21E8002C	| +8D204 
-	.long 0x1FC843FA	| +8D208
+	.long 0x21E8002C	| +8D204 original installFPSP code installs the FPSP vectors without any consideration to if the CPU actually has a FPU!
+	.long 0x1FC843FA	| +8D208 after installFPSP the rest of the FPSP follows...
 	.long 0x07F22149	| +8D20C
 	.long 0x002C43FA	| +8D210
 	.long 0x003E2149	| +8D214
@@ -147788,9 +147778,6 @@ INSTALLFPSP: | https://github.com/elliotnunn/supermario/blob/9dd3c4bef84df2ea30f
 	.long 0x00D843FA	| +8D238
 	.long 0x08742149	| +8D23C
 	.long 0x00DC4E75	| +8D240
-#endif
-| end of installFPSP
-
 	.long 0xF27F0000	| +8D244
 	.long 0x538012D8	| +8D248
 	.long 0x51C8FFFC	| +8D24C
@@ -148749,7 +148736,7 @@ GENEXCEPTPATCHRTN:
 	.long 0xF317F22F	| +8E12C
 	.long 0xA400006C	| +8E130
 	.long 0xF3574FEF	| +8E134
-	.long 0x00643F7C	| +8E138
+	.long 0x00643F7C	| +8E138    https://github.com/elliotnunn/supermario/blob/9dd3c4bef84df2ea30f5ec2c5e97b043e8267b3f/base/SuperMarioProj.1994-02-09/OS/FPUEmulation/GenExcept.a#L487
 	.long 0x20240006	| +8E13C
 	.long 0x2F380024	| +8E140
 	.long 0x4E75422E	| +8E144
@@ -156329,8 +156316,10 @@ GENEXCEPTPATCHRTN:
 	.long 0x00000000	| +9579C
 	.long 0x3FFE0000	| +957A0
 	.long 0xB07197A2	| +957A4
-	.long 0x3C46C654	| +957A8
-	.long 0x00000000	| +957AC
+	.long 0x3C46C654	| +957A8    FPSP structure https://github.com/elliotnunn/supermario/blob/9dd3c4bef84df2ea30f5ec2c5e97b043e8267b3f/base/SuperMarioProj.1994-02-09/OS/FPUEmulation/FPEmulation.a#L78
+	.long 0x00000000	| +957AC    END OF THE FPSP - https://github.com/elliotnunn/supermario/blob/9dd3c4bef84df2ea30f5ec2c5e97b043e8267b3f/base/SuperMarioProj.1994-02-09/OS/FPUEmulation/Constants.a#L770
+#endif
+FPSPEnd:
 INSTALLPRIVTRAP:
 	.long 0x08380004	| +957B0
 	.word 0x0B22        |           btst.b	#hwCbFPU-8,HWCfgFlags; FPU installed on board?	 btst    #4,(byte_B22).w
@@ -167292,7 +167281,7 @@ HMMMMMM:
 	.long 0x2A8070FF	| +A0160
 	.long 0x2B40002C	| +A0164     http://synack.net/~bbraun/djmemcrom.html
 	.long 0x223C0000	| +A0168    Move.L    #$100, D1
-#ifdef ENABLE_BIGSIMMS_HACK
+#ifdef PATCH_BIGSIMMS_HACK
     .word 0
 #else
 	.word 0x0100        | https://github.com/elliotnunn/sys7.1-doc-wip/blob/62f7e0d5dc1d9a047822d5e73ffa8aa50a97e3fa/OS/StartMgr/SizeMem.a#L671
@@ -191149,8 +191138,9 @@ INITDOCKING:
 	.long 0xA64760DC	| +B7544
 SETUPDOCKBASES:
 #ifdef PATCH_LATEINIT
-    jmp LateInit
-    .word 0             | padding
+    .patchStart
+    bral LateInit
+    .patchEnd 8
 #else
 	.long 0x61286700	| +B7548
 	.long 0x01C82F0A	| +B754C
@@ -197203,10 +197193,8 @@ BOOTBEEPPATCH:
 	.long 0x0C0600B0	| +BD33C
 
 #ifdef PATCH_BADDIVIDES
-    .word 0x663A | patch out the 64/32 divides
-    .rep 8
-    nop       
-    .endr
+    .word 0x663A
+    .nopFill 16         | patch out the 64/32 divides
     .word 0x3D42
 #else
 	.long 0x663A4C3C	| +BD340
@@ -242911,10 +242899,9 @@ FlushIT:
 	.word 0xB543	    | +E9B04  EOR.W	D2,D3				; Make the mask (for extracting the phys addr from MMUSR)
  FlusherRoo:
 #ifdef PATCH_SANE_FLUSHIT
+    .patchStart
     plpar (%a1)         | +E9B06 load %A1 with the physical address 
-    .rep 8
-    nop                 |   NOP
-    .endr
+    .patchEnd 18
 #else
     .word 0xF569	    | +E9B06  PTESTR	(A1)			; Get translated physical address
 	.long 0x4E7A1805	| +E9B08  MOVEC	MMUSR,D1			; The address is in the high 20 bits of MMUSR

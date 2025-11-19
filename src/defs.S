@@ -17,6 +17,9 @@ ROM definitions
     #endif
 #endif
 
+#define xpandstr(s) str(s)
+#define str(s) #s
+
 /* ################################################################################ 
 | constants */
 /* vector table (partial) */
@@ -89,6 +92,44 @@ FPOVFL_VEC040	=	0x1FD8
 FPSNAN_VEC040	=	0x1FDC
 
 noErr = 0	
+
+/* ################################################################################
+| patch macros to allow putting our code in place and padding it to a constant length */
+
+/* define the start of a patch section */
+.macro .patchStart
+9:
+.endm
+
+/* define the end of a patch section and pad it to length with NOPs or another word 
+| all branches must use explicit lengths or you get "non-constant expression" as the opcode size 
+| won't be known until link time */
+
+.macro .patchEnd lengthBytes fill=0x4e71
+    .ifgt \lengthBytes % 2
+        .error "Padding \lengthBytes is not divisible by 2"
+    .endif
+
+    .iflt (\lengthBytes - (. - 9b))
+        .error "Patch overflowed max length of \lengthBytes"
+    .endif
+
+    .ifgt (\lengthBytes - (. - 9b)) % 2
+        .error "Patch contains unaligned code (data?)"
+    .endif
+
+    .ifgt (\lengthBytes - (. - 9b))
+        .fill (\lengthBytes - (. - 9b)) / 2, 2, \fill
+    .endif
+.endm
+
+.macro .nopFill length 
+    .ifgt \length % 2
+        .error "Padding \length is not divisible by 2"
+    .endif
+
+    .fill \length / 2, 2, 0x4e71
+.endm
 
 /* ################################################################################
 | Serial constant macros for debugging. */

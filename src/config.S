@@ -11,6 +11,7 @@ ROM configuration
 #define PATCH_LATEINIT          // replace SetupDockBases with LateInit
 #define PATCH_ROM_MAP_8MB       // map 8MB of ROM space. note: 24 bit mode only has 1MB addr space still!
 #define PATCH_FORCE_32BIT       // always run in 32 bit mode as 24 bit mode can't work ROM >1MB
+//#define PATCH_BIGSIMMS_HACK     // allow sizing 64/128MB simms, but may fail to size <64mb simms
 
 /* FEATURES */
 #define INSTALL_ISP             // include the ISP and patch TMVectors
@@ -21,7 +22,6 @@ ROM configuration
 #define ENABLE_LOADSTORE_FIFO   // enable load store FIFO
 #define ENABLE_SUPERSCALAR      // enable pentium-like superscalar execution
 #define ENABLE_BRANCH_CACHE     // enable branch prediction cache and install new bus error handler
-//#define ENABLE_BIGSIMMS_HACK      // allow sizing 64/128MB simms, but may fail to size <64mb simms
 
 /* TODOs / Unproven */
 //#define INSTALL_FPSP            // install the FPSP and enable FPU. (TODO-Not fully working)
