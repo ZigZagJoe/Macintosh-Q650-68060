@@ -11,7 +11,7 @@ LD = ${RETRO68_TOOLCHAIN}/bin/m68k-apple-macos-ld
 CSRC = $(wildcard *.c)
 ASRC = src/F1ACAD13.S
 
-COMFLAGS = -c -march=68060 -mcpu=68060 -I ./src -I . ${BUILD_FLAGS}
+COMFLAGS = -c -march=68060 -mcpu=68060 -I ./src -I . ${BUILD_FLAGS} -DBUILD_DATE="$(shell date)" -DGIT_REV="$(shell git rev-parse --short=7 HEAD)"
 ASFLAGS = ${COMFLAGS}
 CFLAGS  = ${COMFLAGS} -O2 -mpcrel 
 

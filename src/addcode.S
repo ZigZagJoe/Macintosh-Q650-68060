@@ -165,3 +165,33 @@ BranchPredictionError:
 #ifdef ENABLE_SERIAL_DEBUG
     #include "serial.S"
 #endif
+
+/* ################################################################################
+| stick some build info on the very end of the ROM */
+#define xpandstr(s) str(s)
+#define str(s) #s
+
+#define strifdef(a,str)
+ROMBuild:
+    .ascii "\nzigzagjoe 68060-Q650 ROM\n"
+    .ascii xpandstr(built BUILD_DATE)
+    .byte '\n'
+    .ascii xpandstr(git rev GIT_REV)
+    .byte '\n'
+#ifdef DISABLE_FPU 
+    .ascii "FPU Disabled\n"
+#endif
+#ifdef INSTALL_FPSP
+    .ascii "FPSP Enabled\n"
+#endif
+#ifdef ENABLE_SUPERSCALAR 
+    .ascii "Superscalar Enabled\n"
+#endif
+#ifdef ENABLE_BRANCH_CACHE 
+    .ascii "Branch Cache Enabled\n"
+#endif
+#ifdef ENABLE_SERIAL_DEBUG
+    .ascii "Serial Debug Enabled\n"
+#endif
+    .byte 0
+    .align 4

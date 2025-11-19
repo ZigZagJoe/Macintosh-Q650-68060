@@ -26,7 +26,7 @@ ROM configuration
 /* TODOs / Unproven */
 //#define INSTALL_FPSP            // install the FPSP and enable FPU. (TODO-Not fully working)
 #define PATCH_SLOTMGR_BERR_HACK // during slot manager, assume any bus errors are slot manager's fault (TODO)
-#define CPUSH_NO_INVALIDATE     // CPUSH'd lines remain valid in cache. no performance impact/improvement seen
+//#define CPUSH_NO_INVALIDATE     // CPUSH'd lines remain valid in cache. no performance impact/improvement seen
 
 /* DEBUGGING */
 //#define ENABLE_SERIAL_DEBUG     // enable serial debugging over modem port
