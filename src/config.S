@@ -12,6 +12,7 @@ ROM configuration
 #define PATCH_ROM_MAP_8MB       // map 8MB of ROM space. note: 24 bit mode only has 1MB addr space still!
 //#define PATCH_FORCE_32BIT       // force booting in 32 bit mode always
 //#define PATCH_BIGSIMMS_HACK     // allow sizing 64/128MB simms, but may fail to size <64mb simms
+#define REPLACE_040FPSP         // replace 040FPSP with ISP and addcode
 
 /* FEATURES */
 #define INSTALL_ISP             // include the ISP and patch TMVectors
@@ -27,7 +28,6 @@ ROM configuration
 //#define INSTALL_FPSP            // install the FPSP and enable FPU. (TODO-Not fully working)
 #define PATCH_SLOTMGR_BERR_HACK // during slot manager, assume any bus errors are slot manager's fault (TODO)
 //#define CPUSH_NO_INVALIDATE     // CPUSH'd lines remain valid in cache. no performance impact/improvement seen
-#define REPLACE_040FPSP            // experimental: replace 040FPSP with ISP and addcode
 
 /* DEBUGGING */
 //#define ENABLE_SERIAL_DEBUG     // enable serial debugging over modem port
@@ -35,7 +35,7 @@ ROM configuration
 //#define TRACE_ISP             // log ISP calls
 //#define TRACE_FPSP              // log FPSP calls
 #define SERIAL_BAUD_57600       // use 57600 baud, otherwise 9600 is used
-//#define DEBUG_VBLPATCH         // calls DebugVBLPatch 60 times per second...
+//#define DEBUG_VBLTASK         // calls DebugVBLTask 60 times per second...
 
 /* MISC */
 //#define PATCH_BADDIVIDES          // ugly hack out the early 64/32 divides in sound routine

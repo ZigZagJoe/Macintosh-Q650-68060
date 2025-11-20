@@ -27,9 +27,9 @@ ROM definitions
     #warning "PATCH_FORCE_32BIT forced due to FPSP length"
 #endif
 
-#if !defined(REPLACE_040FPSP) && defined(INSTALL_ISP) && !defined(PATCH_FORCE_32BIT)
+#if defined(INSTALL_ISP) && !defined(PATCH_FORCE_32BIT) && !defined(REPLACE_040FPSP) 
     #define PATCH_FORCE_32BIT
-    #warning "PATCH_FORCE_32BIT forced due to ISP length"
+    #warning "PATCH_FORCE_32BIT forced due to ISP"
 #endif
 
 /* Preproc Macros */
@@ -120,7 +120,6 @@ noErr = 0
 /* define the end of a patch section and pad it to length with NOPs or another word 
 | all branches must use explicit lengths or you get "non-constant expression" as the opcode size 
 | won't be known until link time */
-
 .macro .patchEnd lengthBytes fill=0x4e71
     .ifgt \lengthBytes % 2
         .error "Padding \lengthBytes is not divisible by 2"
@@ -139,6 +138,7 @@ noErr = 0
     .endif
 .endm
 
+/* just fill with nops */
 .macro .nopFill length 
     .ifgt \length % 2
         .error "Padding \length is not divisible by 2"

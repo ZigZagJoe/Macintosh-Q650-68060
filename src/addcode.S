@@ -12,7 +12,7 @@ ROMEntryNew:
 #endif
 
     movec %d0, %pcr                 | NOTE: this will prevent an 040 from booting at all! 
-    bral ROMEntryOrig                | back to original entry
+    bral ROMEntryOrig               | back to original entry
 
 /* ################################################################################
 | InstallFPSP replacement.
@@ -117,7 +117,7 @@ TurnOnBC:
 /* ################################################################################
 | VBL patch for shenanigans (debug)
 | do not trash any registers!! */
-DebugVBLPatch:
+DebugVBLTask:
 
     /* patched code from DoVBLTask, do not move */
 	.long 0x52A9000A	            | +A334     addq.l	#1,slotTickCount-slotVBLQHdr(A1)	; increment slot tickcount
@@ -153,13 +153,6 @@ BranchPredictionError:
 #ifdef INSTALL_ISP
     #include "isp-memacc.S"
     #include "isp-callouts.S"
-#endif
-
-/* include the FPSP if we aren't replacing the 040FPSP */
-#ifndef REPLACE_040FPSP
-    #ifdef INSTALL_FPSP
-        #include "fpsp-callouts.S"
-    #endif
 #endif
 
 #ifdef ENABLE_SERIAL_DEBUG

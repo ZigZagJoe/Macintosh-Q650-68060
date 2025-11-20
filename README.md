@@ -3,7 +3,9 @@ This project is a collection of ROM modifications to get a minimum level of func
 
 [Boot video](https://www.youtube.com/watch?v=KXSWiKu-ASA)
 [Running Marathaon](https://www.youtube.com/watch?v=lk_ZgpcZBEY)
-[Writeup @ 68kmla](https://68kmla.org/bb/index.php?threads/macintosh-68060-redux.51016/)
+
+[Initial Writeup @ 68kmla](https://68kmla.org/bb/index.php?threads/macintosh-68060-redux.51016/)
+[Final performance @ 68kmla](https://68kmla.org/bb/index.php?threads/macintosh-68060-redux.51016/post-576174)
 
 This is a experimental proof of concept ONLY. **Do not expect it to be usable**! Please don't rush out to replicate this unless you know *exactly* what you're getting into, or you will be disappointed. No warranty is expressed or implied; I'm not responsible if your Macintosh catches fire, attains sentience, or is raptured into an alternate reality where 68K won the CPU wars. 
 

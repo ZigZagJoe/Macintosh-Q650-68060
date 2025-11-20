@@ -1,13 +1,5 @@
 ############################################################################
 ### TODO / Known bugs  
-    memory/vram throughput is reduced vs 040
-        25, 33mhz bus clocks
-        does NOT show in L2 cache comparison without BC at 64 and 66 ???
-        let's try enabling superscalar late in boot. 
-            Seems to fix timedbra calculation, though what does that affect?
-        oddly, cbits l/a is consistent on 25mhz bclk
-        is it hardware or is it software?
-
     bus error handlers 
         slot manager needs to be updated to actually check the fields correctly (PATCH_SLOTMGR_BERR_HACK)
         scsi mgr 4.3 plays with bus error too BUSERRHANDLER_96_BIOS
@@ -36,6 +28,21 @@
 
 ############################################################################
 ### DONE??
+    memory/vram throughput is reduced vs 040
+        25, 33mhz bus clocks
+        does NOT show in L2 cache comparison without BC at 64 and 66 ???
+        let's try enabling superscalar late in boot. 
+            Seems to fix timedbra calculation, though what does that affect?
+        oddly, cbits l/a is consistent on 25mhz bclk
+        is it hardware or is it software?
+        ***EXPECTED***
+        060 has 18 cycles for MOVE16 (11 on read cache hit; unlikely)
+        040 has 14 cycles for MOVE16. Motorola claims this is relative to BCLK but I don't know that is true
+        These execution timings assume ideal 2-1-1-1 memory timing
+        33mhz quadra is 4-3-3-3 (13 BCLK cycles) on a page burst read and 3-2-2-2 (9 BCLK cycles) on a page burst write
+        (11 [read] + 10 [write] - 2 * 5 [motorola assumed memory cycles]) * 2 [blck is half pclk] = 22 additional pclk cycles over motorola specifications.
+        (14 [040 timing] + 22 extra)/(18 [060 timing] + 22 extra) = 68060 has 90% the MOVE16 bandwidth comapred to 68040,
+
     branch cache
         ** probably branch cache should be turned on after slot manager completes - DONE **
         need to verify bus except handler actually works correctly...

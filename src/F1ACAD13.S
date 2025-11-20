@@ -4337,9 +4337,7 @@ WHICHCPUPATCH:
 	.word 0x4E75		| +4030
 ENABLECACHESPATCH: |  https://github.com/elliotnunn/sys7.1-doc-wip/blob/62f7e0d5dc1d9a047822d5e73ffa8aa50a97e3fa/OS/StartMgr/StartInit.a#L1587
 #ifdef PATCH_ENABLECACHES
-    .patchStart
     bral Initialize060Caches | jump to patchcode and rts from there
-    .patchEnd 32
 #else
 	.word 0x0C38		| +4032
 	.long 0x0004012F	|           cmp.b	#cpu68040,CpuFlag				; check if we're on an 040
@@ -4347,12 +4345,13 @@ ENABLECACHESPATCH: |  https://github.com/elliotnunn/sys7.1-doc-wip/blob/62f7e0d5
 	.word 0x203C        | +403A
     .long 0x80008000	|           move.l	#(1<<CACR_IE_040)  | (1<<CACR_DE_040),d0			; YES ... turn on IE
 	.long 0x4E7B0002	| +4040     Movec	D0,CACR							; set up the CACR as desired from above
-	.word 0x600A	    | +4044         bra.s @exit
+	.word 0x600A	    | +4044     bra.s @exit
     .word 0x203C        | +4046
 	.long 0x00003919	|           move #0x3919, %d0
 	.long 0x4E7B0002	| +404C     Movec	D0,CACR							; 
 	.word 0x4E75		| +4050     @exit: rts
 #endif
+.org 0x4052
 DISABLEMMUPATCH:
 	.word 0x9080		| +4052
 	.long 0x08C0001F	| +4054
@@ -11051,8 +11050,8 @@ ATTACHVBL:
 	.word 0x4E75		| +A330
 DOVBLTASK:      | https://github.com/elliotnunn/sys7.1-doc-wip/blob/62f7e0d5dc1d9a047822d5e73ffa8aa50a97e3fa/OS/VerticalRetraceMgr.a#L384
 	.word 0x61C6		| +A332     bsr.s	GetSlotVBLQHdr
-#ifdef DEBUG_VBLPATCH
-    jsr DebugVBLPatch
+#ifdef DEBUG_VBLTASK
+    jsr DebugVBLTask
     nop
 #else
 	.long 0x52A9000A	| +A334     addq.l	#1,slotTickCount-slotVBLQHdr(A1)	; increment slot tickcount
@@ -141354,7 +141353,7 @@ FLUSHDCACHEPATCH:
 FLUSHCRANGEFORBM:
 	.word 0x205F		| +870AA
 	.word 0x225F		| +870AC
-FLUSHCRANGE: | https://github.com/elliotnunn/sys7.1-doc-wip/blob/62f7e0d5dc1d9a047822d5e73ffa8aa50a97e3fa/OS/HwPriv.a#L1033
+FLUSHCRANGE:            | +870AE https://github.com/elliotnunn/sys7.1-doc-wip/blob/62f7e0d5dc1d9a047822d5e73ffa8aa50a97e3fa/OS/HwPriv.a#L1033
    
 #ifdef PATCH_FLUSHCRANGE_HACK
     cpusha  %bc         | cpusha bc, flush and invalidate both caches
@@ -141376,7 +141375,7 @@ CheckCnt:
 #ifdef PATCH_FLUSHCRANGE
     Cmpi.l	#0x1800,%D1  | check against 8KB * 3 / 4 for 68060
 #else
-    Cmpi.l	#0x0C00,D1	| Less than 3/4 the size of the cache?  ***Tune***
+    Cmpi.l	#0x0C00,%D1	| Less than 3/4 the size of the cache?  ***Tune***
 #endif
 	.long 0x6D064E71	| +870D4
 	.long 0xF4F8605C	| +870D8
@@ -146343,7 +146342,6 @@ p040BusException:		| https://github.com/elliotnunn/supermario/blob/9dd3c4bef84df
 #ifdef PATCH_SLOTMGR_BERR_HACK
     .nopFill 44
 #else
-
 	.long 0x02400518	| +8BCB8
 	.long 0x0C400100	| +8BCBC
 	.long 0x662A102F	| +8BCC0 other check idk
@@ -147758,7 +147756,7 @@ INSTALLFPSP:            | +8D200 https://github.com/elliotnunn/supermario/blob/9
     bral PatchInstallSP
 
     /* around 33.4kb of space used by the old 040 FPSP; replace it with new code 
-    .org statement at FPSPEnd */
+    .org statement at FPSPEnd to keep size correct */
     #ifdef REPLACE_040FPSP
         #include "addcode.S"
     #endif
@@ -191141,9 +191139,8 @@ INITDOCKING:
 	.long 0xA64760DC	| +B7544
 SETUPDOCKBASES:
 #ifdef PATCH_LATEINIT
-    .patchStart
     bral LateInit
-    .patchEnd 8
+    .org 0xB7550        | fill unused space
 #else
 	.long 0x61286700	| +B7548
 	.long 0x01C82F0A	| +B754C
@@ -197194,20 +197191,19 @@ BOOTBEEPPATCH:
 	.long 0x28027CF0	| +BD334
 	.long 0xCC2E0800	| +BD338
 	.long 0x0C0600B0	| +BD33C
+    .word 0x663A        | +BD33E
 
 #ifdef PATCH_BADDIVIDES
-    .word 0x663A
     .nopFill 16         | patch out the 64/32 divides
-    .word 0x3D42
 #else
-	.long 0x663A4C3C	| +BD340
+	.word 0x4C3C	    | +BD340
 	.long 0x24000000	| +BD344
 	.long 0xFFFF4C7C	| +BD348
 	.long 0x2400AC44	| +BD34C
-	.long 0x00003D42	| +BD350
+	.word 0x0000	    | +BD350
 #endif
 
-    | END
+    .word 0x3D42	    | +BD352
 	.long 0x0F043D42	| +BD354
 	.long 0x0F240C43	| +BD358
 	.long 0x00056604	| +BD35C
@@ -265759,14 +265755,14 @@ FlushIT:
 	.long 0x2BC7000F	| +FFFFC
 ROMEND:
 
-/* if we're replacing the 040FPSP with the ISP code, and need the FPSP, then put at the end of the ROM (for now) */
-#ifdef REPLACE_040FPSP
-    #ifdef INSTALL_FPSP
-        #include "fpsp-callouts.S"
-    #endif
-#else
-/* not putting the ISP in place of 040FPSP, include it all here */
+/* if not putting the ISP/etc in place of 040FPSP, then include it here */
+#ifndef REPLACE_040FPSP
     #include "addcode.S"
+#endif
+
+/* FPSP always put at the end of the ROM (for now) due to the size */
+#ifdef INSTALL_FPSP
+    #include "fpsp-callouts.S"
 #endif
 
 /* ################################################################################
@@ -265782,7 +265778,7 @@ ROMBuild:
     .ascii "FPU Disabled\n"
 #endif
 #ifdef INSTALL_FPSP
-    .ascii "FPSP Enabled\n"
+    .ascii "FPSP (FPU) Enabled\n"
 #endif
 #ifdef ENABLE_SUPERSCALAR 
     .ascii "Superscalar Enabled\n"
@@ -265792,6 +265788,9 @@ ROMBuild:
 #endif
 #ifdef ENABLE_SERIAL_DEBUG
     .ascii "Serial Debug Enabled\n"
+#endif
+#ifdef PATCH_FORCE_32BIT
+    .ascii "Force 32-bit only\n"
 #endif
     .byte 0
 .section .text
