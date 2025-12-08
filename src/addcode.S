@@ -94,6 +94,39 @@ ValidatePRAM_Patch:
     move.l  (%sp)+,%d3              | and restore D3
     rts    
 
+#ifdef PATCH_DRAM_SIMMONLY
+/* d0 	- 	total size of RAM in system
+;  d5	-	nibble sizes for up to 8 banks
+;  d6	-	nibble sizes for up to an additional 8 banks	
+
+a2, d2-d4 can be thrashed 
+d5 = 76543210 where each nibble is a bank
+each nibble is size of bank in chunks of (%A5)
+*/
+Concat_bankDisable:
+    move.l %d5, %d2 
+    move.l %d5, %d3
+    
+    and.l #0xF, %d2         | bank0 size in %d2
+
+    lsl.l #4, %d3
+    and.l #0xF, %d3         | bank1 size in %d2
+    add.l %d3, %d2          | %d2 = bank0 + bank1 size
+
+    move.l (%a5), %d3       | get chunk size (1MB, usually)
+    lsl.l %d2, %d3          | size = chunk << %d2 ie 4MB = 1MB < 2
+    sub.l %d3, %d0          | subtract bank size from total RAM
+
+    | clear the size of the lowest two banks
+    and.l #0xFFFFFF00, %d5
+    
+    | original code continued, do not modify
+    move.l  %d0,%d3         | 000A026E
+    moveq   #0,%d2          | 000A0270
+    movea.w #0x2600,%sp     | 000A0272
+    bra.l Concat_resume
+#endif
+
 /* ################################################################################
 | install a new bus error (Access error) handler that deals with branch prediction error correctly */
 .global TurnOnBC

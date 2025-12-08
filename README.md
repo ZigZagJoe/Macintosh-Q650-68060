@@ -23,6 +23,4 @@ Flash the resulting image to a Quadra-compatible ROM SIMM such as those sold by 
 ## License
 I do not assert ownership of material in this repository. Do with it what you will, but credit is appreciated :)
 
-The Macintosh ROM is property of Apple Computer.
-
-*Licenses of reference content vary, please see the licenses in the respective directories for details.*
+The Macintosh ROM is property of Apple Computer. *Licenses of reference content vary, please see the licenses in the respective directories for details.*

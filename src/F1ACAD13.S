@@ -4975,14 +4975,28 @@ MEMORYCTRLINITPATCH:
 	.long 0xE40B0803	| +494C
 	.long 0x00026704	| +4950
 	.long 0x08C30001	| +4954
-	.long 0x02030003	| +4958
+	.long 0x02030003	| +4958 https://github.com/elliotnunn/supermario/blob/9dd3c4bef84df2ea30f5ec2c5e97b043e8267b3f/base/SuperMarioProj.1994-02-09/OS/Universal.a#L799
+#ifdef FORCE_DRAM_TIMINGS
+    .patchStart
+ #ifdef DRAM_TIMINGS_SPEEDBUMP
+    move.l #1, %d4      | second entry in MachineTbl is a bumped config
+ #else
+    move.l #0, %d4      | first entry in MachineTbl is not a bumped config
+ #endif
+ #ifdef DRAM_TIMINGS_CPUSPEED
+    move.l #DRAM_TIMINGS_CPUSPEED, %d3 | force the index in the DRAM config tables, 0=20,1=25,2=33,3=40
+ #endif
+    .patchEnd 26
+#else
 	.long 0x78FF5284	| +495C
 	.long 0x4A7B4320	| +4960
 	.long 0x007A671A	| +4964
 	.long 0x7056C02A	| +4968
 	.long 0x1E00B03B	| +496C
 	.long 0x4320006D	| +4970
-	.long 0x66E847FA	| +4974
+	.word 0x66E8	    | +4974
+#endif
+    .word 0x47FA	    | +4976
 	.long 0x0048103B	| +4978
 	.long 0x43200060	| +497C
 	.long 0x670447FA	| +4980
@@ -5010,13 +5024,18 @@ RELOADBERRVBR:
 	.long 0x01010000	| +49D0
 	.long 0x028001E0	| +49D4
 	.long 0x00D50000	| +49D8
-	.long 0x00420152	| +49DC
-	.long 0x00400042	| +49E0
-	.long 0x01440046	| +49E4
-	.long 0x01500154	| +49E8
-	.word 0x0156		| +49EC
-SCSI96ANDRPUPATCH:
-	.word 0x0000		| +49EE
+MachineTbl:
+	.byte 0x00,0x42	    | +49DC
+    .byte 0x01,0x52	    | +49DE bump
+	.byte 0x00,0x40	    | +49E0
+    .byte 0x00,0x42	    | +49E2
+	.byte 0x01,0x44	    | +49E4 bump
+    .byte 0x00,0x46	    | +49E6
+	.byte 0x01,0x50	    | +49E8 bump
+    .byte 0x01,0x54	    | +49EA bump
+	.byte 0x01,0x56		| +49EC bump
+SCSI96ANDRPUPATCH:      | ???? this offset is wrong
+	.word 0x0000		| +49EE  end of MachineTbl
 	.long 0x0101001A	| +49F0
 	.long 0x00FB02FC	| +49F4
 	.long 0x4ED4DFC3	| +49F8
@@ -11051,7 +11070,7 @@ ATTACHVBL:
 DOVBLTASK:      | https://github.com/elliotnunn/sys7.1-doc-wip/blob/62f7e0d5dc1d9a047822d5e73ffa8aa50a97e3fa/OS/VerticalRetraceMgr.a#L384
 	.word 0x61C6		| +A332     bsr.s	GetSlotVBLQHdr
 #ifdef DEBUG_VBLTASK
-    jsr DebugVBLTask
+    bsrl DebugVBLTask
     nop
 #else
 	.long 0x52A9000A	| +A334     addq.l	#1,slotTickCount-slotVBLQHdr(A1)	; increment slot tickcount
@@ -80446,6 +80465,7 @@ CLKWPOFF:
 	.long 0x00000000	| +4BAB4
 	.long 0x00000000	| +4BAB8
 	.long 0x00000000	| +4BABC
+SIZEMEMORY:
 	.long 0x60FF0005	| +4BAC0
 	.long 0x453E0000	| +4BAC4
 	.long 0x00000000	| +4BAC8
@@ -167191,6 +167211,7 @@ CPUDECLDATA:
 	.long 0x2BC7000F	| +9FFFC
 VSCDECLROM:
 HMMMMMM:
+SIZEMEMORYPATCH:
 	.long 0x260E7400	| +A0000
 	.long 0x4DFA000C	| +A0004
 	.long 0x41F9FFF6	| +A0008
@@ -167281,14 +167302,14 @@ HMMMMMM:
 	.long 0x50F0E000	| +A015C
 	.long 0x2A8070FF	| +A0160
 	.long 0x2B40002C	| +A0164     http://synack.net/~bbraun/djmemcrom.html
-	.long 0x223C0000	| +A0168    Move.L    #$100, D1
+	| +A0168  
 #ifdef PATCH_BIGSIMMS_HACK
-    .word 0
+    Move.L    #0, %D1
 #else
-	.word 0x0100        | https://github.com/elliotnunn/sys7.1-doc-wip/blob/62f7e0d5dc1d9a047822d5e73ffa8aa50a97e3fa/OS/StartMgr/SizeMem.a#L671
+	Move.L    #0x100, %D1        | https://github.com/elliotnunn/sys7.1-doc-wip/blob/62f7e0d5dc1d9a047822d5e73ffa8aa50a97e3fa/OS/StartMgr/SizeMem.a#L671
 #endif 
-    .word 0x7009	    | +A016E
-	.long 0x4BED0004	| +A0170
+    moveq   #9,%d0	    | +A016E moveq #(dj_MaxBanks-1),%d0
+	lea     4(%a5),%a5	| +A0170 LEA MEMCdRAMCfg0(%A5),%A5
 	.long 0x2AC10641	| +A0174
 	.long 0x001051C8	| +A0178
 	.long 0xFFF82A49	| +A017C
@@ -167320,10 +167341,15 @@ HMMMMMM:
 	.long 0x53616D42	| +A01E4
 	.long 0x66062645	| +A01E8
 	.long 0x2A4F609A	| +A01EC
-	.long 0x240B5282	| +A01F0
-	.long 0x67782C0B	| +A01F4
-	.long 0xCD456072	| +A01F8
-	.long 0x4ED22808	| +A01FC
+    move.l  %a3,%d2     | 000A01F0
+    addq.l  #1,%d2      | 000A01F2 
+    beq.s   Concat      | 000A01F4
+    move.l  %a3,%d6     | 000A01F6
+    exg     %d6,%d5     | 000A01F8
+    bra.s   Concat      | 000A01FA  
+loc_A01FC:                           
+    jmp     (%a2)       | 000A01FC return on error
+    .word 0x2808	    | +A01FE different routine
 	.long 0x59892411	| +A0200
 	.long 0x22814ABA	| +A0204
 	.long 0xFFFEB291	| +A0208
@@ -167351,9 +167377,29 @@ HMMMMMM:
 	.long 0xE09951CA	| +A0260
 	.long 0xFFE02083	| +A0264
 	.long 0x21440004	| +A0268
-	.long 0x4ED62600	| +A026C
-	.long 0x74003E7C	| +A0270
-	.long 0x2600280A	| +A0274
+	.word 0x4ED6 	| +A026C
+/*;=============================================================================================
+; Routine:	Concat
+;
+; Inputs:	d0 	- 	total size of RAM in system
+;			d5	-	nibble sizes for up to 8 banks
+;			d6	-	nibble sizes for up to an additional 8 banks						<H7><H8><SM12>
+;			a2	-	SizeMem return address
+;
+; This routine vectors to the appropriate 'stitch' routine, after getting the decoder type.
+;_____________________________________________________________________________________________*/
+Concat:
+#ifdef PATCH_DRAM_SIMMONLY
+    .patchStart
+    bra.l Concat_bankDisable
+    .patchEnd 8
+Concat_resume:
+#else
+    move.l  %d0,%d3      | 000A026E
+    moveq   #0,%d2       | 000A0270
+    movea.w #0x2600,%sp  | 000A0272
+#endif 
+    move.l  %a2,%d4     | 000A0274
 	.long 0x4DFA000C	| +A0278
 	.long 0x41F9FFF6	| +A027C
 	.long 0x2CB84EFB	| +A0280
@@ -265792,5 +265838,15 @@ ROMBuild:
 #ifdef PATCH_FORCE_32BIT
     .ascii "Force 32-bit only\n"
 #endif
+#ifdef PATCH_BIGSIMMS_HACK
+    .ascii "Big SIMMs support hack\n"
+#endif
+#ifdef PATCH_DRAM_SIMMONLY
+    .ascii "Onboard RAM disabled\n"
+#endif
+#ifdef FORCE_DRAM_TIMINGS
+    .ascii "Forced DRAM timings\n"
+#endif
+
     .byte 0
 .section .text

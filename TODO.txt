@@ -22,7 +22,6 @@
 
 ############################################################################
 ### NEEDS TESTING
-
     ISP need to hand off to appropriate vectors off VBR for exceptions like /v, chk, etc
         RTS_TO_VECTOR: DONE, UNTESTED
 
@@ -79,3 +78,23 @@ NOTES
 no FPU detected in tattletech or speedometer
     fpu detect happen at early boot while we have the FPU disabled. 
         TESTFORFPU
+
+
+/* DRAM timing configurations
+Indexed by CPU Speed, ie 0 = 20mhz
+Bump = 80ns DRAM, otherwise 60ns (faster!)
+    @20     dc.w %0000000100000001  ; fastwr=1,                                              ROMspeed=1
+    @bump20 dc.w %0000000100000001  ; fastwr=1,                                              ROMspeed=1
+    @25     dc.w %0000000000011010  ;                                      drpchg=1, drpw=1, ROMspeed=2
+    @bump25 dc.w %0000000000011010  ;                                      drpchg=1, drpw=1, ROMspeed=2
+    @33     dc.w %0000000010100011  ;          mhz33=1,          cyc2ta=1,                   ROMspeed=3
+    @bump33 dc.w %0000000011111011  ;          mhz33=1, drcpw=1, cyc2ta=1, drpchg=1  drpw=1, ROMspeed=4
+    @40     dc.w %0000001011110100  ; dwcpw=1, mhz33=1, drcpw=1, cyc2ta=1, drpchg=1,         ROMspeed=4
+    @bump40 dc.w %0000001011111100  ; dwcpw=1, mhz33=1, drcpw=1, cyc2ta=1, drpchg=1, drpw=1, ROMspeed=5
+dwcpw = add wait on burst write dcas word 2-4
+drcpw = same as dwcpw for read
+drpw = add wait state on dras
+mhz33 = 33mhz or greater bus
+cyc2ta = interleaved bursts wait on lword 2-4
+drpchg = add wait state to dras precharge
+*/

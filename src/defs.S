@@ -13,6 +13,10 @@ ROM definitions
     #warning "FPU not disabled but FPSP not installed"
 #endif
 
+#if !defined(FORCE_DRAM_TIMINGS) && (defined(DRAM_TIMINGS_SPEEDBUMP) || defined(DRAM_TIMINGS_CPUSPEED))
+    #warning Ignoring DRAM_TIMINGS_SPEEDBUMP and DRAM_TIMINGS_CPUSPEED as FORCE_DRAM_TIMINGS is undefined
+#endif
+
 #if defined(SP_MEM_TRACE) || defined(TRACE_ISP) || defined(TRACE_FPSP)
     #ifndef ENABLE_SERIAL_DEBUG
         #error Must define ENABLE_SERIAL_DEBUG to trace

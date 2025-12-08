@@ -10,8 +10,7 @@ ROM configuration
 #define PATCH_ENABLECACHES      // initialize 060 caches specifically
 #define PATCH_LATEINIT          // replace SetupDockBases with LateInit
 #define PATCH_ROM_MAP_8MB       // map 8MB of ROM space. note: 24 bit mode only has 1MB addr space still!
-//#define PATCH_FORCE_32BIT       // force booting in 32 bit mode always
-//#define PATCH_BIGSIMMS_HACK     // allow sizing 64/128MB simms, but may fail to size <64mb simms
+//#define PATCH_FORCE_32BIT     // force booting in 32 bit mode always
 #define REPLACE_040FPSP         // replace 040FPSP with ISP and addcode
 
 /* FEATURES */
@@ -23,6 +22,13 @@ ROM configuration
 #define ENABLE_LOADSTORE_FIFO   // enable load store FIFO
 #define ENABLE_SUPERSCALAR      // enable pentium-like superscalar execution
 #define ENABLE_BRANCH_CACHE     // enable branch prediction cache and install new bus error handler
+
+/* DRAM Configuration */
+//#define PATCH_BIGSIMMS_HACK    // allow sizing 64/128MB simms, but may fail to size <64mb simms
+//#define PATCH_DRAM_SIMMONLY      // disable onboard RAM
+//#define FORCE_DRAM_TIMINGS       // override djmemc configuration based on values below instead of resistors
+//#define DRAM_TIMINGS_SPEEDBUMP   // if defined, forces speedbump timings (slower, for 80ns RAM)
+//#define DRAM_TIMINGS_CPUSPEED   2  // 0 = 20, 1 = 25, 2 = 33, 4 = 40 or undefine to use strap resistors 
 
 /* TODOs / Unproven */
 //#define INSTALL_FPSP            // install the FPSP and enable FPU. (TODO-Not fully working)
