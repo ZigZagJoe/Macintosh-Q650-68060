@@ -57,8 +57,7 @@ LateInit:
 #endif
 
 #ifdef ENABLE_BRANCH_CACHE    
-    jsr TurnOnBC                    | turn on branch cache. we can patch the vector table and have it stick
-                                    | and slot manager is done messing with bus error vector too.
+    jsr TurnOnBC                    | turn on branch cache. (TODO bus error is changed by later code...)
 #endif
 
     rts
@@ -114,11 +113,10 @@ Concat_bankDisable:
     add.l %d3, %d2          | %d2 = bank0 + bank1 size
 
     move.l (%a5), %d3       | get chunk size (1MB, usually)
-    lsl.l %d2, %d3          | size = chunk << %d2 ie 4MB = 1MB < 2
+    lsl.l %d2, %d3          | size = chunk << %d2 ie 4MB = 1MB << 2
     sub.l %d3, %d0          | subtract bank size from total RAM
 
-    | clear the size of the lowest two banks
-    and.l #0xFFFFFF00, %d5
+    and.l #0xFFFFFF00, %d5  | clear the size of the lowest two banks
     
     | original code continued, do not modify
     move.l  %d0,%d3         | 000A026E
@@ -160,7 +158,7 @@ DebugVBLTask:
 /* ################################################################################
 | new access fault handler. Must check for BPE bit and clear branch cache if set, 
 | then either return if no further error or proceed to normal bus error handler 
-| NOTE: not yet verified as don't seem to be hitting BPEs */
+| NOTE: mac os is replacing bus error handler... so this really isn't working/tested */
 New_AccessFault:	
 	PUT_STRING "BERR\n"
     

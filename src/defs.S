@@ -9,7 +9,7 @@ ROM definitions
     #undef INSTALL_FPSP     // no FPSP if we disable the FPU
 #endif
 
-#if !defined(DISABLE_FPU) && !defined(INSTALL_FPSP)
+#if !defined(DISABLE_FPU) && !defined(INSTALL_FPSP) && defined(PROC_686060)
     #warning "FPU not disabled but FPSP not installed"
 #endif
 
@@ -34,6 +34,19 @@ ROM definitions
 #if defined(INSTALL_ISP) && !defined(PATCH_FORCE_32BIT) && !defined(REPLACE_040FPSP) 
     #define PATCH_FORCE_32BIT
     #warning "PATCH_FORCE_32BIT forced due to ISP"
+#endif
+
+#if defined(ENABLE_SUPERSCALAR) || defined(ENABLE_BRANCH_CACHE)
+    #define PATCH_LATEINIT
+#endif
+
+#if defined(DRAM_TIMINGS_CUSTOM) && (defined(DRAM_TIMINGS_SPEEDBUMP) || defined(DRAM_TIMINGS_CPUSPEED))
+    #warning DRAM_TIMINGS_CPUSPEED / DRAM_TIMINGS_SPEEDBUMP overriden by DRAM_TIMINGS_CUSTOM
+    #undef DRAM_TIMINGS_SPEEDBUMP
+    #undef DRAM_TIMINGS_CPUSPEED
+    #define DRAM_TIMINGS_CPUSPEED 0
+#elif defined(DRAM_TIMINGS_CUSTOM)
+    #define DRAM_TIMINGS_CPUSPEED 0
 #endif
 
 /* Preproc Macros */
