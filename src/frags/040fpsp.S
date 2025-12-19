@@ -1,13 +1,4 @@
-INSTALLFPSP:            | +8D200 https://github.com/elliotnunn/supermario/blob/9dd3c4bef84df2ea30f5ec2c5e97b043e8267b3f/base/SuperMarioProj.1994-02-09/OS/FPUEmulation/FPEmulation.a#L46
-#ifdef PATCH_INSTALLFPSP
-    bral PatchInstallSP
-
-    /* around 33.4kb of space used by the old 040 FPSP; replace it with new code 
-    .org statement at FPSPEnd to keep size correct */
-    #ifdef REPLACE_040FPSP
-        #include "addcode.S"
-    #endif
-#else   
+| original 68040 FPSP, starting with InstallFPSP
     .long 0x4E7A8801	| +8D200 movec   vbr,a0
 	.long 0x21E8002C	| +8D204 original installFPSP code installs the FPSP vectors without any consideration to if the CPU actually has a FPU!
 	.long 0x1FC843FA	| +8D208 after installFPSP the rest of the FPSP follows...
@@ -8565,4 +8556,3 @@ GENEXCEPTPATCHRTN:
 	.long 0xB07197A2	| +957A4
 	.long 0x3C46C654	| +957A8   
 	.long 0x00000000	| +957AC    END OF THE FPSP - https://github.com/elliotnunn/supermario/blob/9dd3c4bef84df2ea30f5ec2c5e97b043e8267b3f/base/SuperMarioProj.1994-02-09/OS/FPUEmulation/Constants.a#L770
-#endif

@@ -1,11 +1,8 @@
 | djMEMC Configuration Register initialization values
 | +49C0
 djConfigTable:          
-#ifdef DRAM_TIMINGS_CUSTOM
-|                1           
-|                09876543210       
-   |.word 0b0000000100000011        | 33mhz fastwr=1, romspeed=3
-    .word 0b0000000000001011        | 40mhz drpw=1, romspeed=3
+#ifdef DRAM_TIMINGS_CUSTOM    
+    .word TIMING_DJCONFIG
 #else
 	.word 0x0101        | 20
 #endif
@@ -18,7 +15,7 @@ djConfigTable:
 | +49CC
 djRefreshTable:             
 #ifdef DRAM_TIMINGS_CUSTOM
-	.word 0x01E7        | 33
+    .word TIMING_BIOSTIMEOUT
 #else
 	.word 0x011D        | 20
 #endif
@@ -30,7 +27,7 @@ djRefreshTable:
 | +49D0     BCLK_25 = 1 or not
 BIOS_Config:           	
 #ifdef DRAM_TIMINGS_CUSTOM
-    .byte 0             | 33
+    .byte TIMING_BIOSCFG
 #else
 	.byte 1             
 #endif
@@ -41,7 +38,7 @@ BIOS_Config:
 | BIOS watchdog timer timeout count-down value	
 BIOS_Timeout:          
 #ifdef DRAM_TIMINGS_CUSTOM
-    .word 0x00D5        | 33
+    .word TIMING_BIOSTIMEOUT
 #else
 	.word 0x0280        | 20
 #endif

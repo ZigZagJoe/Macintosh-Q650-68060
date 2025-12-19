@@ -5018,7 +5018,7 @@ RELOADBERRVBR:
 	.long 0x25400600	| +49B8
 	.long 0x603A0000	| +49BC
 
-    #include "frags/memc_tables.S"
+#include "frags/memc_tables.S"
 
 	.long 0x4ED4DFC3	| +49F8
 	.long 0x41FAF312	| +49FC
@@ -141388,7 +141388,9 @@ CheckCnt:
 	.long 0xD0004E7A	| +870EC
 	.long 0x2003E44A	| +870F0
 	.long 0xB5443A04	| +870F4
-    .long 0x46452248	| +870F8    Move.l	A0,A1						; Set scratch register (A1) with logical address.
+    .word 0x4645        | +870F8
+LetsGetPhysical:
+    .word 0x2248	    | Move.l	A0,A1						; Set scratch register (A1) with logical address.
 
 #ifdef PATCH_FLUSHCRANGE
     .patchStart
@@ -147753,9 +147755,19 @@ LCDSCREENCHK:
 	.long 0x00000000	| +8D1F4
 	.long 0x00000000	| +8D1F8
 	.long 0x00000000	| +8D1FC
+INSTALLFPSP:            | +8D200 https://github.com/elliotnunn/supermario/blob/9dd3c4bef84df2ea30f5ec2c5e97b043e8267b3f/base/SuperMarioProj.1994-02-09/OS/FPUEmulation/FPEmulation.a#L46
+#ifdef PATCH_INSTALLFPSP
+    bral PatchInstallSP
 
-| include the 040 FPSP code
-#include "frags/040fpsp.S"
+    /* around 33.4kb of space used by the old 040 FPSP; replace it with new code 
+    .org statement at FPSPEnd to keep size correct */
+    #ifdef REPLACE_040FPSP
+        #include "addcode.S"
+    #endif
+#else   
+    | include the 040 FPSP code
+    #include "frags/040fpsp.S"
+#endif
 
 .org 0x957B0            | make sure code starts at the correct offset
 FPSPEnd:
@@ -158734,11 +158746,21 @@ SIZEMEMORYPATCH:
 	.long 0x001051C8	| +A0178
 	.long 0xFFF82A49	| +A017C
 	.long 0xDBED0004	| +A0180
-	.long 0x700097CB	| +A0184
-	.long 0x538B2E4D	| +A0188
-	.long 0x588F7A00	| +A018C
-	.long 0x7C00223C	| +A0190
-	.long 0x54696E61	| +A0194
+#ifdef PATCH_DRAM_SIMMONLY
+    bra.l SizeBanks_bankDisable | jump to addcode, resume at SizeBanks_nextBank
+#else
+	moveq	#0,%d0		    | A0184 clear total RAM size						<H8><SM12>
+	sub.l	%a3,%a3		    | A0186 initialize the "bank 8-15" information	<H7><SM12>
+	subq.l	#1,%a3		    | A0188 ... to an improbable bank config value	<H8><SM12>
+#endif
+SizeBanks2:                 | where second pass for banks 9, 10 resumes
+    movea.l	%a5,%a7		    | A018A keep running copy in a7					<SM12>
+SizeBanks_Resume:
+    addq.l	#4,%a7		    | A018C skip over chunk size						<SM12>
+    moveq	#0,%d5		    | A018E clear bank size nibbles
+    moveq	#0,%d6			| A0190 clear error bits
+    move.l	#0x54696e61,%d1	| A0192 setup signature
+SizeBanks_nextBank:
 	.long 0xE89DE89E	| +A0198
 	.long 0x205F2408	| +A019C
 	.long 0x0C825361	| +A01A0
@@ -158809,16 +158831,9 @@ loc_A01FC:
 ; This routine vectors to the appropriate 'stitch' routine, after getting the decoder type.
 ;_____________________________________________________________________________________________*/
 Concat:
-#ifdef PATCH_DRAM_SIMMONLY
-    .patchStart
-    bra.l Concat_bankDisable
-    .patchEnd 8
-Concat_resume:
-#else
     move.l  %d0,%d3      | 000A026E
     moveq   #0,%d2       | 000A0270
     movea.w #0x2600,%sp  | 000A0272
-#endif 
     move.l  %a2,%d4     | 000A0274
 	.long 0x4DFA000C	| +A0278
 	.long 0x41F9FFF6	| +A027C
@@ -211208,30 +211223,21 @@ DJMEMCTABLE:
 	.long 0x00E00000	| +D3168
 	.long 0x01000000	| +D316C
 	.long 0xFFFFFFFF	| +D3170
-	.long 0x00400000	| +D3174
-	.long 0x00000000	| +D3178
-	.long 0x04000000	| +D317C
-	.long 0x04000000	| +D3180
-	.long 0x08000000	| +D3184
-	.long 0x08000000	| +D3188
-	.long 0x0C000000	| +D318C
-	.long 0x0C000000	| +D3190
-	.long 0x10000000	| +D3194
-	.long 0x10000000	| +D3198
-	.long 0x14000000	| +D319C
-	.long 0x14000000	| +D31A0
-	.long 0x18000000	| +D31A4
-	.long 0x18000000	| +D31A8
-	.long 0x1C000000	| +D31AC
-	.long 0x1C000000	| +D31B0
-	.long 0x20000000	| +D31B4
-	.long 0x53616D42	| +D31B8
-	.long 0x00400000	| +D31BC
-	.long 0x20000000	| +D31C0
-	.long 0x24000000	| +D31C4
-	.long 0x24000000	| +D31C8
-	.long 0x28000000	| +D31CC
-	.long 0xFFFFFFFF	| +D31D0
+RamInfoDJMEMC:          | https://github.com/elliotnunn/supermario/blob/9dd3c4bef84df2ea30f5ec2c5e97b043e8267b3f/base/SuperMarioProj.1994-02-09/OS/UniversalTables.a#L5108C1-L5108C14
+	.long 0x00400000	| +D3174 chunk size
+	.long 0x00000000,0x04000000	| start address, end address bank 0
+	.long 0x04000000,0x08000000	
+	.long 0x08000000,0x0C000000	
+	.long 0x0C000000,0x10000000	
+	.long 0x10000000,0x14000000	
+	.long 0x14000000,0x18000000	
+	.long 0x18000000,0x1C000000	
+	.long 0x1C000000,0x20000000
+	.long 0x53616D42	| +D31B8 table 1 terminator
+	.long 0x00400000	| second set of banks; chunk size
+	.long 0x20000000,0x24000000	| start address, end address bank 9
+	.long 0x24000000,0x28000000
+	.long 0xFFFFFFFF	| +D31D0 table terminator
 	.long 0x60000000	| +D31D4
 	.long 0x60000000	| +D31D8
 	.long 0x00000000	| +D31DC

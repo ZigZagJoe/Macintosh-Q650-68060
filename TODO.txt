@@ -20,6 +20,12 @@
             anything that looks at the content of the frame or makes an assumption about the frame is gonna have a problem
         current status: if FPU enables, hangs when finder is loading. Doesn't seem to be hitting the FPSP though...
 
+    Bank disable
+        (spurious) bad f-line exception on 060 but seems OK on 040?
+        only seems to happen in after dark
+        cpusha in FLUSHCRANGE fixes it...
+        corruption? or a bug in flushcrange fix??
+
 ############################################################################
 ### NEEDS TESTING
     ISP need to hand off to appropriate vectors off VBR for exceptions like /v, chk, etc

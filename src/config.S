@@ -13,15 +13,22 @@ ROM build configuration */
 //#define PATCH_BIGSIMMS_HACK    // allow sizing 64/128MB simms, but may fail to size <64mb simms
 //#define PATCH_DRAM_SIMMONLY      // disable onboard RAM
 //#define FORCE_DRAM_TIMINGS       // override djmemc configuration based on values below instead of resistors
-//#define DRAM_TIMINGS_SPEEDBUMP   // use speedbump timing table (slower, for 80ns RAM)
-//#define DRAM_TIMINGS_CPUSPEED  2  // specify timing table index 0 = 20, 1 = 25, 2 = 33, 4 = 40 or undefine to use strap resistors 
-//#define DRAM_TIMINGS_CUSTOM     // overrides timings, per manual values in memc_tables. ignores other DRAM_TIMINGS_ settings
+//#define DRAM_TIMINGS_SPEEDBUMP   // use speedbump timing table for 80ns RAM instead of 60ns
+//#define DRAM_TIMINGS_CPUSPEED 2  // specify timing table index. 0 = 20, 1 = 25, 2 = 33, 4 = 40. undefine to use strap resistor as usual     
+//#define DRAM_TIMINGS_CUSTOM     // overrides timings per values below. ignores other DRAM_TIMINGS_ settings
+//                       09876543210   
+TIMING_DJCONFIG = 0b0000000100000011    /* 33mhz RAM OC: fastwr=1, romspeed=3 */
+//TIMING_DJCONFIG = 0b0000000000001100  /* 40mhz RAM OC: drpw=1, romspeed=4 */
+TIMING_BIOSTIMEOUT = 0x00D5 /* 33 */
+TIMING_BIOSCFG = 0          /* 33 */
+TIMING_DJREFRESH = 0x01E7   /* 33 */
 
 #ifdef PROC_686060                  // these patches will cause an 040 to not work
     /* PATCHES */
     #define PATCH_ROMENTRY          // initialize 68060 PCR 
     #define PATCH_INSTALLFPSP       // patch installFPSP to install 060SP vectors
-    #define PATCH_FLUSHCRANGE       // cache flush, replace ptest
+    //#define PATCH_FLUSHCRANGE       // (TODO??) cache flush, replace ptest
+    #define PATCH_FLUSHCRANGE_HACK    // cache flush, flush all caches
     #define PATCH_SANE_FLUSHIT      // SANE cache flush, replace ptest
     #define PATCH_ENABLECACHES      // initialize 060 caches specifically
     #define REPLACE_040FPSP         // replace 040FPSP with ISP and addcode
@@ -38,6 +45,7 @@ ROM build configuration */
     //#define INSTALL_FPSP            // install the FPSP and enable FPU. (TODO-Not fully working)
     #define PATCH_SLOTMGR_BERR_HACK // during slot manager, assume any bus errors are slot manager's fault (TODO)
     //#define CPUSH_NO_INVALIDATE     // CPUSH'd lines remain valid in cache. no performance impact/improvement seen
+    //#define LATE_ENABLE_FPU         // enable FPU late in boot, for netbsd/etc. may cause issues with some mac os apps
 #endif /* PROC_686060 */
 
 /* DEBUGGING */
@@ -53,4 +61,3 @@ ROM build configuration */
 
 /* OLD hacks, no longer needed and can be removed */
 //#define PATCH_SANE_FLUSHIT_HACK   // cache flush hack in SANE flushit just flush all caches
-//#define PATCH_FLUSHCRANGE_HACK    // cache flush hack just flush all caches

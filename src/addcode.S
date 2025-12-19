@@ -50,11 +50,18 @@ PatchInstallSP:
 LateInit:
     PUT_STRING "LateInit\n"
 
+    movec %pcr, %d0                 
+
 #ifdef ENABLE_SUPERSCALAR
-    movec %pcr, %d0                 | turn on superscalar after timedbra has run
-    bset #0, %d0                    | enable superscalar (bit0=1)
-    movec %d0, %pcr     
+    bset #0, %d0                    | turn on superscalar after timedbra has been run (bit0=1)
 #endif
+
+#ifdef LATE_ENABLE_FPU
+    bclr #1, %d0                    | re-enable FPU, if FPU was disabled intentionally early in boot. might cause odd behavior in mac os without FPSP
+#endif
+
+    movec %d0, %pcr     
+
 
 #ifdef ENABLE_BRANCH_CACHE    
     jsr TurnOnBC                    | turn on branch cache. (TODO bus error is changed by later code...)
@@ -93,37 +100,17 @@ ValidatePRAM_Patch:
     move.l  (%sp)+,%d3              | and restore D3
     rts    
 
-#ifdef PATCH_DRAM_SIMMONLY
-/* d0 	- 	total size of RAM in system
-;  d5	-	nibble sizes for up to 8 banks
-;  d6	-	nibble sizes for up to an additional 8 banks	
+SizeBanks_bankDisable:
+    | perform similar initialization as we would have normally performed in SizeBanks
+    | including the code we replaced to jump over here
 
-a2, d2-d4 can be thrashed 
-d5 = 76543210 where each nibble is a bank
-each nibble is size of bank in chunks of (%A5)
-*/
-Concat_bankDisable:
-    move.l %d5, %d2 
-    move.l %d5, %d3
-    
-    and.l #0xF, %d2         | bank0 size in %d2
+	moveq	#0,%d0		            | clear total RAM size
+	sub.l	%a3,%a3		            | initialize the "bank 8-15" information
+	subq.l	#1,%a3		            | ... to an improbable bank config value
+    movea.l	%a5,%a7		            | keep running copy in a7	
+    add.l	#2*8,%a7		        | skip first two banks entries in memory table https://github.com/elliotnunn/supermario/blob/9dd3c4bef84df2ea30f5ec2c5e97b043e8267b3f/base/SuperMarioProj.1994-02-09/OS/UniversalTables.a#L5108
 
-    lsl.l #4, %d3
-    and.l #0xF, %d3         | bank1 size in %d2
-    add.l %d3, %d2          | %d2 = bank0 + bank1 size
-
-    move.l (%a5), %d3       | get chunk size (1MB, usually)
-    lsl.l %d2, %d3          | size = chunk << %d2 ie 4MB = 1MB << 2
-    sub.l %d3, %d0          | subtract bank size from total RAM
-
-    and.l #0xFFFFFF00, %d5  | clear the size of the lowest two banks
-    
-    | original code continued, do not modify
-    move.l  %d0,%d3         | 000A026E
-    moveq   #0,%d2          | 000A0270
-    movea.w #0x2600,%sp     | 000A0272
-    bra.l Concat_resume
-#endif
+    jmp SizeBanks_Resume            | ... resume sizing in original ROM code
 
 /* ################################################################################
 | install a new bus error (Access error) handler that deals with branch prediction error correctly */
