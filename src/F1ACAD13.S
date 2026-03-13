@@ -158752,10 +158752,9 @@ SIZEMEMORYPATCH:
 	moveq	#0,%d0		    | A0184 clear total RAM size						<H8><SM12>
 	sub.l	%a3,%a3		    | A0186 initialize the "bank 8-15" information	<H7><SM12>
 	subq.l	#1,%a3		    | A0188 ... to an improbable bank config value	<H8><SM12>
-#endif
-SizeBanks2:                 | where second pass for banks 9, 10 resumes
+#endif  
     movea.l	%a5,%a7		    | A018A keep running copy in a7					<SM12>
-SizeBanks_Resume:
+SizeBanks_Resume:           | where second pass for banks 9, 10 resumes
     addq.l	#4,%a7		    | A018C skip over chunk size						<SM12>
     moveq	#0,%d5		    | A018E clear bank size nibbles
     moveq	#0,%d6			| A0190 clear error bits
@@ -250261,7 +250260,9 @@ FlushIT:
 	.long 0x009C2619	| +F9324
 	.long 0xB28066F4	| +F9328
 	.long 0x18036000	| +F932C
-	.long 0x0090524E	| +F9330
+	.word 0x0090	    | +F9330
+NCTable:                | https://github.com/elliotnunn/sys7.1-doc-wip/blob/62f7e0d5dc1d9a047822d5e73ffa8aa50a97e3fa/DeclData/PrimaryInit.a#L2347
+    .word 0x524E	    | +F9332
 	.long 0x494E0000	| +F9334
 	.long 0x00065352	| +F9338
 	.long 0x4E4E0000	| +F933C

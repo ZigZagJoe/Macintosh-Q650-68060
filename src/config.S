@@ -2,6 +2,7 @@
 ROM build configuration */
 
 #define PROC_686060             // build for 060, comment to disable 060 modifications 
+//#define DISABLE_FPU // also useful for LC 040
 
 /* Generic features for 040/060 */
 #define DISABLE_RAMTEST         // no memory tests
@@ -10,15 +11,17 @@ ROM build configuration */
 //#define PATCH_FORCE_32BIT     // force booting in 32 bit mode always
     
 /* DRAM Configuration */
-//#define PATCH_BIGSIMMS_HACK    // allow sizing 64/128MB simms, but may fail to size <64mb simms
-//#define PATCH_DRAM_SIMMONLY      // disable onboard RAM
-//#define FORCE_DRAM_TIMINGS       // override djmemc configuration based on values below instead of resistors
+#define PATCH_BIGSIMMS_HACK    // allow sizing 64/128MB simms, but may fail to size <64mb simms
+#define PATCH_DRAM_SIMMONLY      // disable onboard RAM
+#define FORCE_DRAM_TIMINGS       // override djmemc configuration based on values below instead of resistors
 //#define DRAM_TIMINGS_SPEEDBUMP   // use speedbump timing table for 80ns RAM instead of 60ns
 //#define DRAM_TIMINGS_CPUSPEED 2  // specify timing table index. 0 = 20, 1 = 25, 2 = 33, 4 = 40. undefine to use strap resistor as usual     
-//#define DRAM_TIMINGS_CUSTOM     // overrides timings per values below. ignores other DRAM_TIMINGS_ settings
+#define DRAM_TIMINGS_CUSTOM     // overrides timings per values below. ignores other DRAM_TIMINGS_ settings
 //                       09876543210   
-TIMING_DJCONFIG = 0b0000000100000011    /* 33mhz RAM OC: fastwr=1, romspeed=3 */
-//TIMING_DJCONFIG = 0b0000000000001100  /* 40mhz RAM OC: drpw=1, romspeed=4 */
+//TIMING_DJCONFIG = 0b0000000100000011    /* 33mhz RAM OC: fastwr=1, romspeed=3 */
+//TIMING_DJCONFIG =   0b0000000100001011  /* 40mhz RAM super OC: drpw=1, romspeed=3 */
+//TIMING_DJCONFIG =   0b0000000010000011  /* 40mhz RAM OC: mhz33=1, romspeed=3, no two cycle interleave */
+TIMING_DJCONFIG =   0b0000000010100011 /* 33 non speedbump, mhz33, cyc23ta,  romspeed=3*/
 TIMING_BIOSTIMEOUT = 0x00D5 /* 33 */
 TIMING_BIOSCFG = 0          /* 33 */
 TIMING_DJREFRESH = 0x01E7   /* 33 */

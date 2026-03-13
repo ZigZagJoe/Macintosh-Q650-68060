@@ -15,7 +15,7 @@ djConfigTable:
 | +49CC
 djRefreshTable:             
 #ifdef DRAM_TIMINGS_CUSTOM
-    .word TIMING_BIOSTIMEOUT
+    .word TIMING_DJREFRESH
 #else
 	.word 0x011D        | 20
 #endif
