@@ -104,3 +104,5 @@ mhz33 = 33mhz or greater bus
 cyc2ta = interleaved bursts wait on lword 2-4
 drpchg = add wait state to dras precharge
 */
+
+

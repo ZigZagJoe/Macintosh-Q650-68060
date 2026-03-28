@@ -67,6 +67,12 @@ LateInit:
     jsr TurnOnBC                    | turn on branch cache. (TODO bus error is changed by later code...)
 #endif
 
+#ifdef ENABLE_LATE_ADB_CACHE_HACK   
+    movec %cacr, %d0                | get cacr...
+    bset #CACR060_EDC, %d0          | enable data cache
+    movec %d0, %cacr                | ...and make it live
+#endif
+
     rts
 
 /* ################################################################################
@@ -74,7 +80,12 @@ LateInit:
 | OK to thrash D0. */
 Initialize060Caches:
     clr.l %d0
+
+    | ADB seems to get wedged at init with an 060 + L2 cache > 38mhz or so, so do data cache later to slow things down
+#ifndef ENABLE_LATE_ADB_CACHE_HACK
     bset #CACR060_EDC, %d0          | enable data cache
+#endif
+
     bset #CACR060_EIC, %d0          | enable instruction cache
 
 #ifdef ENABLE_LOADSTORE_FIFO

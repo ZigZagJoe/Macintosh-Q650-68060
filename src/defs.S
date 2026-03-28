@@ -93,6 +93,8 @@ ROM definitions
     rts                     | ... and go to the vector 
 .endm
 
+#define TimeVIADB 		0x0CEA
+
 /* CACR bits for 060 */
 #define CACR060_EDC     31  /* 1=enable data cache */
 #define CACR060_NAD     30  /* 1=misses don't allocate */

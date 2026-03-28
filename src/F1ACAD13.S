@@ -11383,9 +11383,10 @@ INITADBDRVR:
 	.long 0x6CBE4E5E	| +A7FC
 	.word 0x4E75		| +A800
 INITADB:
-	.word 0x203C		| +A802
+	.word 0x203C		| +A802 | move.l  #$1B8,d0
 	.long 0x000001B8	| +A804
-	.long 0xA71E2648	| +A808
+	.word 0xA71E        | +A808 _NewPtrSysClear
+    .word 0x2648	    | +A80A
 	.long 0x21CB0CF8	| +A80C
 	.long 0x41FAFF64	| +A810
 	.long 0x21C806B8	| +A814
@@ -177941,7 +177942,8 @@ QUADRAADBTABLE:
 	.long 0x6126082B	| +B2C98
 	.long 0x0002015D	| +B2C9C
 	.long 0x66163038	| +B2CA0
-	.long 0x0CEAE848	| +B2CA4
+	.word 0x0CEA	| +B2CA4
+    lsr.w   #4,%d0	| +B2CA6 https://github.com/elliotnunn/sys7.1-doc-wip/blob/62f7e0d5dc1d9a047822d5e73ffa8aa50a97e3fa/OS/IoPrimitives/ADBPrimitives.a#L237
 	.long 0x08110000	| +B2CA8
 	.long 0x51C8FFFA	| +B2CAC
 	.long 0x610660FF	| +B2CB0
@@ -257228,6 +257230,7 @@ NCTable:                | https://github.com/elliotnunn/sys7.1-doc-wip/blob/62f7
 	.long 0x2BC7000F	| +FFFFC
 ROMEND:
 
+#ifndef NO_ADDCODE
 /* if not putting the ISP/etc in place of 040FPSP, then include it here */
 #ifndef REPLACE_040FPSP
     #include "addcode.S"
@@ -257277,3 +257280,4 @@ ROMBuild:
 
     .byte 0
 .section .text
+#endif
