@@ -1,6 +1,7 @@
 /* ################################################################################
-| patch to initialize the 68060 PCR immediately after boot, replacing normal entry */
-ROMEntryNew:
+| StartTest patch.
+| runs very early, just after some basic MMU setup and RESET */
+PatchStartTest:
     clr.l %d0                       | disable superscalar (bit0=0)
 
 #ifdef DISABLE_FPU
@@ -12,7 +13,11 @@ ROMEntryNew:
 #endif
 
     movec %d0, %pcr                 | NOTE: this will prevent an 040 from booting at all! 
-    bral ROMEntryOrig               | back to original entry
+
+    # replaced code resumes here
+	movea.w #0x2600,%sp
+	moveq   #0,%d7
+    bral PatchStartTest_return
 
 /* ################################################################################
 | InstallFPSP replacement.

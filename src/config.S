@@ -27,9 +27,10 @@ TIMING_BIOSTIMEOUT = 0x00D5 /* 33 */
 TIMING_BIOSCFG = 0          /* 33 */
 TIMING_DJREFRESH = 0x01E7   /* 33 */
 
+
 #ifdef PROC_686060                  // these patches will cause an 040 to not work
     /* PATCHES */
-    #define PATCH_ROMENTRY          // initialize 68060 PCR 
+    #define PATCH_STARTTEST         // initialize 68060 PCR 
     #define PATCH_INSTALLFPSP       // patch installFPSP to install 060SP vectors
     //#define PATCH_FLUSHCRANGE       // (TODO??) cache flush, replace ptest
     #define PATCH_FLUSHCRANGE_HACK    // cache flush, flush all caches

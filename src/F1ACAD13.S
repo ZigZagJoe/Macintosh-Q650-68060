@@ -13,12 +13,7 @@ InitialSP:
 	.long 0xF1C68060	| +0  (not a valid CRC)
 
 InitialPC:
-#ifdef PATCH_ROMENTRY   /* start in my ROM code */
-    .long (ROMEntryNew - BASEOFROM) | starting PC: offset to start routine, in overlay mode
-#else
 	.long ROMEntryOrig	| +4  starting PC
-#endif
-
 	.long 0x067C4EFA	| +8
 	.long 0x00804EFA	| +C
 	.long 0x007C23F2	| +10
@@ -75596,9 +75591,15 @@ TMVECTORS: | Vector table used at early boot. https://github.com/elliotnunn/supe
 	.long 0x26004EFA	| +4707C
 	.word 0x3596		| +47080
 STARTTEST1:
-	.word 0x3E7C		| +47082
-	.long 0x26007E00	| +47084
-	.long 0x7C0043FA	| +47088
+#ifdef PATCH_STARTTEST
+    bral PatchStartTest
+PatchStartTest_return:
+#else
+	.long 0x3E7C2600		| +47082  movea.w #$2600,sp
+	.word 0x7E00	| +47086  moveq   #0,d7
+#endif
+    .word 0x7C00    | +47088  moveq   #0,d6
+    .word 0x43FA	| +4708A
 	.long 0xFC704BFA	| +4708C
 	.long 0xFFF2BBE9	| +47090
 	.long 0x00046704	| +47094
